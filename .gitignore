@@ -1,0 +1,7 @@
+*.opendb
+*.pdb
+*.tlog
+*.ipch
+*.db
+*.exe
+.vs

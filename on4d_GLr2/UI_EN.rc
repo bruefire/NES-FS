@@ -1,0 +1,123 @@
+#pragma once
+#include "UI_DEF.h"
+
+
+
+KITTY_EN MENU 
+BEGIN
+    POPUP "program"
+    BEGIN
+		POPUP "frame rate"			//UI_FPS
+		BEGIN
+			MENUITEM "30 (CFR)"			UI_FPS_30
+			MENUITEM "60 (CFR)"			UI_FPS_60
+		END
+		POPUP "Language"					//UI_LANG
+		BEGIN
+			MENUITEM "日本語"			UI_LANG_JA
+			MENUITEM "English"			UI_LANG_EN
+		END
+		MENUITEM SEPARATOR 
+        MENUITEM "exit",                UI_END
+    END
+    
+    POPUP "options"
+    BEGIN
+        POPUP "background"
+        BEGIN
+            MENUITEM "white",                 UI_BG_WH
+            MENUITEM "dark",                 UI_BG_BK
+        END
+        POPUP "coordinate"
+        BEGIN
+            MENUITEM "polar",               UI_LOC_TUDE
+            MENUITEM "rectangular",          UI_LOC_EUC
+        END
+        POPUP "radius"
+        BEGIN
+            MENUITEM "20",                UI_RDS_SS
+            MENUITEM "30",                UI_RDS_S
+            MENUITEM "60",               UI_RDS_M
+            MENUITEM "100",               UI_RDS_L
+        END
+        POPUP "Field of vision"
+        BEGIN
+            MENUITEM "confined",                UI_CR_S
+            MENUITEM "middle",                UI_CR_M
+            MENUITEM "wide",                UI_CR_L
+        END
+        POPUP "depth effect"
+        BEGIN
+            MENUITEM "none",					UI_SD_0
+            MENUITEM "linear decay",   UI_SD_1
+            MENUITEM "shadow 1(light = POV)",       UI_SD_2
+            MENUITEM "shadow 2(light = POV)",       UI_SD_4
+        END
+        //POPUP "レンダリング"
+        //BEGIN
+        //    MENUITEM "ポイント",              UI_MAP
+        //    MENUITEM "ライン",               40025
+        //    MENUITEM "サーフェス",             40026
+        //END
+        //MENUITEM "射撃objの自転", UI_SHOOT_ROT
+    END
+	POPUP "object"
+	BEGIN
+		MENUITEM "move object"			UI_CALL_MODLG
+		POPUP "change object"
+		BEGIN
+			POPUP "base object"
+			BEGIN
+				MENUITEM "none",          UI_WL_NONE
+				MENUITEM "6 lines (points)",          UI_6_POINT
+				MENUITEM " 6 lines (lines)",          UI_6_LINE
+				MENUITEM "polar (points)",           UI_TUDE_POINT
+				MENUITEM "polar (lines)",           UI_TUDE_LINE
+				MENUITEM "120-cell (points)"			 UI_120C_POINT
+				MENUITEM "120-cell (lines)"			 UI_120C_LINE
+				MENUITEM "120-cell (polygons)"			 UI_120C_SURFACE
+				MENUITEM "torus(points)",           UI_TORUS_POINT
+				MENUITEM "torus(lines)",           UI_TORUS_LINE
+				MENUITEM "torus(polygons)",           UI_TORUS_SURFACE
+				MENUITEM "earth",				  UI_MK_EARTH
+				MENUITEM SEPARATOR 
+				MENUITEM "irregular field",				  UI_MK_TC
+			END
+			POPUP "shooted object"
+			BEGIN
+				MENUITEM "box",               UI_THROW_CUBE
+				MENUITEM "earth",                UI_THROW_SPHERE
+				MENUITEM "horse?",              UI_THROW_HORSE
+				MENUITEM "rock",              UI_THROW_ROCK
+				MENUITEM "reference(.obj)",          UI_THROW_REF
+			END
+		END
+        POPUP "replace shoot-obj"
+		BEGIN
+			MENUITEM "random (cluster)",             UI_THROW_RANDOM
+			MENUITEM "random (Uniform)",             UI_THROW_RANDOM2
+			MENUITEM "clear",             UI_THROW_CLEAR
+		END
+        POPUP "motion"
+        BEGIN
+            MENUITEM "constant",                 UI_MV_CONST
+            MENUITEM "attraction",                 UI_MV_ATTRACT
+            MENUITEM "repulsion",                 UI_MV_REPULSE
+        END
+	END
+    POPUP "view"
+    BEGIN
+        MENUITEM "coordinate",                UI_XYZ
+        MENUITEM "player object",     UI_PLR
+        MENUITEM "map",               UI_MAP
+        MENUITEM "loc/rot",                UI_LR_RESULT
+        MENUITEM "distance",                UI_DST
+        MENUITEM "track",                UI_PAST
+    END
+    POPUP "help"
+    BEGIN
+        MENUITEM "how to operate",              UI_HOWTO_DLG
+        //MENUITEM "超球面の性質",            40041
+        MENUITEM "about",            UI_INFO_DLG
+    END
+END

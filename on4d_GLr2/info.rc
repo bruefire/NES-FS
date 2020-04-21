@@ -1,0 +1,17 @@
+#include <Windows.h>
+#define IDC_STATIC -1
+
+INFO_DLG DIALOGEX 25, 25, 155, 80
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "バージョン情報"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+
+BEGIN
+	LTEXT "超球面遊泳シミュレーター 2.5.2\n\nリリース: 2020.04\n作成者: bruefire\
+			\nライセンス: オープンソースソフトウェア",
+			-1, 8, 15, 105, 45
+	ICON "IDI_ICON1", IDC_STATIC, 122, 18, 18, 21
+END
+
+
+IDI_ICON1 ICON "s3sim.ico"

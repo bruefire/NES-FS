@@ -1,0 +1,88 @@
+<style type="text/css">
+
+.mapItemImg
+{
+	width: 100px;
+}
+
+#mapItemTable
+{
+	display: table;
+}
+.mapItemTableRow
+{
+	display: table-row;
+}
+.mapItemTableCell
+{
+	display: table-cell;
+}
+.mapImg
+{
+	width: 100;
+}
+.head0
+{
+	font-size: 18pt;
+}
+.head1
+{
+	font-weight: bold;
+	border-bottom: 1px solid #aab;
+	display: inline-block;
+	padding: 2px;
+}
+
+</style>
+<div class="head0">**** infomation about how to see maps ****</div>
+<br>
+<div class="head1">about marker which be showed on maps</div><br>
+here, the Circumference of 3-sphere is dfined as 2π.<br>
+when measuring from front of the player, <br>
+if the distance between the player and a object is in range of 0~π/2,<br>
+marker of the object has shape and color like below:<br>
+<img src="mapInfo/mapItem1.png" class="mapItemImg"><br>
+<br>
+similarly, if a distance is in the range of π/2~π, like below:<br>
+<img src="mapInfo/mapItem2.png" class="mapItemImg"><br>
+<br>
+similarly, if a distance is in the range of π~3π/2, like below:<br>
+<img src="mapInfo/mapItem4.png" class="mapItemImg"><br>
+<br>
+similarly, if a distance is in the range of 3π/2~2π, like below:<br>
+<img src="mapInfo/mapItem3.png" class="mapItemImg"><br>
+<br>
+<br>
+<div class="head1">single/dual map mode</div><br>
+in single map mode, all kinds of marker is showed on the one map.<br>
+in dual map mode, two X-shape marker is showed on one map.<br>
+and two cross-shape marker is showed on another map.<br>
+<br>
+<br>
+
+<!-- <div id="mapItemTable"> -->
+	<!-- <div class="mapItemTableRow"> -->
+		<!-- <div class="mapItemTableCell"> -->
+		<!-- </div> -->
+		<!-- <div class="mapItemTableCell"> -->
+		<!-- </div> -->
+		<!-- <div class="mapItemTableCell"> -->
+		<!-- </div> -->
+		<!-- <div class="mapItemTableCell"> -->
+		<!-- </div> -->
+	<!-- </div> -->
+<!-- </div> -->
+
+<div class="head1">front map/bird's-eye map</div><br>
+map with blue line and red line is front map.<br>
+object upper than the player is showed on upper side of map.<br>
+similarly, lower one is on lower side.<br>
+right one is on right, left one is on left.<br>
+<img src="mapInfo/map1.png" class="mapImg"><br>
+<br>
+map with yellow line and red line is bird's-eye map.<br>
+object in front of the player is showed on upper side of map.<br>
+similarly, back one is on lower side.<br>
+and right one is on right, left one is on left.<br>
+<img src="mapInfo/map2.png" class="mapImg"><br>
+<br>

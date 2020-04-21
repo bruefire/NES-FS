@@ -1,0 +1,39 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include <Windows.h>
+#include "modlgRc.h"
+/////////////////////////////////////////////////////////////////////////////
+
+// Dialog
+//
+
+MOVE_OBJ_DLG DIALOGEX 0, 0, 255, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "位置・方向の変更"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,137,175,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,198,175,50,14
+    EDITTEXT        MODLG_LON_TXT,187,25,41,14,ES_AUTOHSCROLL
+    LTEXT           "経度",IDC_STATIC,26,28,43,8
+    CONTROL         "",MODLG_LON_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,57,25,100,15
+    EDITTEXT        MODLG_LAT_TXT,188,44,41,14,ES_AUTOHSCROLL
+    LTEXT           "緯度",IDC_STATIC,26,47,43,8
+    CONTROL         "",MODLG_LAT_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,58,44,100,15
+    EDITTEXT        MODLG_ALT_TXT,188,64,41,14,ES_AUTOHSCROLL
+    LTEXT           "高度",IDC_STATIC,26,66,43,8
+    CONTROL         "",MODLG_ALT_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,58,64,100,15
+    EDITTEXT        MODLG_LON_TXT2,188,102,41,14,ES_AUTOHSCROLL
+    LTEXT           "経度",IDC_STATIC,26,105,43,8
+    CONTROL         "",MODLG_LON_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,58,102,100,15
+    EDITTEXT        MODLG_LAT_TXT2,188,121,41,14,ES_AUTOHSCROLL
+    LTEXT           "緯度",IDC_STATIC,26,123,43,8
+    CONTROL         "",MODLG_LAT_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,58,121,100,15
+    EDITTEXT        MODLG_ALT_TXT2,188,141,41,14,ES_AUTOHSCROLL
+    LTEXT           "高度",IDC_STATIC,26,142,43,8
+    CONTROL         "",MODLG_ALT_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,58,141,100,15
+    LTEXT           "プレイヤー位置",IDC_STATIC,23,12,48,8
+    LTEXT           "プレイヤー方向",IDC_STATIC,23,89,48,8
+END
+
+
