@@ -40,7 +40,6 @@ public:
 
 	int to3d();
 	int getOn4loc(short*, double*, UINT*);	//-- on4dオブジェクトの座標取得
-	int simulate3(UINT* bmp);
 	int createDIBS();
 	int disposeDIBS();
 	double clcRangeY(double rangeX);

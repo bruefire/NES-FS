@@ -597,8 +597,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_KEYDOWN:///------------ キーメッセージ (down) -----------
 			switch(wp)
 			{
-			case VK_F1:
-				SC_BGN = !SC_BGN;	//-- 録画
 				///----- 補助キー ▼
 			case VK_SHIFT: shiftK = true; break;
 			case VK_CONTROL: ctrlK = true; break;

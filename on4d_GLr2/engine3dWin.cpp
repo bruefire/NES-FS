@@ -10,8 +10,6 @@
 #include "functions.h"
 using namespace std;
 
-bool recSW = false;
-
 
 
 engine3dWin::engine3dWin()
@@ -104,24 +102,7 @@ int engine3dWin::update()
 
 	// 基底クラス
 	engine3dGL::update();
-	
-	if(VIEW_ON4) simulate3(bmp);
 
-
-	if(SC_REC && SC_BGN)
-	{
-		glReadBuffer(GL_BACK);
-		glReadPixels(0,0,WIDTH,HEIGHT,GL_BGRA,GL_UNSIGNED_BYTE,bmp);
-		
-		//SaveDIB32(REC_PATH , (LPBYTE)bmp, &bmpInfo, loop);
-		if(recSW!=SC_BGN) std::cout << "録画開始 " << endl;
-	}	//レコード
-
-
-	if(recSW!=SC_BGN){
-		if(!SC_BGN) std::cout << "録画終了 " << endl;
-		recSW = SC_BGN;
-	}
 
 	return 1;
 }

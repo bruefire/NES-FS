@@ -132,9 +132,6 @@
     <ClCompile Include="core.cpp">
       <Filter>c++ソース\OS依存%28Windows%29</Filter>
     </ClCompile>
-    <ClCompile Include="draw3.cpp">
-      <Filter>c++ソース\OS依存%28Windows%29</Filter>
-    </ClCompile>
     <ClCompile Include="engine3dWin.cpp">
       <Filter>c++ソース\OS依存%28Windows%29</Filter>
     </ClCompile>

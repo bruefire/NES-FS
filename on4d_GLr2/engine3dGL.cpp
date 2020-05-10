@@ -360,6 +360,10 @@ int engine3dGL::update()
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
+	// map•`‰æ
+	if (VIEW_ON4) DrawMap();
+
+
 	return 1;
 }
 

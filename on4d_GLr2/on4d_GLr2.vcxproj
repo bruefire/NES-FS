@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp" />
-    <ClCompile Include="draw3.cpp" />
     <ClCompile Include="draw3GL4.cpp" />
     <ClCompile Include="engine3d.cpp" />
     <ClCompile Include="engine3dGL.cpp" />

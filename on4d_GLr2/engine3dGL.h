@@ -155,6 +155,7 @@ public:
 	void DrawDistances();	// ‹——£•`‰æ
 	void DrawChar(uint8_t dChar, double x, double y, double w, double h);
 	void DrawChars(GuiString);
+	int DrawMap();
 
 	// OpenGL
 	int GL_Init();
