@@ -13,12 +13,6 @@
 using namespace std;
 
 
-plyr::plyr(){
-	hp = 0;
-	ep = 0;
-	sp = 0;
-}
-
 mesh3d::~mesh3d(){
 	for(int i=0; i<faceLen; i++){	///=====–Ê‚²‚Æ‚Ìˆ—
 		delete[] faces[i].pts;

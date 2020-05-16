@@ -57,6 +57,8 @@
     <None Include="pixel_low.c">
       <FileType>CppCode</FileType>
     </None>
+    <ClCompile Include="operation.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="rcFunc.cpp" />
     <ClCompile Include="objs.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -71,8 +73,14 @@
     <ClInclude Include="engine3dGL.h" />
     <ClInclude Include="engine3dWin.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="geometry.h" />
     <ClInclude Include="global_var.h" />
     <ClInclude Include="global_var2.h" />
+    <ClInclude Include="guiItem.h" />
+    <ClInclude Include="object.h" />
+    <ClInclude Include="operation.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="point.h" />
     <ClInclude Include="rcFunc.h" />
     <ClInclude Include="rcFunc2.h" />
     <ClInclude Include="modlgRc.h" />

@@ -25,26 +25,20 @@ engine3d::engine3d()
 	, ALL_QTY(OBJ_QTY + EFE_QTY + ATK_QTY)
 
 	, obMove(true)
-	, cmBack(false)
 	, radius(30)
 	, radius_min(20)
-	, speed1(0)
 	, SPEED_MAX(0.2)
 	, GRAVITY(0)
 	, loop(0)
 	, clsType(CLS_TYPE::LOGIC)
 	, disposeFlg(false)
-	, vfrFlg(false)
 	, STD_PMSEC(1000 / 30)
 	, MAX_PMSEC(1000 / 60)
 	, MIN_PMSEC(1000 / 25)
-	, inputByKey(false)
 	, stdRefSpan(600)
 	, mapDir(MapDirection::FRONT)
 	, mapMode(MapMode::SINGLE)
 	, useJoyPad(false)
-	, chgMapState(0)
-	, chgMapStateOld(0)
 
 	// 1.0 radian
 	, SIN_1(0.8414709848)
@@ -54,8 +48,7 @@ engine3d::engine3d()
 	, markObj(this)
 {
 	adjTime[0] = adjTime[1] = 0;
-	cm_loc[0] = cm_loc[1] = cm_loc[2] = 0;
-	preCm_rotX = preCm_rotY = preCm_rotZ = 0;
+	
 
 	// 瞬間移動
 	mvObjFlg = false;
@@ -153,6 +146,7 @@ int engine3d::init()
 int engine3d::update()
 {
 
+
 	////-----------------time
 	// 計測終了時刻を保存
 	long long newTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -163,16 +157,6 @@ int engine3d::update()
 	
 	adjTime[0] = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
-	if (vfrFlg) {
-		long long pmSec = adjTime[1];
-
-		if (pmSec < MAX_PMSEC)
-			pmSec = MAX_PMSEC;
-		else if (MIN_PMSEC < pmSec)
-			pmSec = MIN_PMSEC;
-
-		adjSpd = ((double)pmSec / STD_PMSEC);
-	}
 	////-----------------time
 
 	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- いずれこっちに変更
@@ -181,7 +165,7 @@ int engine3d::update()
 	if(GRAVITY && obMove) physics();
 	simulateS3();
 
-	inputByKey = false;
+	ope.inputByKey = false;
 
 	return 1;
 };
@@ -267,9 +251,9 @@ int engine3d::simulateS3()
 	//===============^^^^^^^^^~~~~~~~~~~-----------
 
 	if(!useJoyPad)
-		ClearLocRotParam();
+		ope.ClearLocRotParam();
 
-	chgMapStateOld = chgMapState;
+	ope.chgMapStateOld = ope.chgMapState;
 
 	return 0;
 }
@@ -433,7 +417,7 @@ void engine3d::UpdFloatObjs()
 // プレイヤーオブジェクト更新
 void engine3d::UpdPlayerObjs(double* cmrStd) 
 {
-	objs[PLR_No].rot.asg(-preCm_rotX, preCm_rotY, preCm_rotZ);
+	objs[PLR_No].rot.asg(-ope.cmRot.x, ope.cmRot.y, ope.cmRot.z);
 
 	//----
 	object3d* curObj = &objs[PLR_No];
@@ -491,7 +475,7 @@ void engine3d::UpdPlayerObjs(double* cmrStd)
 	std1N = tmpN[0], sideN = tmpN[1];
 
 	///-------- 位置,基準位置の更新 ----------
-	pt4 cmLc = pt4(0, cm_loc[1], cm_loc[2], cm_loc[0]).mtp(3);
+	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(3);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
 
 	std1 = std1N.mtp(SIN_1).pls(normO);
@@ -606,7 +590,7 @@ void engine3d::ClcRelaivePos(double* cmrStd)
 		tudeRst(&std1.x, &std1.y, cmrStd[2], 0);
 		tudeRst(&std2.x, &std2.y, cmrStd[2], 0);
 		//-- 後方カメラなら
-		if (cmBack) {
+		if (ope.cmBack) {
 			tudeRst(&locT.x, &locT.z, PIE, 1);//-- X-Y 回転 (-方向3
 			tudeRst(&std1.x, &std1.z, PIE, 1);
 			tudeRst(&std2.x, &std2.z, PIE, 1);
@@ -985,23 +969,23 @@ void engine3d::shoot()
 int engine3d::inPutMouseMv(double x, double y, int opt)
 {
 	// ジョイパッドによる上書を無効化
-	inputByKey = true;
+	ope.inputByKey = true;
 	// 入力データ初期化
 	InitInputParams();
 
 	if (opt==1)
 	{
-		updRotationParam
+		ope.updRotationParam
 		(
 			x, y, opt
 		);
 	}
 	else
 	{
-		updLocationParam
+		ope.updLocationParam
 		(
-			-1 * x * powi(3.0, speed1), 
-			y * powi(3.0, speed1), 
+			-1 * x * powi(3.0, ope.speed), 
+			y * powi(3.0, ope.speed), 
 			opt
 		);
 	}
@@ -1013,60 +997,34 @@ int engine3d::inPutMouseMv(double x, double y, int opt)
 int engine3d::inPutWheel(double val, int opt)
 {
 	// ジョイパッドによる上書を無効化
-	inputByKey = true;
+	ope.inputByKey = true;
 	// 入力データ初期化
 	InitInputParams();
 
 	if (!opt) {
-		cm_loc[0] = val * powi(3.0, speed1);	//前後
+		ope.cmLoc.x = val * powi(3.0, ope.speed);	//前後
 	}
 	else {
-		preCm_rotZ = val * 0.1;	//-- ねじれ回転
+		ope.cmRot.z = val * 0.1;	//-- ねじれ回転
 	}
 
 	return 1;
 }
 
 
-int engine3d::updRotationParam(double x, double y, int opt)
-{
-	preCm_rotX = x;
-	preCm_rotY = y;
-
-	return 1;
-}
-
-
-int engine3d::updLocationParam(double x, double y, int opt)
-{
-	cm_loc[1] = x;
-	cm_loc[2] = y;
-
-	return 1;
-}
-
-void engine3d::ClearLocRotParam()
-{
-	cm_loc[0] = 0;
-	cm_loc[1] = 0;
-	cm_loc[2] = 0;
-	preCm_rotX = 0;
-	preCm_rotY = 0;
-	preCm_rotZ = 0;
-}
 
 // キー入力処理メソッド
 int engine3d::inPutKey(int key, int opt)
 {
 	// ジョイパッドによる上書を無効化
-	inputByKey = true;
+	ope.inputByKey = true;
 	// 入力データ初期化
 	InitInputParams();
 
 	switch (key)
 	{
 	case IK::No_1:
-		speed1 = ++speed1 % 3;
+		ope.speed = ++ope.speed % 3;
 		break;
 
 	case IK::No_2:
@@ -1102,15 +1060,11 @@ int engine3d::inPutKey(int key, int opt)
 // 入力値初期化
 void engine3d::InitInputParams()
 {
-	cm_loc[0] = 0.0;
-	cm_loc[1] = 0.0;
-	cm_loc[2] = 0.0;
+	ope.cmLoc = pt3(0.0, 0.0, 0.0);
+	ope.cmRot = pt3(0.0, 0.0, 0.0);
 
-	preCm_rotX = 0.0;
-	preCm_rotY = 0.0;
-	preCm_rotZ = 0.0;
 
-	cmBack = false;
+	ope.cmBack = false;
 }
 
 // 内積

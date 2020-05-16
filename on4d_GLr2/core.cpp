@@ -246,19 +246,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case UI_FPS_30:
 					newEngine.fps = newEngine.STD_PMSEC;
 					newEngine.adjSpd = 1.0;
-					newEngine.vfrFlg = false;
 					menuCheck(hMenu, &menuItemInfo, UI_FPS_30, unCk_fps, unCk_fps_len);
 					break;
 				case UI_FPS_60:
 					newEngine.fps = newEngine.MAX_PMSEC;
 					newEngine.adjSpd = 0.5;
-					newEngine.vfrFlg = false;
 					menuCheck(hMenu, &menuItemInfo, UI_FPS_60, unCk_fps, unCk_fps_len);
 					break;
 				case UI_FPS_VFR:
 					newEngine.fps = newEngine.MAX_PMSEC;
 					newEngine.adjSpd = 1.0;
-					newEngine.vfrFlg = true;
 					menuCheck(hMenu, &menuItemInfo, UI_FPS_VFR, unCk_fps, unCk_fps_len);
 					break;
 				//-- 言語
@@ -571,8 +568,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		case WM_MBUTTONUP:
 			if(cmJD==1){
-				newEngine.preCm_rotX = fmod(newEngine.preCm_rotX, PIE*2);
-				newEngine.preCm_rotY = fmod(newEngine.preCm_rotY, PIE*2);
+				newEngine.ope.cmRot.x = fmod(newEngine.ope.cmRot.x, PIE*2);
+				newEngine.ope.cmRot.y = fmod(newEngine.ope.cmRot.y, PIE*2);
 			}
 			cmJD = 0;
 			break;
@@ -631,7 +628,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			if(JOYERR_NOERROR == joyGetPosEx(0, &JoyInfoEx))
 			{
 				// 既にキー操作済なら退出
-				if (newEngine.inputByKey)
+				if (newEngine.ope.inputByKey)
 					break;
 				double xMaxHf = newEngine.joyCaps.wXmax * 0.5;
 				double yMaxHf = newEngine.joyCaps.wYmax * 0.5;
@@ -642,44 +639,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				pt3 gLoc = pt3(	-(LOWORD(JoyInfoEx.dwZpos)-zMaxHf) / zMaxHf,	// 前後
 								 (LOWORD(JoyInfoEx.dwXpos)-xMaxHf) / xMaxHf,	// 左右
 								-(LOWORD(JoyInfoEx.dwYpos)-yMaxHf) / yMaxHf)	// 上下
-							.mtp(0.32767 * newEngine.adjSpd * powi(3.0, newEngine.speed1));	// 係数
+							.mtp(0.32767 * newEngine.adjSpd * powi(3.0, newEngine.ope.speed));	// 係数
 				
 				pt2 gRot = pt2(	-(LOWORD(JoyInfoEx.dwUpos)-uMaxHf) / uMaxHf,	//左右
 								-(LOWORD(JoyInfoEx.dwRpos)-rMaxHf) / rMaxHf)	//上下
 							.mtp(0.32767 * 0.3);
 
 				// 位置
-				double lLim = 0.05 * newEngine.adjSpd * powi(3.0, newEngine.speed1);
-				newEngine.cm_loc[0] = (lLim < abs(gLoc.x)) ? gLoc.x : 0.0;
-				newEngine.cm_loc[1] = (lLim < abs(gLoc.y)) ? gLoc.y : 0.0;
-				newEngine.cm_loc[2] = (lLim < abs(gLoc.z)) ? gLoc.z : 0.0;
+				double lLim = 0.05 * newEngine.adjSpd * powi(3.0, newEngine.ope.speed);
+				newEngine.ope.cmLoc.x = (lLim < abs(gLoc.x)) ? gLoc.x : 0.0;
+				newEngine.ope.cmLoc.y = (lLim < abs(gLoc.y)) ? gLoc.y : 0.0;
+				newEngine.ope.cmLoc.z = (lLim < abs(gLoc.z)) ? gLoc.z : 0.0;
 				
 				// 回転
-				newEngine.preCm_rotX = (0.02 < abs(gRot.x)) ? gRot.x * newEngine.adjSpd : 0.0;
-				newEngine.preCm_rotY = (0.02 < abs(gRot.y)) ? gRot.y * newEngine.adjSpd : 0.0;
+				newEngine.ope.cmRot.x = (0.02 < abs(gRot.x)) ? gRot.x * newEngine.adjSpd : 0.0;
+				newEngine.ope.cmRot.y = (0.02 < abs(gRot.y)) ? gRot.y * newEngine.adjSpd : 0.0;
 				if (JoyInfoEx.dwButtons == 16)
-					newEngine.preCm_rotZ = -0.1;
+					newEngine.ope.cmRot.z = -0.1;
 				else if (JoyInfoEx.dwButtons == 32)
-					newEngine.preCm_rotZ = 0.1;
+					newEngine.ope.cmRot.z = 0.1;
 				else
-					newEngine.preCm_rotZ = 0.0;
+					newEngine.ope.cmRot.z = 0.0;
 
 				// マップ
-				newEngine.chgMapState = JoyInfoEx.dwPOV;
-				if (newEngine.chgMapState != newEngine.chgMapStateOld)
+				newEngine.ope.chgMapState = JoyInfoEx.dwPOV;
+				if (newEngine.ope.chgMapState != newEngine.ope.chgMapStateOld)
 				{
-					if (newEngine.chgMapState == JOY_POVFORWARD)
+					if (newEngine.ope.chgMapState == JOY_POVFORWARD)
 					{
 						newEngine.inPutKey(newEngine.IK::No_4, NULL); break;
 					}
-					else if (newEngine.chgMapState == JOY_POVLEFT)
+					else if (newEngine.ope.chgMapState == JOY_POVLEFT)
 					{
 						newEngine.inPutKey(newEngine.IK::No_5, NULL); break;
 					}
 				}
 
 				// 後ろを見る
-				newEngine.cmBack = (JoyInfoEx.dwButtons & JOY_BUTTON10) ? true : false;
+				newEngine.ope.cmBack = (JoyInfoEx.dwButtons & JOY_BUTTON10) ? true : false;
 			}
 			break;
 
@@ -687,7 +684,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			if(JOYERR_NOERROR == joyGetPosEx(0, &JoyInfoEx))
 			{
 				//cout << ((JoyInfoEx.dwButtons))  << endl;
-				if(JoyInfoEx.dwButtons==4) newEngine.speed1 = ++newEngine.speed1%3;
+				if(JoyInfoEx.dwButtons==4) newEngine.ope.speed = ++newEngine.ope.speed%3;
 				else if(JoyInfoEx.dwButtons==1) newEngine.shoot();
 				else if(JoyInfoEx.dwButtons==2) newEngine.obMove = !newEngine.obMove;
 				else if(JoyInfoEx.dwButtons==8) 

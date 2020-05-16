@@ -138,6 +138,12 @@
     <ClCompile Include="to3d.cpp">
       <Filter>c++ソース\OS依存%28Windows%29</Filter>
     </ClCompile>
+    <ClCompile Include="operation.cpp">
+      <Filter>c++ソース\コア演算部</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>c++ソース\コア演算部</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -181,6 +187,24 @@
     </ClInclude>
     <ClInclude Include="UI_DEF.h">
       <Filter>c++ ヘッダ\GL部</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
+    </ClInclude>
+    <ClInclude Include="guiItem.h">
+      <Filter>c++ ヘッダ\GL部</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
+    </ClInclude>
+    <ClInclude Include="operation.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
