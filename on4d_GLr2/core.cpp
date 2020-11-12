@@ -283,19 +283,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 
 				case UI_THROW_CLEAR:
-					newEngine.player.ep = newEngine.ENR_QTY;
-					for(int i=newEngine.BWH_QTY+newEngine.PLR_QTY;i<newEngine.OBJ_QTY;i++){
-						newEngine.objs[i].used = false;
-						newEngine.objs[i].markInit(newEngine.radius);
-					}
+					newEngine.DisableShootObjs();
 					break;
 				case UI_THROW_RANDOM:
 					newEngine.player.ep = 0;
-					newEngine.randLoc(1);
+					newEngine.RandLocS3(engine3d::RandMode::Cluster);
 					break;
 				case UI_THROW_RANDOM2:
 					newEngine.player.ep = 0;
-					newEngine.randLoc(0);
+					newEngine.RandLocS3(engine3d::RandMode::Uniform);
 					break;
 
 				case UI_CR_S:
@@ -514,7 +510,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					newEngine.GRAVITY = 0;
 					for (int h = 0; h < newEngine.OBJ_QTY; h++) {
 						newEngine.objs[h].fc.asg(0, 0, 0, 0);
-						newEngine.objs[h].mkLspX( newEngine.objs[h].lspX );
+						newEngine.objs[h].mkLspX_S3( newEngine.objs[h].lspX );
 					}
 					menuCheck(hMenu, &menuItemInfo, UI_MV_CONST, unCk_mv, unCk_mv_len);
 					break;

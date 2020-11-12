@@ -46,6 +46,10 @@ engine3d::engine3d()
 	, SIN_1R(1.0 / SIN_1)
 	, sun(this)
 	, markObj(this)
+	, worldGeo(WorldGeo::SPHERICAL)
+	, H3_STD_LEN(0.1)
+	, H3_MAX_RADIUS(0.9) // 双曲長で約3.0
+	, H3_REF_RADIUS(0.97) // 双曲長で約4.1
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -128,11 +132,19 @@ int engine3d::init()
 		objs[i].owner = this;
 	}
 	objCnt = OBJ_QTY;
-		
 
-	init_on4();
 
-	// マップ
+	//-- フレームレート
+	fps = STD_PMSEC;
+	adjSpd = 1.0;
+
+	// 軌跡用バッファ確保
+	markMesh.meshInitB((OBJ_QTY) * (object3d::PAST_QTY - 1), (meshLen - 1) + 2);
+
+	srand(time(NULL));
+	InitWorld();
+
+	// S3用マップ
 	mapMeshLen = 2;
 	mapMesh[0] = meshs + 15;
 	mapMesh[1] = meshs + 16;
@@ -145,7 +157,6 @@ int engine3d::init()
 // フレーム単位の更新
 int engine3d::update()
 {
-
 
 	////-----------------time
 	// 計測終了時刻を保存
@@ -161,14 +172,36 @@ int engine3d::update()
 
 	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- いずれこっちに変更
 
-	// S3演算処理
-	if(GRAVITY && obMove) physics();
-	simulateS3();
+	// World Geometry
+	if (worldGeo == WorldGeo::SPHERICAL)
+		UpdateS3();
+	else
+		UpdateH3();
+
 
 	ope.inputByKey = false;
 
 	return 1;
 };
+
+/// <summary>
+/// S3世界更新
+/// </summary>
+void engine3d::UpdateS3()
+{
+	// S3演算処理
+	if (GRAVITY && obMove) physics();
+	simulateS3();
+}
+
+/// <summary>
+/// H3世界更新
+/// </summary>
+void engine3d::UpdateH3()
+{
+	// H3演算処理
+	simulateH3();
+}
 
 
 // 後処理
@@ -199,16 +232,27 @@ int engine3d::allocMesh()
 }
 
 
+///=============== >>>ループ(双曲空間)<<< ==================
+void engine3d::simulateH3()
+{
+	//射撃オブジェクト更新
+	UpdFloatObjsH3();
 
+	// プレイヤーオブジェクト更新
 
-///=============== >>>ループ(メイン)<<< ==================
+	// 相対位置計算
+
+	//
+}
+
+///=============== >>>ループ(球面空間)<<< ==================
 int engine3d::simulateS3()
 {
 
 	///==============
 
 	// 射撃オブジェクト更新
-	UpdFloatObjs();
+	UpdFloatObjsS3();
 
 	/// パラメータ指定(byダイアログ等)プレイヤー姿勢変更
 	setObjPos();
@@ -259,8 +303,8 @@ int engine3d::simulateS3()
 }
 
 
-// 射撃オブジェクト更新
-void engine3d::UpdFloatObjs()
+// 射撃オブジェクト更新 S3
+void engine3d::UpdFloatObjsS3()
 {
 	for (int h = -1; h < objCnt; h++) {//-----------オブジェクトごとの速度更新----------//
 		object3d* curObj;
@@ -409,6 +453,27 @@ void engine3d::UpdFloatObjs()
 				tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
 				tmpt.z = curObj->loc.z * radius;	//--距離(長さ)
 				curObj->past[0] = tmpt;
+			}
+		}
+	}
+}
+
+// 射撃オブジェクト更新 H3
+void engine3d::UpdFloatObjsH3()
+{
+	//-----------オブジェクトごとの速度更新----------//
+	for (int h = 0; h < 100; h++)
+	{
+		object3d* curObj = objs + h;
+		if (!curObj->used) continue;
+
+		//-- 位置,速度,傾きのデータ更新
+		if (obMove)
+		{
+			if (0.000000001 < abs(curObj->lspX.w))
+			{
+				///-----------> 位置,速度,基準位置の更新 <-------------
+
 			}
 		}
 	}
@@ -612,84 +677,156 @@ void engine3d::ClcRelaivePos(double* cmrStd)
 
 
 
-///============== 初期化 =================
-int engine3d::init_on4() {
-	srand(time(NULL));
-
-	// 残弾
-	player.ep = ENR_QTY;
-
-	//-- フレームレート
-	fps = STD_PMSEC;
-	adjSpd = 1.0;
-
+//============== 初期化 =================
+void engine3d::InitWorld()	// 世界初期化
+{
+	// プレイヤー座標obj初期化
 	cmData.loc.asg(0, 0, 0);
 	cmData.rot.asg(0, 0, 0);
 
+	// 世界形状
+	if(worldGeo == WorldGeo::SPHERICAL)
+		InitS3();
+	else if(worldGeo == WorldGeo::HYPERBOLIC)
+		InitH3();
+}
+
+int engine3d::InitH3()	// 双曲世界用初期化
+{
+	// 残弾
+	player.ep = ENR_QTY;
+
 	//-- 太陽
-	sun.objInit(meshs + 6);
-	sun.loc = pt3(	//-- 位置
-		0.0, 0.0, 0.0
-	);
-	sun.mkLspX(	//-- 速度 
-		pt4(SPEED_MAX, 0.8, 1.6, 1.0)
-	);
-	sun.draw = 2;
-	sun.used = false;	//-- 有効化
-	sun.init_std(0);//-- 標準の設定
+	sun.used = false;	// 無効化
 
 	//-- 軌跡オブジェクト
-	markMesh.meshInitB((OBJ_QTY) * (object3d::PAST_QTY - 1), (meshLen - 1) + 2);
-	markObj.objInit(meshs + 0);
+	markObj.objInitH3(meshs + 0);
 	markObj.loc = pt3(	//-- 位置
 		0,
 		0,
 		0
 	);
-	markObj.init_std(0);	//-- 角度標準の設定
+	markObj.init_stdH3(false);	//-- 角度標準の設定
 	markObj.mesh = &markMesh;
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
 
 
-	//-- 最初に全オブジェクトを用意してしまう
+	// 最初に全部オブジェクトを用意
+	int h = 0;
+	// todo★ 基準線
+	for (h; h < BWH_QTY; h++) 
+	{
+		objs[h].objInitH3(meshs + 0);
+		objs[h].draw = 0;
+		objs[h].scale = 0.5 * radius;
+		objs[h].init_stdH3(0);	//-- std
+		objs[h].used = false;	//-- 有効化
+	}
+
+	///-- プレイヤー ----------
+	for (h; h < BWH_QTY + PLR_QTY; h++)
+	{
+		objs[h].objInitH3(meshs + 1);
+
+		objs[h].rsp.asg(0, 0, 1 DEG);
+		objs[h].used = true;	//-- 有効化
+		objs[h].draw = 2;
+	}
+	// ランダムな位置
+	RandLocH3(RandMode::Cluster, ObjType::Player);
+
+	///-- 放出オブジェクト ------
+	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++)
+	{
+		objs[h].objInitH3(meshs + 4);
+
+		objs[h].rot.asg(0, 1 DEG, 0);
+		objs[h].rsp.asg(1 DEG, 0, 0);
+		objs[h].used = true;	//-- 有効化
+		objs[h].draw = 2;
+	}
+	// ランダムな位置
+	RandLocH3(RandMode::Cluster, ObjType::Energy);
+
+	///-- 共通
+	for (h = 0; h < OBJ_QTY; h++) 
+	{
+		objs[h].markInitS3(radius);
+	}
+
+
+	return 1;
+}
+
+int engine3d::InitS3()	// 球面世界用初期化
+{
+	// 残弾
+	player.ep = ENR_QTY;
+
+	//-- 太陽
+	sun.objInitS3(meshs + 6);
+	sun.loc = pt3(	//-- 位置
+		0.0, 0.0, 0.0
+	);
+	sun.mkLspX_S3(	//-- 速度 
+		pt4(SPEED_MAX, 0.8, 1.6, 1.0)
+	);
+	sun.draw = 2;
+	sun.used = false;	//-- 有効化
+	sun.init_stdS3(0);//-- 標準の設定
+
+	//-- 軌跡オブジェクト
+	markObj.objInitS3(meshs + 0);
+	markObj.loc = pt3(	//-- 位置
+		0,
+		0,
+		0
+	);
+	markObj.init_stdS3(0);	//-- 角度標準の設定
+	markObj.mesh = &markMesh;
+	markObj.draw = 1;
+	markObj.used = false;	//-- 有効化
+
+
+	//-- 最初に全オブジェクトを用意
 	int h = 0;
 	///-- 基準線
 	for (h; h < BWH_QTY; h++) {
-		objs[h].objInit(meshs + 0);
+		objs[h].objInitS3(meshs + 0);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
-		objs[h].init_std(0);	//-- std
+		objs[h].init_stdS3(0);	//-- std
 		objs[h].used = true;	//-- 有効化
 	}
 	///-- プレイヤー ----------
 	for (h; h < BWH_QTY + PLR_QTY; h++) {
-		objs[h].objInit(meshs + 1);
+		objs[h].objInitS3(meshs + 1);
 		objs[h].loc = pt3(	//-- 位置
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
 			((double)rand() / RAND_MAX) * PIE
 		);
-		objs[h].mkLspX( pt4(	//-- 速度
+		objs[h].mkLspX_S3( pt4(	//-- 速度
 			0,
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
 			((double)rand() / RAND_MAX) * PIE
 		));
 		objs[h].rsp.asg(0, 0, 1 DEG);
-		objs[h].init_std(0);	//-- std
+		objs[h].init_stdS3(0);	//-- std
 		objs[h].used = true;	//-- 有効化
 		objs[h].draw = 2;
 	}
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++) {
-		objs[h].objInit(meshs + 4);
+		objs[h].objInitS3(meshs + 4);
 		objs[h].loc = pt3(	//-- 位置
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
 			((double)rand() / RAND_MAX) * PIE
 		);
-		objs[h].mkLspX( pt4(	//-- 速度
+		objs[h].mkLspX_S3( pt4(	//-- 速度
 			SPEED_MAX,
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
@@ -697,32 +834,43 @@ int engine3d::init_on4() {
 		));
 		objs[h].rot.asg(0, 1 DEG, 0);
 		objs[h].rsp.asg(1 DEG, 0, 0);
-		objs[h].init_std(1);	//-- std
+		objs[h].init_stdS3(1);	//-- std
 		objs[h].used = false;	//-- 有効化
 		objs[h].draw = 2;
 	}
 
 	///-- 共通
 	for (h = 0; h < OBJ_QTY; h++) {
-		objs[h].markInit(radius);
+		objs[h].markInitS3(radius);
 	}
 
 	//--
 	return 0;
 }
 
-int engine3d::randLoc(int mode) {	//-- objのランダム配置
+// 全射撃オブジェクトをクリア
+void engine3d::DisableShootObjs()
+{
+	player.ep = ENR_QTY;
+	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++) {
+		objs[i].used = false;
+		objs[i].markInitS3(radius);
+	}
+}
+
+// objのランダム配置 (S3)
+int engine3d::RandLocS3(engine3d::RandMode mode) {	
 
 	///-- 放出オブジェクト ------
 	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++) {
 
-		if (mode) {//-- 集中型乱数
+		if (mode == RandMode::Cluster) {//-- 乱数 (極座標)
 			objs[h].loc = pt3(	//-- 位置
 				(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 				((double)rand() / RAND_MAX) * PIE,
 				((double)rand() / RAND_MAX) * PIE
 			);
-			objs[h].mkLspX( pt4(	//-- 速度
+			objs[h].mkLspX_S3( pt4(	//-- 速度
 				SPEED_MAX,
 				(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 				((double)rand() / RAND_MAX) * PIE,
@@ -730,18 +878,80 @@ int engine3d::randLoc(int mode) {	//-- objのランダム配置
 			));
 
 		}
-		else {
+		else // 一様乱数
+		{
 			objs[h].loc = randLoc2(0);
 			pt3 tmp = randLoc2(0);
-			objs[h].mkLspX( pt4(SPEED_MAX, tmp.x, tmp.y, tmp.z) );
+			objs[h].mkLspX_S3( pt4(SPEED_MAX, tmp.x, tmp.y, tmp.z) );
 		}
 		objs[h].fc.asg(0, 0, 0, 0);	//必要?
-		objs[h].init_std(1);	//-- std
+		objs[h].init_stdS3(1);	//-- std
 		objs[h].used = true;	//-- 有効化
-		objs[h].markInit(radius);
+		objs[h].markInitS3(radius);
 	}
 
 	return 0;
+}
+
+// objのランダム配置 (H3)
+int engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
+{
+	int bgn;
+	int end;
+	if (oType == ObjType::Player)
+	{
+		bgn = BWH_QTY;
+		end = BWH_QTY + PLR_QTY;
+	}
+	else
+	{
+		bgn = BWH_QTY + PLR_QTY;
+		end = OBJ_QTY;
+	}
+
+	for (int h = bgn; h < end; h++)
+	{
+		if (mode == RandMode::Cluster) // 乱数 (極座標)
+		{
+			// ランダム位置決定
+			double maxRad = object3d::ClcHypbFromEuc(H3_MAX_RADIUS);
+			double hypDst = ((double)rand() / RAND_MAX) * maxRad;		// 長さ (双曲)
+			double dst = object3d::ClcEucFromHypb(hypDst);				// 長さ
+			double po1 = ((double)rand() / RAND_MAX) * PIE;				// 極1
+			double po2 = (((double)rand() / RAND_MAX) * 2 - 1) * PIE;	// 極2
+
+			pt3 eucPt = pt3(0, 0, dst);
+			tudeRst(&eucPt.y, &eucPt.z, po1, 1);
+			tudeRst(&eucPt.x, &eucPt.y, po2, 1);
+
+			// ランダム速度ベクトル決定
+			double pox1 = ((double)rand() / RAND_MAX) * PIE;				// 極1
+			double pox2 = (((double)rand() / RAND_MAX) * 2 - 1) * PIE;		// 極2
+			pt4 spdDrc = pt4(SPEED_MAX, 0, 0, H3_STD_LEN);
+			tudeRst(&spdDrc.y, &spdDrc.z, pox1, 1);
+			tudeRst(&spdDrc.x, &spdDrc.y, pox2, 1);
+			objs[h].lspX = spdDrc;
+
+			// 位置, 速度ベクトル平行移動
+			double eucPtPh = pyth3(eucPt);
+			pt3 refPt = (eucPtPh < 0.001) 
+					? pt3(0, 0, H3_REF_RADIUS) 
+					: eucPt.mtp(H3_REF_RADIUS / eucPtPh);
+			object3d mrrObj = objs[h].ParallelMove(refPt);	// 鏡映1回目
+			object3d movObj = mrrObj.ParallelMove(eucPt);	// 鏡映2回目
+
+			// 結果反映
+			objs[h].loc = movObj.loc;
+			objs[h].std[0] = movObj.std[0];
+			objs[h].std[1] = movObj.std[1];
+			objs[h].lspX   = movObj.lspX;
+
+		}
+		else // todo★ 一様乱数
+		{
+
+		}
+	}
 }
 
 pt3 engine3d::randLoc2(int cnt) {	//-- objのランダム配置
@@ -953,7 +1163,7 @@ void engine3d::shoot()
 				objs[i].lspX.w = SPEED_MAX;
 
 				objs[i].cnvForce();
-				objs[i].markInit(radius);
+				objs[i].markInitS3(radius);
 
 				player.ep += -1;
 				break;

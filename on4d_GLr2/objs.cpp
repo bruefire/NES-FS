@@ -50,6 +50,7 @@ mesh3d::mesh3d()
 int object3d::PAST_QTY = 75;
 object3d::object3d()
 	: stdRefCnt(1)
+	, copyFlg(false)
 {	//-- OBJ_コンストラクタ
 	used = false;
 	draw = 2;
@@ -61,16 +62,115 @@ object3d::object3d(engine3d* owner)
 {	//-- OBJ_コンストラクタ
 	this->owner = owner;
 }
-object3d::~object3d(){
+object3d::~object3d()
+{
+	if (copyFlg)
+		return;
+
 	delete[] past;
 }
+object3d::object3d(const object3d& obj)
+{
+	copyFlg = true;
+	past = nullptr;
+}
 
-void object3d::init_std(bool randSW){	//-- 標準の初期設定
+// ToDo★: 平行移動 (H3)
+// dstPts: 移動方向ベクトル (原点から離れた点を指定する)
+object3d object3d::ParallelMove(pt3 dst)
+{
+	// 鏡映用球面上の点 src, dst
+	pt4 locR = pt4(pyth3OS(loc), loc.x, loc.y, loc.z);
+	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
+
+	// locR, dstRを通りポアンカレ球面に接する直線
+	// 切片、傾き算出
+	pt4 ldDif = locR.mns(dstR);
+	double slopeX = ldDif.x / ldDif.w;
+	double slopeY = ldDif.y / ldDif.w;
+	double slopeZ = ldDif.z / ldDif.w;
+	double segmX = locR.x - locR.w * slopeX;
+	double segmY = locR.y - locR.w * slopeY;
+	double segmZ = locR.z - locR.w * slopeZ;
+
+	// 各切片を成分とした点が接地点
+	pt4 grdPt = pt4(0, segmX, segmY, segmZ);
+
+
+	// 鏡映用球面上の点 std1, std2
+	pt4 std1R = pt4(pyth3OS(std[0]), std[0].x, std[0].y, std[0].z);
+	pt4 std2R = pt4(pyth3OS(std[1]), std[1].x, std[1].y, std[1].z);
+	pt4 lspXR = pt4(pyth3OS(lspX.xyz()), lspX.x, lspX.y, lspX.z);
+
+	// 鏡映結果を算出
+	auto ClcReflected = [](pt4 grdPt, pt4 trgPt) 
+	{
+		// 球面原点からの垂線ベクトル (接点)
+		pt4 trgToGrd = grdPt.mns(trgPt);
+		pt4 ttgCmpt = trgToGrd.mtp(pt4::dot(trgToGrd, trgPt));
+		pt4 ttgNorm = trgPt.mns(ttgCmpt);
+
+		pt4 result = ttgNorm.mns(trgPt.mns(ttgNorm));
+
+		return result; 
+	};
+	pt4 ntd1R = ClcReflected(grdPt, std1R);
+	pt4 ntd2R = ClcReflected(grdPt, std2R);
+	pt4 nspXR = ClcReflected(grdPt, lspXR);
+
+	// 結果を格納
+	object3d moved(*this); // コピー
+	moved.loc	 = dst;
+	moved.std[0] = ntd1R.xyz();
+	moved.std[1] = ntd2R.xyz();
+	moved.lspX	 = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
+
+	return moved;
+}
+
+// ToDo★: 標準の初期設定 H3
+void object3d::init_stdH3(bool randSW)
+{
+	// 2つの基準ベクトル
+	pt3 std1 = pt3(0, 0, owner->H3_STD_LEN);
+	pt3 std2 = pt3(0, owner->H3_STD_LEN, 0);
+
+	// ToDo★: ランダムstd
+	if (randSW)
+	{
+		double rotOn[2] = {
+			((double)rand() / RAND_MAX) * PIE * 2 - PIE,
+			((double)rand() / RAND_MAX) * PIE
+		};
+		tudeRst(&std1.y, &std1.z, rotOn[0], 1);
+		tudeRst(&std2.y, &std2.z, rotOn[0], 1);
+		tudeRst(&std1.x, &std1.y, rotOn[1], 1);
+		tudeRst(&std2.x, &std2.y, rotOn[1], 1);
+	}
+	pt3 tLoc = loc;
+	loc = pt3(0,0,0);
+	std[0] = std1;
+	std[1] = std2;
+
+	double tLocPh = pyth3(tLoc);
+	pt3 refVec = (tLocPh < 0.001) 
+				? pt3(0, 0, owner->H3_REF_RADIUS) 
+				: tLoc.mtp(owner->H3_REF_RADIUS/tLocPh);
+	object3d mrr = ParallelMove(refVec);
+	object3d rst = mrr.ParallelMove(tLoc);
+
+	// 結果格納
+	loc    = rst.loc;
+	std[0] = rst.std[0];
+	std[1] = rst.std[1];
+}
+
+void object3d::init_stdS3(bool randSW){	//-- 標準の初期設定 S3
 	//-- 2つの基準ベクトル
 	pt4 std1 = pt4( owner->COS_1,0,0,owner->SIN_1 );// WXYZ
 	pt4 std2 = pt4( owner->COS_1,0,owner->SIN_1,0 );// WXYZ
 
-	if(randSW){//-- ランダムなstd
+	if(randSW){//todo★ ランダムなstd
 		double rotOn[2] = {
 			( (double)rand() / RAND_MAX )*PIE*2 - PIE,
 			( (double)rand() / RAND_MAX )*PIE
@@ -392,7 +492,36 @@ int mesh3d::meshInit(std::string objName, uint32_t texNo, int md)
 }
 
 
-void object3d::objInit(mesh3d* pForm)
+void object3d::objInitH3(mesh3d* pForm)
+{
+	mesh = pForm;
+	//-- モデルメッシュからコピー
+
+
+
+	///--------
+	///-----------///
+	//alfa = 0.4;
+	scale = 1;
+	//------
+
+	ctr.asg(0, 0, 0);
+	loc.asg(0, 0, 0.1);	//-- ポアンカレ球面x,y,z (n <= 1)
+	rot.asg(0, 0, 0);
+	rsp.asg(0 DEG, 0 DEG, 0 DEG);
+	fc.asg(0, 0, 0, 0);
+	fc2.asg(0, 0, 0, 0);
+	ssp = 0.0;		// スケール速度
+
+	init_stdH3(false);	//-- 角度標準の設定
+	mkLspX_H3(pt4(0, std[0].x, std[0].y, std[0].z));
+
+	polObj = false;
+	//used = true;
+
+}
+
+void object3d::objInitS3(mesh3d* pForm)
 {
   mesh = pForm;
   //-- モデルメッシュからコピー
@@ -408,21 +537,23 @@ void object3d::objInit(mesh3d* pForm)
 	ctr.asg(0, 0, 0);
 	loc.asg(0, 0, PIE);	//-- (緯度, 経度, 深度)
 	pt4 cPt4 = pt4( 0, 0*PIE, 0*PIE, 0.2*PIE );
-	mkLspX(cPt4);
+	mkLspX_S3(cPt4);
 	rot.asg(0,0,0);
 	rsp.asg(0 DEG, 0 DEG,0 DEG);
 	fc.asg(0,0,0,0);
 	fc2.asg(0,0,0,0);
 	ssp = 0.0;		// スケール速度
   
-  init_std(0);	//-- 角度標準の設定
+  init_stdS3(0);	//-- 角度標準の設定
 
   polObj = false;
   //used = true;
 
 }
 
-void object3d::markInit(double radius){
+// 軌跡初期化 S3
+void object3d::markInitS3(double radius)
+{
 	pt4 loc4 = tudeToEuc( loc );
 	pt3 tmpt;
 	tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
@@ -431,9 +562,20 @@ void object3d::markInit(double radius){
 
 	for(int i=0;i<PAST_QTY;i++) past[i] = tmpt;
 }
-//
-//
-//
+
+// 軌跡初期化 H3
+void object3d::markInitH3(double radius)
+{
+	double dst = ClcHypbFromEuc(pyth3(loc));
+	pt3 tmpt;
+	tmpt.x = atan2(loc.x, loc.z);		//--方向1
+	tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--方向2
+	tmpt.z = dst * radius;	//--距離(長さ)
+
+	for (int i = 0; i < PAST_QTY; i++) past[i] = tmpt;
+}
+
+
 poly::poly(){
 }
 void poly::polyInit(int form){
@@ -736,7 +878,7 @@ pt3 pt3::pls(pt3 pts){ pts.x+=x, pts.y+=y, pts.z+=z; return pts; }
 pt3 pt3::mns(pt3 pts){ pts.x = x-pts.x, pts.y = y-pts.y, pts.z = z-pts.z; return pts; }
 pt3 pt3::mtp(double mt){ pt3 pt; pt.x = x*mt, pt.y = y*mt, pt.z = z*mt; return pt; }	//乗算
 pt3 pt3::mtp(pt3 mt){ mt.x *= x, mt.y *= y, mt.z *= z; return mt; }	//乗算
-pt3::pt3(){}
+pt3::pt3() :x(0), y(0), z(0) {}
 pt3::pt3(double x, double y, double z)
 {
 	this->x = x; this->y = y; this->z = z;
@@ -835,7 +977,23 @@ pt3 object3d::eucToTude(pt4 vecT){	// [XYZ]W座標を[緯,経,深]座標に変換
 
 	return locT;
 }
-void object3d::mkLspX(pt4 vec) 
+
+// Euc距離から双曲距離に変換
+double object3d::ClcHypbFromEuc(double dst)
+{
+	double dstSrc = cosh(dst);
+	return sqrt((dstSrc - 1) / (1 + dstSrc));
+}
+
+// 双曲距離からEuc距離に変換
+double object3d::ClcEucFromHypb(double dst)
+{
+	double dstPh = dst * dst;
+	return acosh(1 + ((2 * dstPh) / (1 - dstPh)));
+}
+
+// 移動用ベクトル作成 S3
+void object3d::mkLspX_S3(pt4 vec) 
 {
 	pt4 locE = tudeToEuc(loc);		// 位置
 	pt4 vecT = tudeToEuc(vec.xyz());		// 速度
@@ -856,6 +1014,13 @@ void object3d::mkLspX(pt4 vec)
 	lspX.asgPt3(eucToTude(lspXE));
 	lspX.w = vec.w;
 }
+
+// 移動用ベクトル作成 H3
+void object3d::mkLspX_H3(pt4 vec)
+{
+	lspX = vec;
+}
+
 void object3d::clcStd(pt4 std1, pt4 std2, double* rotStd){///-- 基準方向1,2,3の特定
 
 	pt4 tVec = std2;

@@ -11,8 +11,12 @@
 double pyth2(double x, double y){ return sqrt(x*x + y*y); }
 double pyth3(double x, double y, double z){ return sqrt(x*x + y*y + z*z); }
 double pyth4(double w, double x, double y, double z){ return sqrt(w*w + x*x + y*y + z*z); }
-double pyth3(pt3 pts){ return sqrt(pts.x*pts.x + pts.y*pts.y + pts.z*pts.z); }
+double pyth3(pt3 pts) { return sqrt(pts.x * pts.x + pts.y * pts.y + pts.z * pts.z); }
 double pyth4(pt4 pts){ return sqrt(pts.w*pts.w + pts.x*pts.x + pts.y*pts.y + pts.z*pts.z); }
+double pyth3OS(pt3 pts, double hLen)
+{ 
+	return sqrt(hLen*hLen - (pts.x * pts.x + pts.y * pts.y + pts.z * pts.z));
+}
 
 //==
 double powi(double x, int y)

@@ -39,20 +39,30 @@ public:
 	int drawFace(uint32_t* bmp);
 	void pSet(pt3*, uint32_t);
 
-	static pt4 tudeToEuc(pt3);			//if(on4D) [緯,経,深]座標を[XYZW]座標に変換
-	static pt3 eucToTude(pt4);			//if(on4D) [XYZW]座標を[緯,経,深]座標に変換
-	void mkLspX(pt4);
+	static pt4 tudeToEuc(pt3);			// S3 [緯,経,深]座標を[XYZW]座標に変換
+	static pt3 eucToTude(pt4);			// S3 [XYZW]座標を[緯,経,深]座標に変換
+	static double ClcHypbFromEuc(double);	// H3 双曲距離を算出
+	static double ClcEucFromHypb(double);	// H3 双曲極座標をEUC[X,Y,Z]座標に変換
+	void mkLspX_S3(pt4);		// S3用
+	void mkLspX_H3(pt4);	// H3用
 
 	void clcStd(pt4, pt4, double*);
-	void markInit(double);			// 軌跡初期化
+	void markInitS3(double);			// 軌跡初期化
+	void markInitH3(double);			// 軌跡初期化
 	void cnvForce();	// 速度ベクトルから変換
 
 	char draw;	//-- 0:ポイント, 1:ライン, 2:サーフェス. 
 	bool used;
-	void objInit(mesh3d*);
-	void init_std(bool);
+	void objInitS3(mesh3d*);
+	void objInitH3(mesh3d*);
+	void init_stdS3(bool);
+	void init_stdH3(bool);
+	object3d ParallelMove(pt3);	// 平行移動 (H3)
+
+	bool copyFlg;	// 宣言、引数、戻り値からの作成
 	object3d();
 	object3d(engine3d*);
+	object3d(const object3d&);
 	~object3d();
 };
 

@@ -17,6 +17,11 @@ public:
 	const double SIN_1;
 	const double SIN_1R;
 
+	
+	const double H3_STD_LEN;	// ポアンカレstd長 (EUC長)
+	double H3_MAX_RADIUS;		// ポアンカレ有効半径 (EUC長)
+	double H3_REF_RADIUS;		// ポアンカレ鏡映半径 (EUC長)
+
 	enum CLS_TYPE
 	{
 		LOGIC,
@@ -100,13 +105,29 @@ public:
 	mvObjParam;
 
 	// メソッド //
-	int init_on4();					// 初期化
+	void InitWorld();				// 世界初期化(共通)
+	int InitS3();					// 球面世界初期化
+	int InitH3();					// 双曲世界初期化
 	int simulateS3();
-	void UpdFloatObjs();			// 射撃オブジェクト更新
+	void simulateH3();
+	void UpdFloatObjsS3();			// 射撃オブジェクト更新 S3
+	void UpdFloatObjsH3();			// 射撃オブジェクト更新 H3
 	void UpdPlayerObjs(double*);	// プレイヤーオブジェクト更新
 	void ClcRelaivePos(double*);	// 相対位置計算
 	int physics();
-	int randLoc(int);
+
+	enum class RandMode
+	{
+		Cluster,
+		Uniform
+	};
+	enum class ObjType
+	{
+		Player,
+		Energy
+	};
+	int RandLocS3(RandMode);
+	int RandLocH3(RandMode, ObjType);
 	pt3 randLoc2(int);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
@@ -124,6 +145,16 @@ public:
 	int init();
 	int update();
 	int dispose();
+
+	enum class WorldGeo
+	{
+		SPHERICAL,
+		HYPERBOLIC
+	}
+	worldGeo;
+	void UpdateS3();		// S3更新
+	void UpdateH3();		// H3更新
+	void DisableShootObjs();
 
 	// 操作関係
 	int inPutMouseMv(double x, double y, int opt); // 受け取る値は正規化済のもの
