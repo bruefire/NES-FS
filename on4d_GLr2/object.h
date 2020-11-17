@@ -46,7 +46,9 @@ public:
 	void mkLspX_S3(pt4);		// S3用
 	void mkLspX_H3(pt4);	// H3用
 
+	void clcStd(pt3, pt3, double*);
 	void clcStd(pt4, pt4, double*);
+	//void clcStd(double*);
 	void markInitS3(double);			// 軌跡初期化
 	void markInitH3(double);			// 軌跡初期化
 	void cnvForce();	// 速度ベクトルから変換
@@ -57,7 +59,9 @@ public:
 	void objInitH3(mesh3d*);
 	void init_stdS3(bool);
 	void init_stdH3(bool);
-	object3d ParallelMove(pt3);	// 平行移動 (H3)
+	void OptimStd();
+	object3d ReflectionH3(pt3, pt3* = nullptr);	// 平行移動 (H3)
+	void ParallelMove(pt3, pt3* = nullptr);
 
 	bool copyFlg;	// 宣言、引数、戻り値からの作成
 	object3d();

@@ -25,6 +25,10 @@ public:
 	pt3 mns(pt3 pts);
 	pt3 mtp(double pts);
 	pt3 mtp(pt3 pts);
+	pt3 norm();
+
+	static double dot(pt3, pt3);	// ì‡êœ
+	static pt3 cross(pt3, pt3);		// äOêœ(ÉNÉçÉXêœ)
 
 	pt3();
 	pt3(double, double, double);
@@ -43,6 +47,7 @@ public:
 	pt4 mtp(double pts);
 	pt4 mtp(pt4 pts);
 	pt3 xyz();
+	pt4 norm();
 	void asgPt3(pt3);
 
 	static double dot(pt4, pt4);		// ì‡êœ

@@ -75,57 +75,99 @@ object3d::object3d(const object3d& obj)
 	past = nullptr;
 }
 
-// ToDo★: 平行移動 (H3)
-// dstPts: 移動方向ベクトル (原点から離れた点を指定する)
-object3d object3d::ParallelMove(pt3 dst)
+// std調整 (事前にlocの原点移動が必要)
+void object3d::OptimStd()
 {
+	// std調整
+	double rotOn[3];
+	clcStd(std[0], std[1], rotOn);
+	pt3 ntd1 = pt3(0, 0, owner->H3_STD_LEN);
+	pt3 ntd2 = pt3(0, owner->H3_STD_LEN, 0);
+	tudeRst(&ntd2.x, &ntd2.y, rotOn[2], 1);
+	tudeRst(&ntd1.y, &ntd1.z, rotOn[1], 1);
+	tudeRst(&ntd2.y, &ntd2.z, rotOn[1], 1);
+	tudeRst(&ntd1.x, &ntd1.y, rotOn[0], 1);
+	tudeRst(&ntd2.x, &ntd2.y, rotOn[0], 1);
+	std[0] = ntd1;
+	std[1] = ntd2;
+}
+
+// 鏡映 (H3)
+// dstPts: 移動方向ベクトル (原点から離れた点を指定する)
+object3d object3d::ReflectionH3(pt3 dst, pt3* ctr)
+{
+	if (ctr == nullptr)
+		ctr = &loc;
+
 	// 鏡映用球面上の点 src, dst
-	pt4 locR = pt4(pyth3OS(loc), loc.x, loc.y, loc.z);
+	pt4 ctrR = pt4(pyth3OS(*ctr), ctr->x, ctr->y, ctr->z);
 	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
 
 	// locR, dstRを通りポアンカレ球面に接する直線
 	// 切片、傾き算出
-	pt4 ldDif = locR.mns(dstR);
+	pt4 ldDif = ctrR.mns(dstR);
 	double slopeX = ldDif.x / ldDif.w;
 	double slopeY = ldDif.y / ldDif.w;
 	double slopeZ = ldDif.z / ldDif.w;
-	double segmX = locR.x - locR.w * slopeX;
-	double segmY = locR.y - locR.w * slopeY;
-	double segmZ = locR.z - locR.w * slopeZ;
+	double segmX = ctrR.x - ctrR.w * slopeX;
+	double segmY = ctrR.y - ctrR.w * slopeY;
+	double segmZ = ctrR.z - ctrR.w * slopeZ;
 
 	// 各切片を成分とした点が接地点
 	pt4 grdPt = pt4(0, segmX, segmY, segmZ);
 
 
-	// 鏡映用球面上の点 std1, std2
-	pt4 std1R = pt4(pyth3OS(std[0]), std[0].x, std[0].y, std[0].z);
-	pt4 std2R = pt4(pyth3OS(std[1]), std[1].x, std[1].y, std[1].z);
-	pt4 lspXR = pt4(pyth3OS(lspX.xyz()), lspX.x, lspX.y, lspX.z);
-
 	// 鏡映結果を算出
-	auto ClcReflected = [](pt4 grdPt, pt4 trgPt) 
+	auto ClcReflected = [](pt4 grdPt, pt3 trg) 
 	{
+		// 鏡映用球面上の点 std1, std2
+		pt4 trgPt = pt4(pyth3OS(trg), trg.x, trg.y, trg.z);
+
 		// 球面原点からの垂線ベクトル (接点)
 		pt4 trgToGrd = grdPt.mns(trgPt);
-		pt4 ttgCmpt = trgToGrd.mtp(pt4::dot(trgToGrd, trgPt));
-		pt4 ttgNorm = trgPt.mns(ttgCmpt);
+		double ip = pt4::dot(trgToGrd.norm(), trgPt.norm());
+		double ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
+		pt4 ttgNorm = trgToGrd.mtp(ttgRate).mtp(ip);
 
-		pt4 result = ttgNorm.mns(trgPt.mns(ttgNorm));
+		// 結果
+		pt4 result = trgPt.mns(ttgNorm).mns(ttgNorm);
 
 		return result; 
 	};
-	pt4 ntd1R = ClcReflected(grdPt, std1R);
-	pt4 ntd2R = ClcReflected(grdPt, std2R);
-	pt4 nspXR = ClcReflected(grdPt, lspXR);
+	pt4 ntd1R = ClcReflected(grdPt, std[0]);
+	pt4 ntd2R = ClcReflected(grdPt, std[1]);
+	pt4 nspXR = ClcReflected(grdPt, lspX.xyz());
+	pt4 nLocR = ClcReflected(grdPt, loc);
+
 
 	// 結果を格納
 	object3d moved(*this); // コピー
-	moved.loc	 = dst;
+	moved.loc	 = nLocR.xyz();
 	moved.std[0] = ntd1R.xyz();
 	moved.std[1] = ntd2R.xyz();
 	moved.lspX	 = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
 
 	return moved;
+}
+
+/// <summary>
+/// H3 平行移動 鏡映2回
+/// </summary>
+void object3d::ParallelMove(pt3 tLoc, pt3* ctr)
+{
+	double tLocPh = pyth3(tLoc);
+	pt3 refVec = (tLocPh < 0.001)
+		? pt3(0, 0, owner->H3_REF_RADIUS)
+		: tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
+
+	object3d mrr = ReflectionH3(refVec, ctr);
+	object3d rst = mrr.ReflectionH3(tLoc, ctr);
+	
+	// 結果反映
+	loc    = rst.loc;
+	std[0] = rst.std[0];
+	std[1] = rst.std[1];
+	lspX   = rst.lspX;
 }
 
 // ToDo★: 標準の初期設定 H3
@@ -152,17 +194,8 @@ void object3d::init_stdH3(bool randSW)
 	std[0] = std1;
 	std[1] = std2;
 
-	double tLocPh = pyth3(tLoc);
-	pt3 refVec = (tLocPh < 0.001) 
-				? pt3(0, 0, owner->H3_REF_RADIUS) 
-				: tLoc.mtp(owner->H3_REF_RADIUS/tLocPh);
-	object3d mrr = ParallelMove(refVec);
-	object3d rst = mrr.ParallelMove(tLoc);
-
-	// 結果格納
-	loc    = rst.loc;
-	std[0] = rst.std[0];
-	std[1] = rst.std[1];
+	// 平行移動
+	ParallelMove(tLoc);
 }
 
 void object3d::init_stdS3(bool randSW){	//-- 標準の初期設定 S3
@@ -508,6 +541,7 @@ void object3d::objInitH3(mesh3d* pForm)
 	ctr.asg(0, 0, 0);
 	loc.asg(0, 0, 0.1);	//-- ポアンカレ球面x,y,z (n <= 1)
 	rot.asg(0, 0, 0);
+	lspX.asg(0, 0, 0, 0);
 	rsp.asg(0 DEG, 0 DEG, 0 DEG);
 	fc.asg(0, 0, 0, 0);
 	fc2.asg(0, 0, 0, 0);
@@ -878,6 +912,27 @@ pt3 pt3::pls(pt3 pts){ pts.x+=x, pts.y+=y, pts.z+=z; return pts; }
 pt3 pt3::mns(pt3 pts){ pts.x = x-pts.x, pts.y = y-pts.y, pts.z = z-pts.z; return pts; }
 pt3 pt3::mtp(double mt){ pt3 pt; pt.x = x*mt, pt.y = y*mt, pt.z = z*mt; return pt; }	//乗算
 pt3 pt3::mtp(pt3 mt){ mt.x *= x, mt.y *= y, mt.z *= z; return mt; }	//乗算
+// 長さ正規化
+pt3 pt3::norm()
+{
+	double len = pyth3(*this);
+	return (len == 0) ? pt3(0, 0, 1) : this->mtp(1 / len);
+}
+// 内積
+double pt3::dot(pt3 a, pt3 b)
+{
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+// クロス積
+pt3 pt3::cross(pt3 a, pt3 b)
+{
+	return pt3
+	(
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x
+	);
+}
 pt3::pt3() :x(0), y(0), z(0) {}
 pt3::pt3(double x, double y, double z)
 {
@@ -929,6 +984,12 @@ void object4d::fSet(uint32_t* pt, uint32_t Len)
 }
 pt3 pt4::xyz(){
 	return pt3(x,y,z);
+}
+// 長さ正規化
+pt4 pt4::norm()
+{
+	double len = pyth4(*this);
+	return (len == 0) ? pt4(0, 0, 0, 0) : this->mtp(1 / len);
 }
 void pt4::asgPt3(pt3 pts3){ x = pts3.x, y = pts3.y, z = pts3.z; }
 pt4::pt4()
@@ -1021,7 +1082,26 @@ void object3d::mkLspX_H3(pt4 vec)
 	lspX = vec;
 }
 
-void object3d::clcStd(pt4 std1, pt4 std2, double* rotStd){///-- 基準方向1,2,3の特定
+//void object3d::clcStd(double* rotStd)
+//{
+//	pt4 std1 = tudeToEuc(std[0]);
+//	pt4 std2 = tudeToEuc(std[1]);
+//
+//	clcStd(std1, std2, rotStd);
+//}
+
+void object3d::clcStd(pt3 std1, pt3 std2, double* rotStd) {///-- 基準方向1,2,3の特定
+
+	pt3 tVec = std2;
+	rotStd[0] = atan2(std1.x, std1.y);					//-方向1の特定
+	rotStd[1] = atan2(pyth2(std1.x, std1.y), std1.z);	//-方向2の特定
+	///-- 3特定の際、基準2cpyの基準方向1,2を0に
+	tudeRst(&tVec.x, &tVec.y, rotStd[0], 0);//-- X-Y 回転 (基準2cpy
+	tudeRst(&tVec.y, &tVec.z, rotStd[1], 0);//-- Y-Z 回転 (基準2cpy
+	rotStd[2] = atan2(tVec.x, tVec.y);	//-方向3の特定
+}
+
+void object3d::clcStd(pt4 std1, pt4 std2, double* rotStd){///-- 基準方向1,2,3の特定 (上と同じ。pt4である必要はなかった)
 
 	pt4 tVec = std2;
 	rotStd[0] = atan2(std1.x, std1.y);					//-方向1の特定

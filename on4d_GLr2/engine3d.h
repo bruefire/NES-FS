@@ -112,8 +112,10 @@ public:
 	void simulateH3();
 	void UpdFloatObjsS3();			// 射撃オブジェクト更新 S3
 	void UpdFloatObjsH3();			// 射撃オブジェクト更新 H3
-	void UpdPlayerObjs(double*);	// プレイヤーオブジェクト更新
-	void ClcRelaivePos(double*);	// 相対位置計算
+	void UpdPlayerObjsS3(double*);	// プレイヤー更新S3
+	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
+	void ClcRelaivePosS3(double*);	// 相対位置計算S3
+	void ClcRelaivePosH3(double*);	// 相対位置計算H3
 	int physics();
 
 	enum class RandMode

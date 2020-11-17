@@ -239,6 +239,7 @@ void engine3d::simulateH3()
 	UpdFloatObjsH3();
 
 	// プレイヤーオブジェクト更新
+	UpdPlayerObjsH3(nullptr);
 
 	// 相対位置計算
 
@@ -259,7 +260,7 @@ int engine3d::simulateS3()
 
 	// プレイヤーオブジェクト更新
 	double cmrStd[3] = {};
-	UpdPlayerObjs(cmrStd);
+	UpdPlayerObjsS3(cmrStd);
 
 
 	///===============^^^^^^^^^~~~~~~~~~~-----------
@@ -291,7 +292,7 @@ int engine3d::simulateS3()
 	}
 
 	// 相対位置計算
-	ClcRelaivePos(cmrStd);
+	ClcRelaivePosS3(cmrStd);
 	//===============^^^^^^^^^~~~~~~~~~~-----------
 
 	if(!useJoyPad)
@@ -470,17 +471,37 @@ void engine3d::UpdFloatObjsH3()
 		//-- 位置,速度,傾きのデータ更新
 		if (obMove)
 		{
-			if (0.000000001 < abs(curObj->lspX.w))
-			{
-				///-----------> 位置,速度,基準位置の更新 <-------------
+			//-----------> 位置,速度,基準位置の更新 <-------------
+			pt3 preLoc = curObj->loc;
+			// 原点に移動
+			curObj->ParallelMove(pt3(0, 0, 0));
 
+			// std調整
+			curObj->OptimStd();
+			// 速度vec調整
+			curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
+
+			// 速度方向に移動
+			double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w / radius);
+			if (lspEuc > abs(0.000000001))
+			{
+				pt3 drc = curObj->lspX.xyz().norm().mtp(lspEuc);
+
+				// 有効範囲チェック
+				if (pyth3(drc) < H3_MAX_RADIUS)
+					curObj->ParallelMove(drc);
+				else
+					curObj->used = false;
 			}
+
+			// 元の位置に戻す
+			curObj->ParallelMove(preLoc, &pt3(0, 0, 0));
 		}
 	}
 }
 
 // プレイヤーオブジェクト更新
-void engine3d::UpdPlayerObjs(double* cmrStd) 
+void engine3d::UpdPlayerObjsS3(double* cmrStd) 
 {
 	objs[PLR_No].rot.asg(-ope.cmRot.x, ope.cmRot.y, ope.cmRot.z);
 
@@ -617,6 +638,7 @@ void engine3d::UpdPlayerObjs(double* cmrStd)
 	// std再計算カウンタ
 	++curObj->stdRefCnt;
 	
+	// 表示情報更新
 	double mvCoe = (1000.0 / fps) / radius;
 	double rtCoe = (1000.0 / fps);
 	cmData.loc.asg(cmLc.z * mvCoe, cmLc.x * mvCoe, cmLc.y * mvCoe);
@@ -624,8 +646,81 @@ void engine3d::UpdPlayerObjs(double* cmrStd)
 
 }
 
+// プレイヤー更新 H3
+void engine3d::UpdPlayerObjsH3(double* cmrStd)
+{
+	//----
+	object3d* curObj = &objs[PLR_No];
+	curObj->rot.asg(-ope.cmRot.x, ope.cmRot.y, ope.cmRot.z);
+	pt3 preLoc = curObj->loc;
+
+	// 原点に移動
+	curObj->ParallelMove(pt3(0, 0, 0));
+
+	// std調整
+	curObj->OptimStd();
+
+	//---> 新規回転の反映
+	// 軸ベクトル定義
+	pt3 std1N = curObj->std[0].norm();
+	pt3 std2N = curObj->std[1].norm();
+	pt3 sideN = pt3::cross(std1N, std2N);
+
+	// 軸方向の回転
+	auto RotVecs = [](pt3* vec1, pt3* vec2, double rot)
+	{
+		pt3 tmpN[2];
+		pt2 tmpRt = pt2(0, 1);
+
+		tudeRst(&tmpRt.x, &tmpRt.y, rot, 1);
+
+		tmpN[0] = pt3()
+			.pls(vec1->mtp(tmpRt.y))
+			.pls(vec2->mtp(tmpRt.x));
+		tmpN[1] = pt3()
+			.pls(vec1->mtp(tmpRt.x).mtp(-1))
+			.pls(vec2->mtp(tmpRt.y));
+
+		*vec1 = tmpN[0];
+		*vec2 = tmpN[1];
+	};
+	RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
+	RotVecs(&std1N, &std2N, curObj->rot.y);	// 上下方向回転
+	RotVecs(&std1N, &sideN, curObj->rot.x);	// 左右方向回転
+
+	///-------- 位置,基準位置の更新 ----------
+	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius);
+	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
+	double eucW = object3d::ClcHypbFromEuc(cmLc.w);
+
+	if (cmLc.w > 0.0000000001)
+	{
+		// 移動方向ベクトル
+		pt3 lspX = std1N.mtp(cmLc.z)
+			.pls(std2N.mtp(cmLc.y))
+			.pls(sideN.mtp(cmLc.x))
+			.norm()
+			.mtp(eucW);
+
+		// 有効範囲チェック
+		if (pyth3(lspX) < H3_MAX_RADIUS)
+			curObj->ParallelMove(lspX);	// 平行移動
+	}
+
+	// 元の位置に戻す
+	curObj->ParallelMove(preLoc, &pt3(0, 0, 0));
+
+
+	// todo★ 表示情報更新
+	//double mvCoe = (1000.0 / fps) / radius;
+	//double rtCoe = (1000.0 / fps);
+	//cmData.loc.asg(cmLc.z * mvCoe, cmLc.x * mvCoe, cmLc.y * mvCoe);
+	//cmData.rot.asg(curObj->rot.x * rtCoe, curObj->rot.y * rtCoe, curObj->rot.z * rtCoe);
+}
+
+
 // 相対位置計算
-void engine3d::ClcRelaivePos(double* cmrStd)
+void engine3d::ClcRelaivePosS3(double* cmrStd)
 {
 	for (int h = -2; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
 
@@ -672,6 +767,40 @@ void engine3d::ClcRelaivePos(double* cmrStd)
 		curObj->clcStd(std1, std2, objStd);
 
 		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);	//-- 光用 面倒なので
+	}
+}
+
+
+// 相対位置計算 H3
+void engine3d::ClcRelaivePosH3(double* cmrStd)
+{
+	object3d* plrObj = &objs[PLR_No];
+
+	for (int h = 0; h < OBJ_QTY; h++)
+	{
+		object3d* curObj = objs + h;
+
+		//プレイヤー中心の平行移動 原点へ
+		curObj->ParallelMove(pt3(0, 0, 0), &plrObj->loc);
+		
+		// 有効範囲チェック
+		double cLocLen = pyth3(curObj->loc);
+		if (cLocLen < H3_MAX_RADIUS)
+		{
+			// プレイヤーの場合範囲内に留める
+			if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
+			{
+				curObj->loc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
+			}
+			else
+				curObj->used = false;
+		}
+
+		// プレイヤー(原点)中心の回転
+		double rotOn[3];
+		curObj->clcStd(plrObj->std[0], plrObj->std[1], rotOn);
+		//tudeRst(&curObj->std[0], &curObj->std[1])
+
 	}
 }
 
@@ -933,18 +1062,7 @@ int engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 			objs[h].lspX = spdDrc;
 
 			// 位置, 速度ベクトル平行移動
-			double eucPtPh = pyth3(eucPt);
-			pt3 refPt = (eucPtPh < 0.001) 
-					? pt3(0, 0, H3_REF_RADIUS) 
-					: eucPt.mtp(H3_REF_RADIUS / eucPtPh);
-			object3d mrrObj = objs[h].ParallelMove(refPt);	// 鏡映1回目
-			object3d movObj = mrrObj.ParallelMove(eucPt);	// 鏡映2回目
-
-			// 結果反映
-			objs[h].loc = movObj.loc;
-			objs[h].std[0] = movObj.std[0];
-			objs[h].std[1] = movObj.std[1];
-			objs[h].lspX   = movObj.lspX;
+			objs[h].ParallelMove(eucPt);
 
 		}
 		else // todo★ 一様乱数
