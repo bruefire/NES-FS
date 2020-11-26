@@ -179,6 +179,13 @@ int engine3d::update()
 		UpdateH3();
 
 
+	// 入力状態 次回待機処理
+	if (!useJoyPad)
+		ope.ClearLocRotParam();
+
+	ope.chgMapStateOld = ope.chgMapState;
+	//----
+
 	ope.inputByKey = false;
 
 	return 1;
@@ -242,7 +249,7 @@ void engine3d::simulateH3()
 	UpdPlayerObjsH3(nullptr);
 
 	// 相対位置計算
-
+	ClcRelaivePosH3(nullptr);
 	//
 }
 
@@ -294,11 +301,6 @@ int engine3d::simulateS3()
 	// 相対位置計算
 	ClcRelaivePosS3(cmrStd);
 	//===============^^^^^^^^^~~~~~~~~~~-----------
-
-	if(!useJoyPad)
-		ope.ClearLocRotParam();
-
-	ope.chgMapStateOld = ope.chgMapState;
 
 	return 0;
 }
@@ -774,8 +776,13 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 // 相対位置計算 H3
 void engine3d::ClcRelaivePosH3(double* cmrStd)
 {
+	// プレイヤーstd算出
 	object3d* plrObj = &objs[PLR_No];
+	double rotOn[3];
+	plrObj->clcStd(plrObj->std[0], plrObj->std[1], rotOn);
 
+
+	// 各obj位置ををプレイヤーからの相対位置に
 	for (int h = 0; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = objs + h;
@@ -796,10 +803,18 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 				curObj->used = false;
 		}
 
-		// プレイヤー(原点)中心の回転
-		double rotOn[3];
-		curObj->clcStd(plrObj->std[0], plrObj->std[1], rotOn);
-		//tudeRst(&curObj->std[0], &curObj->std[1])
+		// プレイヤーの回転リセット
+		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[0], 0);
+		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[0], 0);
+		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[0], 0);
+
+		tudeRst(&curObj->loc.y, &curObj->loc.z, rotOn[1], 0);
+		tudeRst(&curObj->std[0].y, &curObj->std[0].z, rotOn[1], 0);
+		tudeRst(&curObj->std[1].y, &curObj->std[1].z, rotOn[1], 0);
+
+		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[2], 0);
+		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[2], 0);
+		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
 
 	}
 }
@@ -1023,7 +1038,7 @@ int engine3d::RandLocS3(engine3d::RandMode mode) {
 }
 
 // objのランダム配置 (H3)
-int engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
+void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 {
 	int bgn;
 	int end;

@@ -129,7 +129,7 @@ public:
 		Energy
 	};
 	int RandLocS3(RandMode);
-	int RandLocH3(RandMode, ObjType);
+	void RandLocH3(RandMode, ObjType);
 	pt3 randLoc2(int);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
