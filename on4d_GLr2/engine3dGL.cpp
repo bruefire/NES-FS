@@ -333,8 +333,6 @@ int engine3dGL::init()
 		}
 	}
 
-	// ƒ}ƒbƒv
-	first4 = false;
 
 	return 1;
 }

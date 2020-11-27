@@ -44,7 +44,8 @@ int engine3dGL::GL_Init()
 	int varing;
 	glGetIntegerv(GL_MAX_VARYING_VECTORS, &varing);
 	cout << "varing :" << varing << endl;
-    //
+
+	// S3シェーダ
 	if (!GLEW_EXT_geometry_shader4 || varing < 31)
 	{
 		qyMode = QY_MODE::LOW;
@@ -56,12 +57,12 @@ int engine3dGL::GL_Init()
 	{
 		shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
 	}
-	
 	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );
 	shader[2] = LoadShaders( "vtx3D.c", "pxl3D.c" );
 	shader[3] = LoadShaders2( "vartex.c", "lineG.c", "lineF.c" , 1);
 	shader[4] = LoadShaders2( "vartex.c", "lineG2.c", "lineF2.c" , 2);
-
+	// H3シェーダ
+	shader[5] = LoadShaders("h3vtx.c", "h3pxl.c");
 
 	///-- テクスチャ --///
 	glEnable(GL_TEXTURE_2D);

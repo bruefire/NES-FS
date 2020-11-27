@@ -14,8 +14,10 @@ using namespace std;
 
 
 
-
-int engine3dGL::simulateS3GL()
+/// <summary>
+/// S3世界描画
+/// </summary>
+void engine3dGL::simulateS3GL()
 {
 	//=====カメラの範囲
 	double cRangeX = tan((LDBL)CR_RANGE_X/2 *PIE/180);	
@@ -94,7 +96,52 @@ int engine3dGL::simulateS3GL()
 	}
 
 
-	return 1;
+}
+
+/// <summary>
+/// H3世界描画
+/// </summary>
+void engine3dGL::SimulateH3GL()
+{
+	//=====カメラの範囲
+	double cRangeX = tan((LDBL)CR_RANGE_X / 2 * PIE / 180);
+	double cRangeY = tan((LDBL)CR_RANGE_Y / 2 * PIE / 180);
+
+	// todo★//-- 軌跡データ転送
+	//glBindBuffer(GL_ARRAY_BUFFER, buffers[markMesh.texNo]);
+	//glBufferData(	//---- pts転送
+	//	GL_ARRAY_BUFFER,
+	//	markMesh.lLen * 16 * sizeof(float),
+	//	markMesh.pts2,
+	//	GL_STATIC_DRAW
+	//	);
+
+	// 描画内容の初期化
+	objs[0].scale = 0.5 * radius;	//-- 調整
+	/*if (sun.used) glClearColor(0.2, 0.8, 1, 0.0);
+	else if (bgCol) glClearColor(1, 1, 1, 0.0);*/
+	glClearColor(0, 0, 0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// ユニフォーム変数設定
+	glUseProgram(shader[5]);
+	//GLint xID = glGetUniformLocation(shader[3], "WH_CR");
+	//glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
+
+	// MVPマトリックス設定
+	glm::mat4 Projection = glm::perspective((float)CR_RANGE_Y, (float)(cRangeX / cRangeY), 0.00001f, 2.0f);
+	glm::mat4 View = glm::lookAt(
+		glm::vec3(0, 0, 0), // Camera location in World Space
+		glm::vec3(0, 1, 0), // direction of view
+		glm::vec3(0, 0, 1)  // Head of POV
+		);
+	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 MVP = Projection * View * Model;
+
+	GLuint MatrixID = glGetUniformLocation(shader[0], "MVP");
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
 }
 
 

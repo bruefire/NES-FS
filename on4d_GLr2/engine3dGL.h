@@ -47,7 +47,6 @@ public:
 	// フィールド //
 	int lang;
 	bool disposeFlg;
-	bool first4;
 	int WIDTH;
 	int HEIGHT;
 	int decMode;
@@ -74,7 +73,8 @@ public:
 	int update();
 	int dispose();
 	// 描画
-	int simulateS3GL();
+	void simulateS3GL();
+	void SimulateH3GL();
 	int drawEachObjs();
 	int drawEachObjs_LQY();
 	double GetAsp();
@@ -106,7 +106,7 @@ public:
 	//private:
 	uint32_t* buffers;
 	uint32_t* texNames;
-	int shader[5];
+	int shader[6];
 	int outMax;
 
 	// コンストラクタ, デストラクタ
