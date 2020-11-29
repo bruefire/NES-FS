@@ -163,7 +163,7 @@ void object3d::ParallelMove(pt3 tLoc, pt3* ctr)
 		: tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
 
 	object3d mrr = ReflectionH3(refVec, ctr);
-	object3d rst = mrr.ReflectionH3(tLoc, ctr);
+	object3d rst = mrr.ReflectionH3(tLoc, &refVec);
 	
 	// 結果反映
 	loc    = rst.loc;
@@ -1044,15 +1044,15 @@ pt3 object3d::eucToTude(pt4 vecT){	// [XYZ]W座標を[緯,経,深]座標に変換
 // Euc距離から双曲距離に変換
 double object3d::ClcHypbFromEuc(double dst)
 {
-	double dstSrc = cosh(dst);
-	return sqrt((dstSrc - 1) / (1 + dstSrc));
+	double dstPh = dst * dst;
+	return acosh(1 + ((2 * dstPh) / (1 - dstPh)));
 }
 
 // 双曲距離からEuc距離に変換
 double object3d::ClcEucFromHypb(double dst)
 {
-	double dstPh = dst * dst;
-	return acosh(1 + ((2 * dstPh) / (1 - dstPh)));
+	double dstSrc = cosh(dst);
+	return sqrt((dstSrc - 1) / (1 + dstSrc));
 }
 
 // 移動用ベクトル作成 S3

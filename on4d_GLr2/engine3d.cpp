@@ -243,7 +243,7 @@ int engine3d::allocMesh()
 void engine3d::simulateH3()
 {
 	//射撃オブジェクト更新
-	UpdFloatObjsH3();
+	//UpdFloatObjsH3();
 
 	// プレイヤーオブジェクト更新
 	UpdPlayerObjsH3(nullptr);
@@ -696,9 +696,10 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	///-------- 位置,基準位置の更新 ----------
 	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
-	double eucW = object3d::ClcHypbFromEuc(cmLc.w);
+	double eucW = object3d::ClcEucFromHypb(cmLc.w);
 
-	if (cmLc.w > 0.0000000001)
+	// 有効範囲チェック
+	if (cmLc.w > 0.0000000001 && eucW < H3_MAX_RADIUS)
 	{
 		// 移動方向ベクトル
 		pt3 lspX = std1N.mtp(cmLc.z)
@@ -707,9 +708,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 			.norm()
 			.mtp(eucW);
 
-		// 有効範囲チェック
-		if (pyth3(lspX) < H3_MAX_RADIUS)
-			curObj->ParallelMove(lspX);	// 平行移動
+		curObj->ParallelMove(lspX);	// 平行移動
 	}
 
 	// 元の位置に戻す
@@ -799,7 +798,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		
 		// 有効範囲チェック
 		double cLocLen = pyth3(curObj->loc);
-		if (cLocLen < H3_MAX_RADIUS)
+		if (cLocLen > H3_MAX_RADIUS)
 		{
 			// プレイヤーの場合範囲内に留める
 			if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)

@@ -58,14 +58,14 @@ float atan2(float x, float y) {///ok
 // Euc‹——£‚©‚ç‘o‹È‹——£‚É•ÏŠ·
 float ClcHypbFromEuc(float dst)
 {
-	float dstSrc = cosh(dst);
-	return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
+	float dstPh = dst * dst;
+	return acosh(1.0 + ((2.0 * dstPh) / (1.0 - dstPh)));
 }
 // ‘o‹È‹——£‚©‚çEuc‹——£‚É•ÏŠ·
 float ClcEucFromHypb(float dst)
 {
-	float dstPh = dst * dst;
-	return acosh(1.0 + ((2.0 * dstPh) / (1.0 - dstPh)));
+	float dstSrc = cosh(dst);
+	return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
 }
 
 
