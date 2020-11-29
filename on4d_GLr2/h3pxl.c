@@ -6,12 +6,22 @@ in vec2 txr;
 in vec3 fCol;
 
 // uniform data
-//...
+uniform vec3 locR;
 
 // output data
 out vec3 color;
 
 
+// functions (declare)
+float pyth3(float x, float y, float z);
+
+
+// functions (define)
+float pyth3(float x, float y, float z) { return sqrt(x * x + y * y + z * z); }///ok
+
+
+
+// ---------> ƒGƒ“ƒgƒŠŠÖ” <----------
 void main()
 {
 	vec2 gl = vec2(gl_FragCoord.x, gl_FragCoord.y);
@@ -22,7 +32,7 @@ void main()
 	//...
 
 
-	color = vec3(1.0, 1.0, 1.0);
+	color = vec3(1.0, 1-pyth3(locR.x, locR.y, locR.z), 1.0);
 	//gl_FragDepth = 1.001 - dec;
 
 }

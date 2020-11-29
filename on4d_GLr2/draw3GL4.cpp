@@ -433,6 +433,7 @@ int engine3dGL::DrawEachObjsH3()
 			);
 
 
+		glPointSize(2.0); // todoš b’è
 		if (curObj->draw == 2)
 			glDrawArrays(GL_POINTS, 0, curObj->mesh->faceLen * 3);	// OŠpŒ`‚ğ•`‚­
 		else if (curObj->draw == 1 || curObj->draw == 0) {

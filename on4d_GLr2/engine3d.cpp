@@ -18,13 +18,13 @@ using namespace std::chrono;
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
 	, PLR_QTY(10)	// プレイヤー
-	, ENR_QTY(100)	// 隕石()
+	, ENR_QTY(500)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
 	, ATK_QTY(1)	// ﾌﾟﾚｲﾔと敵の攻撃
 	, ALL_QTY(OBJ_QTY + EFE_QTY + ATK_QTY)
 
-	, obMove(true)
+	, obMove(false)	//todo★ 暫定
 	, radius(30)
 	, radius_min(20)
 	, SPEED_MAX(0.2)
@@ -48,8 +48,8 @@ engine3d::engine3d()
 	, markObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
-	, H3_MAX_RADIUS(0.9) // 双曲長で約3.0
-	, H3_REF_RADIUS(0.97) // 双曲長で約4.1
+	, H3_MAX_RADIUS(0.99) // 双曲長で約5.3	//=0.9
+	, H3_REF_RADIUS(0.999) // 双曲長で約7.7	//=0.97
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -243,7 +243,7 @@ int engine3d::allocMesh()
 void engine3d::simulateH3()
 {
 	//射撃オブジェクト更新
-	//UpdFloatObjsH3();
+	UpdFloatObjsH3();
 
 	// プレイヤーオブジェクト更新
 	UpdPlayerObjsH3(nullptr);
@@ -666,7 +666,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	// 軸ベクトル定義
 	pt3 std1N = curObj->std[0].norm();
 	pt3 std2N = curObj->std[1].norm();
-	pt3 sideN = pt3::cross(std1N, std2N);
+	pt3 sideN = pt3::cross(std2N, std1N);
 
 	// 軸方向の回転
 	auto RotVecs = [](pt3* vec1, pt3* vec2, double rot)
