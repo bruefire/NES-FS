@@ -87,11 +87,11 @@ void engine3dGL::simulateS3GL()
 	switch (qyMode)
 	{
 	case QY_MODE::HIGH:
-		drawEachObjs();
+		DrawEachObjsS3();
 		break;
 
 	case QY_MODE::LOW:
-		drawEachObjs_LQY();
+		DrawEachObjsS3_LQY();
 		break;
 	}
 
@@ -139,13 +139,16 @@ void engine3dGL::SimulateH3GL()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
 
-	GLuint MatrixID = glGetUniformLocation(shader[0], "MVP");
+	GLuint MatrixID = glGetUniformLocation(shader[5], "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	// 各オブジェクトの描画
+	DrawEachObjsH3();
 
 }
 
 
-int engine3dGL::drawEachObjs()
+int engine3dGL::DrawEachObjsS3()
 {
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = -2; h < objCnt; h++)
@@ -230,7 +233,7 @@ int engine3dGL::drawEachObjs()
 	return 1;
 }
 
-int engine3dGL::drawEachObjs_LQY()
+int engine3dGL::DrawEachObjsS3_LQY()
 {
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = -2; h < objCnt; h++)
@@ -362,6 +365,90 @@ int engine3dGL::drawEachObjs_LQY()
 		glDisableVertexAttribArray(vPos1);
 		glDisableVertexAttribArray(vPos2);
 		glDisableVertexAttribArray(vPos3);
+
+	}
+
+	return 1;
+}
+
+int engine3dGL::DrawEachObjsH3()
+{
+	//==============オブジェクトごとのGL描画==============//
+	for (int h = 0; h < objCnt; h++)
+	{
+		object3d* curObj = objs + h;
+
+		if (!curObj->used) continue;
+		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
+		if (h == PLR_No) continue;
+		///...++++++++++++ 一括GL描画 +++++++++++++...///
+		char SDR = 5;
+
+
+		/////===================///
+		glUseProgram(shader[SDR]);
+
+		// ユニフォーム変数設定
+		GLint xID = glGetUniformLocation(shader[SDR], "scl_rad");
+		glUniform2f(xID, (float)curObj->scale, (float)radius);
+		xID = glGetUniformLocation(shader[SDR], "objRot");
+		glUniform3f(xID, curObj->rot.x, curObj->rot.y, curObj->rot.z);
+		xID = glGetUniformLocation(shader[SDR], "objStd");
+		glUniform3f(xID, curObj->objStd.x, curObj->objStd.y, curObj->objStd.z);
+		xID = glGetUniformLocation(shader[SDR], "locR");
+		glUniform3f(xID, curObj->locr.x, curObj->locr.y, curObj->locr.z);
+		//xID = glGetUniformLocation(shader[SDR], "decMode");
+		//if (h != -1)	glUniform1i(xID, decMode);
+		//else		glUniform1i(xID, 3);
+		//xID = glGetUniformLocation(shader[SDR], "bgMode");
+		//glUniform1i(xID, bgCol);
+		//xID = glGetUniformLocation(shader[SDR], "texJD");
+		//glUniform1i(xID, curObj->mesh->texJD);
+
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[curObj->mesh->texNo]);
+		glBindTexture(GL_TEXTURE_2D, texNames[curObj->mesh->texNo]);
+
+
+
+		glEnable(GL_TEXTURE_2D);
+
+
+		// 最初の属性バッファ : 頂点
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+
+		glVertexAttribPointer(  //---- 属性1    
+			0, 3, GL_FLOAT, GL_FALSE,
+			8 * sizeof(GLfloat), (void*)0
+			);
+		glVertexAttribPointer(    //---- 属性2
+			1, 3, GL_FLOAT, GL_FALSE,
+			8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
+			);
+		glVertexAttribPointer(    //---- 属性3 テクスチャ
+			2, 2, GL_FLOAT, GL_FALSE,
+			8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
+			);
+
+
+		if (curObj->draw == 2)
+			glDrawArrays(GL_POINTS, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
+		else if (curObj->draw == 1 || curObj->draw == 0) {
+			glPointSize(2.0);
+			glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
+			glPointSize(1.0);
+		}
+		else {
+			glPointSize(2.0);
+			glDrawArrays(GL_LINE_LOOP, 0, 24);	// 点を描く
+			glPointSize(1.0);
+		}
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
 
 	}
 

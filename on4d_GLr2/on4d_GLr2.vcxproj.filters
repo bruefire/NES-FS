@@ -46,28 +46,31 @@
     <Filter Include="リソース ファイル\GL部\GLSLシェーダ">
       <UniqueIdentifier>{e3032fc6-14e7-49ec-8906-ffc43e5e4bc5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="リソース ファイル\GL部\GLSLシェーダ\main">
-      <UniqueIdentifier>{dd7b011f-cd1b-4a77-a494-304102ae007b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="リソース ファイル\GL部\GLSLシェーダ\line4">
       <UniqueIdentifier>{015eab34-8abe-4b9e-990a-240a095ce4ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="リソース ファイル\GL部\GLSLシェーダ\pxl">
       <UniqueIdentifier>{9ce4d1b5-a4a0-492a-8235-6e4181d91907}</UniqueIdentifier>
     </Filter>
-    <Filter Include="リソース ファイル\GL部\GLSLシェーダ\main_low">
+    <Filter Include="リソース ファイル\GL部\GLSLシェーダ\S3">
+      <UniqueIdentifier>{dd7b011f-cd1b-4a77-a494-304102ae007b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル\GL部\GLSLシェーダ\S3_low">
       <UniqueIdentifier>{c171438f-5eb5-4818-a5cf-534fe45e4ee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル\GL部\GLSLシェーダ\H3">
+      <UniqueIdentifier>{84409077-b1a5-4128-8872-27f0e98d1d55}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="geo.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\main</Filter>
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\S3</Filter>
     </None>
     <None Include="pixel.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\main</Filter>
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\S3</Filter>
     </None>
     <None Include="vartex.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\main</Filter>
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\S3</Filter>
     </None>
     <None Include="lineF.c">
       <Filter>リソース ファイル\GL部\GLSLシェーダ\line4</Filter>
@@ -98,10 +101,10 @@
     </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="pixel_low.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\main_low</Filter>
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\S3_low</Filter>
     </None>
     <None Include="vartex_low.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\main_low</Filter>
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\S3_low</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +146,12 @@
     </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>c++ソース\コア演算部</Filter>
+    </ClCompile>
+    <ClCompile Include="h3vtx.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
+    </ClCompile>
+    <ClCompile Include="h3pxl.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

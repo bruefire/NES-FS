@@ -57,6 +57,14 @@
     <None Include="pixel_low.c">
       <FileType>CppCode</FileType>
     </None>
+    <None Include="h3vtx.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="h3pxl.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>CppCode</FileType>
+    </None>
     <ClCompile Include="operation.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="rcFunc.cpp" />

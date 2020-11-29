@@ -46,7 +46,7 @@ engine3d::engine3d()
 	, SIN_1R(1.0 / SIN_1)
 	, sun(this)
 	, markObj(this)
-	, worldGeo(WorldGeo::SPHERICAL)
+	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
 	, H3_MAX_RADIUS(0.9) // 双曲長で約3.0
 	, H3_REF_RADIUS(0.97) // 双曲長で約4.1
@@ -71,8 +71,8 @@ int engine3d::init()
 {
 	int rtnVal = 1;
 
-	//-- プレイヤー空き番号を設定 (ランダム)
-	PLR_No = BWH_QTY + (time(NULL) % PLR_QTY);	
+	//-- プレイヤー空き番号を設定
+	PLR_No = BWH_QTY;	
 
 	// メッシュ定義
 	meshLen = 21;
@@ -175,7 +175,7 @@ int engine3d::update()
 	// World Geometry
 	if (worldGeo == WorldGeo::SPHERICAL)
 		UpdateS3();
-	else
+	else if (worldGeo == WorldGeo::HYPERBOLIC)
 		UpdateH3();
 
 
@@ -465,7 +465,7 @@ void engine3d::UpdFloatObjsS3()
 void engine3d::UpdFloatObjsH3()
 {
 	//-----------オブジェクトごとの速度更新----------//
-	for (int h = 0; h < 100; h++)
+	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = objs + h;
 		if (!curObj->used) continue;
@@ -690,6 +690,9 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	RotVecs(&std1N, &std2N, curObj->rot.y);	// 上下方向回転
 	RotVecs(&std1N, &sideN, curObj->rot.x);	// 左右方向回転
 
+	curObj->std[0] = std1N.mtp(H3_STD_LEN);
+	curObj->std[1] = std2N.mtp(H3_STD_LEN);
+
 	///-------- 位置,基準位置の更新 ----------
 	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
@@ -776,10 +779,14 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 // 相対位置計算 H3
 void engine3d::ClcRelaivePosH3(double* cmrStd)
 {
-	// プレイヤーstd算出
 	object3d* plrObj = &objs[PLR_No];
+	pt3 plrLoc = plrObj->loc;
+
+	// プレイヤーstd算出
+	object3d plrCpy(*plrObj);	// コピー
+	plrCpy.ParallelMove(pt3(0, 0, 0));	// 原点に移動
 	double rotOn[3];
-	plrObj->clcStd(plrObj->std[0], plrObj->std[1], rotOn);
+	plrCpy.clcStd(plrCpy.std[0], plrCpy.std[1], rotOn);
 
 
 	// 各obj位置ををプレイヤーからの相対位置に
@@ -788,7 +795,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		object3d* curObj = objs + h;
 
 		//プレイヤー中心の平行移動 原点へ
-		curObj->ParallelMove(pt3(0, 0, 0), &plrObj->loc);
+		curObj->ParallelMove(pt3(0, 0, 0), &plrLoc);
 		
 		// 有効範囲チェック
 		double cLocLen = pyth3(curObj->loc);
@@ -807,15 +814,24 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[0], 0);
 		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[0], 0);
 		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[0], 0);
+		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[0], 0);
 
 		tudeRst(&curObj->loc.y, &curObj->loc.z, rotOn[1], 0);
 		tudeRst(&curObj->std[0].y, &curObj->std[0].z, rotOn[1], 0);
 		tudeRst(&curObj->std[1].y, &curObj->std[1].z, rotOn[1], 0);
+		tudeRst(&curObj->lspX.y, &curObj->lspX.z, rotOn[1], 0);
 
 		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[2], 0);
 		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[2], 0);
 		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
+		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[2], 0);
 
+		curObj->locr = curObj->loc;
+
+		// std算出
+		double objStd[3];
+		curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
+		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);	
 	}
 }
 
@@ -879,6 +895,10 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	}
 	// ランダムな位置
 	RandLocH3(RandMode::Cluster, ObjType::Player);
+	// 一期は中心に
+	objs[BWH_QTY].loc = pt3(0, 0, 0);
+	objs[BWH_QTY].init_stdH3(0);
+	objs[BWH_QTY].lspX.asgPt3(objs[BWH_QTY].std[0]);
 
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++)
@@ -931,6 +951,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	markObj.mesh = &markMesh;
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
+
 
 
 	//-- 最初に全オブジェクトを用意

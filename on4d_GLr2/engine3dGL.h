@@ -75,8 +75,9 @@ public:
 	// •`‰æ
 	void simulateS3GL();
 	void SimulateH3GL();
-	int drawEachObjs();
-	int drawEachObjs_LQY();
+	int DrawEachObjsS3();
+	int DrawEachObjsS3_LQY();
+	int DrawEachObjsH3();
 	double GetAsp();
 	
 	void MakeCharVBO();

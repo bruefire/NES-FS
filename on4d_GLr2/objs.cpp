@@ -71,6 +71,8 @@ object3d::~object3d()
 }
 object3d::object3d(const object3d& obj)
 {
+	*this = obj;
+
 	copyFlg = true;
 	past = nullptr;
 }

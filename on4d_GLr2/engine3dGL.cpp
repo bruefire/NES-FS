@@ -343,23 +343,31 @@ int engine3dGL::update()
 	engine3d::update();
 
 
-
 	//======== << ƒGƒ“ƒWƒ“ >> =======//
 	GL_SwapBuffer();
-	simulateS3GL();
+	if (worldGeo == WorldGeo::SPHERICAL)
+	{
+		simulateS3GL();
 
-	// GUI•`‰æ
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+		// GUI•`‰æ
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
 
-	DrawDistances();
-	DrawCoordinate();
+		DrawDistances();
+		DrawCoordinate();
 
-	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
 
-	// map•`‰æ
-	if (VIEW_ON4) DrawMap();
+		// map•`‰æ
+		if (VIEW_ON4) DrawMap();
+
+	}
+	else if (worldGeo == WorldGeo::HYPERBOLIC)
+	{
+		SimulateH3GL();
+	}
+
 
 
 	return 1;
