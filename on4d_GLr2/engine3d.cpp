@@ -828,9 +828,11 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		curObj->locr = curObj->loc;
 
 		// stdŽZo
+		object3d tmpObj(*curObj);
+		tmpObj.ParallelMove(pt3(0, 0, 0));
 		double objStd[3];
-		curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
-		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);	
+		tmpObj.clcStd(tmpObj.std[0], tmpObj.std[1], objStd);
+		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
 	}
 }
 

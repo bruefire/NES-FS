@@ -11,6 +11,7 @@ uniform vec2 scl_rad;
 uniform vec3 objRot;
 uniform vec3 objStd;
 uniform vec3 locR;
+uniform float H3_REF_RADIUS;
 
 // to pixel shader
 out vec3 vPos;
@@ -24,9 +25,15 @@ float PIE = 3.1415926535;
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode);
 float pyth2(float x, float y);
 float pyth3(float x, float y, float z);
+float pyth3(vec3 pts);
+float pyth4(vec4 vec);
+float pyth3OS(vec3 pts, float hLen);
 float atan2(float x, float y);
 float ClcHypbFromEuc(float dst);
 float ClcEucFromHypb(float dst);
+vec3 ParallelMove(vec3 tLoc, vec3 ctr, vec3 mvPt);
+vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt);
+vec4 ClcReflected(vec4 grdPt, vec3 trg);
 
 // function definition (é¿ëï)
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)
@@ -44,6 +51,14 @@ void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)
 }
 float pyth2(float x, float y) { return sqrt(x * x + y * y); }///ok
 float pyth3(float x, float y, float z) { return sqrt(x * x + y * y + z * z); }///ok
+float pyth3(vec3 pts) { return sqrt(pts.x * pts.x + pts.y * pts.y + pts.z * pts.z); }///ok
+float pyth4(vec4 vec) {
+	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
+}///ok
+float pyth3OS(vec3 pts)
+{
+	return sqrt(1.0 - (pts.x * pts.x + pts.y * pts.y + pts.z * pts.z));
+}
 float atan2(float x, float y) {///ok
 	float deg = atan(x / y); deg += PIE * float(y < 0);
 	if (x == 0) {
@@ -68,34 +83,96 @@ float ClcEucFromHypb(float dst)
 	return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
 }
 
+/// <summary>
+/// H3 ïΩçsà⁄ìÆ ãæâf2âÒ
+/// </summary>
+vec3 ParallelMove(vec3 tLoc, vec3 ctr, vec3 mvPt)
+{
+	float tLocPh = pyth3(tLoc);
+	vec3 refVec = (tLocPh < 0.001)
+		? vec3(0.0, 0.0, H3_REF_RADIUS)
+		: tLoc * (H3_REF_RADIUS / tLocPh);
+
+	vec3 mrr = ReflectionH3(refVec, ctr, mvPt);
+	vec3 rst = ReflectionH3(tLoc, refVec, mrr);
+
+	// åãâ îΩâf
+	return rst;
+}
+
+// ãæâf (H3)
+// dstPts: à⁄ìÆï˚å¸ÉxÉNÉgÉã (å¥ì_Ç©ÇÁó£ÇÍÇΩì_ÇéwíËÇ∑ÇÈ)
+vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt)
+{
+	// ãæâfópãÖñ è„ÇÃì_ src, dst
+	vec4 ctrR = vec4( ctr.x, ctr.y, ctr.z, pyth3OS(ctr));
+	vec4 dstR = vec4(dst.x, dst.y, dst.z, pyth3OS(dst));
+
+	// locR, dstRÇí ÇËÉ|ÉAÉìÉJÉåãÖñ Ç…ê⁄Ç∑ÇÈíºê¸
+	// êÿï–ÅAåXÇ´éZèo
+	vec4 ldDif = ctrR - dstR;
+	float slopeX = ldDif.x / ldDif.w;
+	float slopeY = ldDif.y / ldDif.w;
+	float slopeZ = ldDif.z / ldDif.w;
+	float segmX = ctrR.x - ctrR.w * slopeX;
+	float segmY = ctrR.y - ctrR.w * slopeY;
+	float segmZ = ctrR.z - ctrR.w * slopeZ;
+
+	// äeêÿï–Çê¨ï™Ç∆ÇµÇΩì_Ç™ê⁄ínì_
+	vec4 grdPt = vec4(segmX, segmY, segmZ, 0.0);
+
+
+	// ãæâfåãâ ÇéZèo
+	vec4 mvptR = ClcReflected(grdPt, mvPt);
+
+	return mvptR.xyz;
+}
+
+// ãæâfåãâ ÇéZèo
+vec4 ClcReflected(vec4 grdPt, vec3 trg)
+{
+	// ãæâfópãÖñ è„ÇÃì_ std1, std2
+	vec4 trgPt = vec4(trg.x, trg.y, trg.z, pyth3OS(trg));
+
+	// ãÖñ å¥ì_Ç©ÇÁÇÃêÇê¸ÉxÉNÉgÉã (ê⁄ì_)
+	vec4 trgToGrd = grdPt - trgPt;
+	float ip = dot(normalize(trgToGrd), normalize(trgPt));
+	float ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
+	vec4 ttgNorm = trgToGrd * ttgRate * ip;
+
+	// åãâ 
+	vec4 result = trgPt - ttgNorm - ttgNorm;
+
+	return result;
+};
+
 
 
 // ---------> ÉGÉìÉgÉää÷êî <-----------
 void main()
 {
-	//// í∏ì_à íuîΩâf
-	//vec3 pts = vec3(
-	//	0.0,
-	//	scl_rad[0] * ClcHypbFromEuc(vPosition.z) / scl_rad[1],
-	//	0.0
-	//);
-	//tudeRst(pts.z, pts.y, vPosition.y, 1);	// äpìx1
-	//tudeRst(pts.x, pts.z, vPosition.x, 1);	// äpìx2
+	// í∏ì_à íuîΩâf
+	vec3 pts = vec3(
+		0.0,
+		ClcEucFromHypb(scl_rad[0] * vPosition.z / scl_rad[1]),
+		0.0
+	);
+	tudeRst(pts.z, pts.y, vPosition.y, 1);	// äpìx1
+	tudeRst(pts.x, pts.z, vPosition.x, 1);	// äpìx2
 
-	//// é©ì]ÇÃîΩâf
-	//tudeRst(pts.x, pts.y, objRot.z, 1);	// äpìx3
-	//tudeRst(pts.y, pts.z, objRot.y, 1);	// äpìx2
-	//tudeRst(pts.x, pts.z, objRot.x, 1);	// äpìx1
+	// é©ì]ÇÃîΩâf
+	tudeRst(pts.x, pts.y, objRot.z, 1);	// äpìx3
+	tudeRst(pts.y, pts.z, objRot.y, 1);	// äpìx2
+	tudeRst(pts.x, pts.z, objRot.x, 1);	// äpìx1
 
-	//// å¥ì_à⁄ìÆçœstdÇÃîΩâf
-	//tudeRst(pts.x, pts.y, objStd[2], 1);	// ï˚å¸3
-	//tudeRst(pts.y, pts.z, objStd[1], 1);	// ï˚å¸2
-	//tudeRst(pts.x, pts.y, objStd[0], 1);	// ï˚å¸1
+	// å¥ì_à⁄ìÆçœstdÇÃîΩâf
+	tudeRst(pts.x, pts.y, objStd[2], 1);	// ï˚å¸3
+	tudeRst(pts.y, pts.z, objStd[1], 1);	// ï˚å¸2
+	tudeRst(pts.x, pts.y, objStd[0], 1);	// ï˚å¸1
 
-	//// å≥ÇÃà íuÇ…ñﬂÇ∑
-	////...
+	// å≥ÇÃà íuÇ…ñﬂÇ∑
+	pts = ParallelMove(locR, vec3(0.0, 0.0, 0.0), pts);
 
-	vec3 pts = locR;
 
 	// âEéË/ç∂éËånå›ä∑
 	float tmptY = pts.y;

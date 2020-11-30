@@ -397,8 +397,8 @@ int engine3dGL::DrawEachObjsH3()
 		glUniform3f(xID, curObj->objStd.x, curObj->objStd.y, curObj->objStd.z);
 		xID = glGetUniformLocation(shader[SDR], "locR");
 		glUniform3f(xID, curObj->locr.x, curObj->locr.y, curObj->locr.z);
-		//xID = glGetUniformLocation(shader[SDR], "decMode");
-		//if (h != -1)	glUniform1i(xID, decMode);
+		xID = glGetUniformLocation(shader[SDR], "H3_REF_RADIUS");
+		glUniform1f(xID, H3_REF_RADIUS);
 		//else		glUniform1i(xID, 3);
 		//xID = glGetUniformLocation(shader[SDR], "bgMode");
 		//glUniform1i(xID, bgCol);
@@ -433,9 +433,8 @@ int engine3dGL::DrawEachObjsH3()
 			);
 
 
-		glPointSize(3.0); // todo★ 暫定
 		if (curObj->draw == 2)
-			glDrawArrays(GL_POINTS, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
+			glDrawArrays(GL_LINE_LOOP, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
 		else if (curObj->draw == 1 || curObj->draw == 0) {
 			glPointSize(2.0);
 			glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
