@@ -31,8 +31,8 @@ void main()
 	float dec;
 	//...
 
-
-	color = vec3(1.0, 1-pyth3(locR.x, locR.y, locR.z), 1.0);
+	dec = 1.0 - pyth3(locR.x, locR.y, locR.z);
+	color = vec3(1.0, dec, 1.0);
 	//gl_FragDepth = 1.001 - dec;
 
 }
