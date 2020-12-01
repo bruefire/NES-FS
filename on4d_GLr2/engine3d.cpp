@@ -478,11 +478,6 @@ void engine3d::UpdFloatObjsH3()
 			// 原点に移動
 			curObj->ParallelMove(pt3(0, 0, 0));
 
-			// std調整
-			curObj->OptimStd();
-			// 速度vec調整
-			curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
-
 			// 速度方向に移動
 			double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w / radius);
 			if (lspEuc > abs(0.000000001))
@@ -659,9 +654,6 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	// 原点に移動
 	curObj->ParallelMove(pt3(0, 0, 0));
 
-	// std調整
-	curObj->OptimStd();
-
 	//---> 新規回転の反映
 	// 軸ベクトル定義
 	pt3 std1N = curObj->std[0].norm();
@@ -827,12 +819,20 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 
 		curObj->locr = curObj->loc;
 
-		// std算出
-		object3d tmpObj(*curObj);
-		tmpObj.ParallelMove(pt3(0, 0, 0));
+		// std算出、調整、保存
+		pt3 locOld = curObj->loc;
+		curObj->ParallelMove(pt3(0, 0, 0));
 		double objStd[3];
-		tmpObj.clcStd(tmpObj.std[0], tmpObj.std[1], objStd);
+		curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
 		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
+
+		// std調整
+		curObj->OptimStd();
+		// 速度vec調整
+		curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
+		
+		// 元の位置に戻す
+		curObj->ParallelMove(locOld);	
 	}
 }
 
