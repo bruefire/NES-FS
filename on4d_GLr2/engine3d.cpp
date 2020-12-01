@@ -476,7 +476,7 @@ void engine3d::UpdFloatObjsH3()
 			//-----------> 位置,速度,基準位置の更新 <-------------
 			pt3 preLoc = curObj->loc;
 			// 原点に移動
-			curObj->ParallelMove(pt3(0, 0, 0));
+			curObj->ParallelMove(curObj->loc, false);
 
 			// 速度方向に移動
 			double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w / radius);
@@ -486,13 +486,13 @@ void engine3d::UpdFloatObjsH3()
 
 				// 有効範囲チェック
 				if (pyth3(drc) < H3_MAX_RADIUS)
-					curObj->ParallelMove(drc);
+					curObj->ParallelMove(drc, true);
 				else
 					curObj->used = false;
 			}
 
 			// 元の位置に戻す
-			curObj->ParallelMove(preLoc, &pt3(0, 0, 0));
+			curObj->ParallelMove(preLoc, true);
 		}
 	}
 }
@@ -652,7 +652,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	pt3 preLoc = curObj->loc;
 
 	// 原点に移動
-	curObj->ParallelMove(pt3(0, 0, 0));
+	curObj->ParallelMove(curObj->loc, false);
 
 	//---> 新規回転の反映
 	// 軸ベクトル定義
@@ -700,11 +700,11 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 			.norm()
 			.mtp(eucW);
 
-		curObj->ParallelMove(lspX);	// 平行移動
+		curObj->ParallelMove(lspX, true);	// 平行移動
 	}
 
 	// 元の位置に戻す
-	curObj->ParallelMove(preLoc, &pt3(0, 0, 0));
+	curObj->ParallelMove(preLoc, true);
 
 
 	// todo★ 表示情報更新
@@ -775,7 +775,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 
 	// プレイヤーstd算出
 	object3d plrCpy(*plrObj);	// コピー
-	plrCpy.ParallelMove(pt3(0, 0, 0));	// 原点に移動
+	plrCpy.ParallelMove(plrCpy.loc, false);	// 原点に移動
 	double rotOn[3];
 	plrCpy.clcStd(plrCpy.std[0], plrCpy.std[1], rotOn);
 
@@ -786,7 +786,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		object3d* curObj = objs + h;
 
 		//プレイヤー中心の平行移動 原点へ
-		curObj->ParallelMove(pt3(0, 0, 0), &plrLoc);
+		curObj->ParallelMove(plrLoc, false);
 		
 		// 有効範囲チェック
 		double cLocLen = pyth3(curObj->loc);
@@ -821,7 +821,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 
 		// std算出、調整、保存
 		pt3 locOld = curObj->loc;
-		curObj->ParallelMove(pt3(0, 0, 0));
+		curObj->ParallelMove(curObj->loc, false);
 		double objStd[3];
 		curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
 		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
@@ -832,7 +832,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
 		
 		// 元の位置に戻す
-		curObj->ParallelMove(locOld);	
+		curObj->ParallelMove(locOld, true);	
 	}
 }
 
@@ -1098,8 +1098,8 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 			tudeRst(&spdDrc.x, &spdDrc.y, pox2, 1);
 			objs[h].lspX = spdDrc;
 
-			// 位置, 速度ベクトル平行移動
-			objs[h].ParallelMove(eucPt);
+			// 結果を反映
+			objs[h].ParallelMove(eucPt, true);
 
 		}
 		else // todo★ 一様乱数

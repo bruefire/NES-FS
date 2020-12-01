@@ -60,8 +60,8 @@ public:
 	void init_stdS3(bool);
 	void init_stdH3(bool);
 	void OptimStd();
-	object3d ReflectionH3(pt3, pt3* = nullptr);	// 平行移動 (H3)
-	void ParallelMove(pt3, pt3* = nullptr);
+	object3d ReflectionH3(pt3, pt3);	// 平行移動 (H3)
+	void ParallelMove(pt3, bool);
 
 	bool copyFlg;	// 宣言、引数、戻り値からの作成
 	object3d();

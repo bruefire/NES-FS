@@ -96,13 +96,11 @@ void object3d::OptimStd()
 
 // 鏡映 (H3)
 // dstPts: 移動方向ベクトル (原点から離れた点を指定する)
-object3d object3d::ReflectionH3(pt3 dst, pt3* ctr)
+object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 {
-	if (ctr == nullptr)
-		ctr = &loc;
 
 	// 鏡映用球面上の点 src, dst
-	pt4 ctrR = pt4(pyth3OS(*ctr), ctr->x, ctr->y, ctr->z);
+	pt4 ctrR = pt4(pyth3OS(ctr), ctr.x, ctr.y, ctr.z);
 	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
 
 	// locR, dstRを通りポアンカレ球面に接する直線
@@ -153,17 +151,26 @@ object3d object3d::ReflectionH3(pt3 dst, pt3* ctr)
 }
 
 /// <summary>
-/// H3 平行移動 鏡映2回
+/// H3 平行移動 鏡映2回 (原点-任意点間の移動限定)
 /// </summary>
-void object3d::ParallelMove(pt3 tLoc, pt3* ctr)
+void object3d::ParallelMove(pt3 tLoc, bool mode)
 {
 	double tLocPh = pyth3(tLoc);
 	pt3 refVec = (tLocPh < 0.001)
 		? pt3(0, 0, owner->H3_REF_RADIUS)
 		: tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
 
-	object3d mrr = ReflectionH3(refVec, ctr);
-	object3d rst = mrr.ReflectionH3(tLoc, &refVec);
+	pt3 bgnPt, endPt;
+	if (mode){
+		bgnPt = pt3(0, 0, 0);
+		endPt = tLoc;
+	} else {
+		bgnPt = tLoc;
+		endPt = pt3(0, 0, 0);
+	}
+
+	object3d mrr = ReflectionH3(refVec, bgnPt);
+	object3d rst = mrr.ReflectionH3(endPt, refVec);
 	
 	// 結果反映
 	loc    = rst.loc;
@@ -197,7 +204,7 @@ void object3d::init_stdH3(bool randSW)
 	std[1] = std2;
 
 	// 平行移動
-	ParallelMove(tLoc);
+	ParallelMove(tLoc, true);
 }
 
 void object3d::init_stdS3(bool randSW){	//-- 標準の初期設定 S3
