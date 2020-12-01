@@ -86,15 +86,27 @@ float ClcEucFromHypb(float dst)
 /// <summary>
 /// H3 ïΩçsà⁄ìÆ ãæâf2âÒ
 /// </summary>
-vec3 ParallelMove(vec3 tLoc, vec3 ctr, vec3 mvPt)
+vec3 ParallelMove(vec3 tLoc, bool mode, vec3 mvPt)
 {
 	float tLocPh = pyth3(tLoc);
 	vec3 refVec = (tLocPh < 0.001)
 		? vec3(0.0, 0.0, H3_REF_RADIUS)
 		: tLoc * (H3_REF_RADIUS / tLocPh);
 
-	vec3 mrr = ReflectionH3(refVec, ctr, mvPt);
-	vec3 rst = ReflectionH3(tLoc, refVec, mrr);
+	vec3 bgnPt, endPt;
+	if (mode)
+	{
+		bgnPt = vec3(0.0, 0.0, 0.0);
+		endPt = tLoc;
+	}
+	else
+	{
+		bgnPt = tLoc;
+		endPt = vec3(0.0, 0.0, 0.0);
+	}
+
+	vec3 mrr = ReflectionH3(refVec, bgnPt, mvPt);
+	vec3 rst = ReflectionH3(endPt, refVec, mrr);
 
 	// åãâ îΩâf
 	return rst;
@@ -171,7 +183,7 @@ void main()
 	tudeRst(pts.x, pts.y, objStd[0], 1);	// ï˚å¸1
 
 	// å≥ÇÃà íuÇ…ñﬂÇ∑
-	pts = ParallelMove(locR, vec3(0.0, 0.0, 0.0), pts);
+	pts = ParallelMove(locR, true, pts);
 
 
 	// âEéË/ç∂éËånå›ä∑
