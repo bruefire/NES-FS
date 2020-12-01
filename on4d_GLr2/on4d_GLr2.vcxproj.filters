@@ -106,6 +106,12 @@
     <None Include="vartex_low.c">
       <Filter>リソース ファイル\GL部\GLSLシェーダ\S3_low</Filter>
     </None>
+    <None Include="h3pxl.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="h3vtx.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rcFunc.cpp">
@@ -146,12 +152,6 @@
     </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>c++ソース\コア演算部</Filter>
-    </ClCompile>
-    <ClCompile Include="h3vtx.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
-    </ClCompile>
-    <ClCompile Include="h3pxl.c">
-      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

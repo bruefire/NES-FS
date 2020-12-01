@@ -434,7 +434,7 @@ int engine3dGL::DrawEachObjsH3()
 
 
 		if (curObj->draw == 2)
-			glDrawArrays(GL_LINE_LOOP, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
+			glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
 		else if (curObj->draw == 1 || curObj->draw == 0) {
 			glPointSize(2.0);
 			glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
