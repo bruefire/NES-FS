@@ -360,12 +360,15 @@ int engine3dGL::update()
 		glEnable(GL_DEPTH_TEST);
 
 		// map•`‰æ
-		if (VIEW_ON4) DrawMap();
+		if (VIEW_ON4) DrawMapS3();
 
 	}
 	else if (worldGeo == WorldGeo::HYPERBOLIC)
 	{
 		SimulateH3GL();
+
+		// map•`‰æ
+		if (VIEW_ON4) DrawMapH3();
 	}
 
 

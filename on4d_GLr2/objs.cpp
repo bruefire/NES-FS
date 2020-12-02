@@ -548,7 +548,7 @@ void object3d::objInitH3(mesh3d* pForm)
 	//------
 
 	ctr.asg(0, 0, 0);
-	loc.asg(0, 0, 0.1);	//-- ポアンカレ球面x,y,z (n <= 1)
+	loc.asg(0, 0, 0);	//-- ポアンカレ球面x,y,z (n <= 1)
 	rot.asg(0, 0, 0);
 	lspX.asg(0, 0, 0, 0);
 	rsp.asg(0 DEG, 0 DEG, 0 DEG);
