@@ -73,14 +73,16 @@ float atan2(float x, float y) {///ok
 // Euc距離から双曲距離に変換
 float ClcHypbFromEuc(float dst)
 {
-	float dstPh = dst * dst;
-	return acosh(1.0 + ((2.0 * dstPh) / (1.0 - dstPh)));
+	//float dstPh = dst * dst;
+	//return acosh(1.0 + ((2.0 * dstPh) / (1.0 - dstPh)));
+	return atanh(dst);
 }
 // 双曲距離からEuc距離に変換
 float ClcEucFromHypb(float dst)
 {
-	float dstSrc = cosh(dst);
-	return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
+	//float dstSrc = cosh(dst);
+	//return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
+	return tanh(dst);
 }
 
 /// <summary>
@@ -120,7 +122,7 @@ vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt)
 	vec4 ctrR = vec4( ctr.x, ctr.y, ctr.z, pyth3OS(ctr));
 	vec4 dstR = vec4(dst.x, dst.y, dst.z, pyth3OS(dst));
 
-	// locR, dstRを通りポアンカレ球面に接する直線
+	// locR, dstRを通りクライン球面に接する直線
 	// 切片、傾き算出
 	vec4 ldDif = ctrR - dstR;
 	float slopeX = ldDif.x / ldDif.w;

@@ -103,7 +103,7 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 	pt4 ctrR = pt4(pyth3OS(ctr), ctr.x, ctr.y, ctr.z);
 	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
 
-	// locR, dstRを通りポアンカレ球面に接する直線
+	// locR, dstRを通りクライン球面に接する直線
 	// 切片、傾き算出
 	pt4 ldDif = ctrR.mns(dstR);
 	double slopeX = ldDif.x / ldDif.w;
@@ -548,7 +548,7 @@ void object3d::objInitH3(mesh3d* pForm)
 	//------
 
 	ctr.asg(0, 0, 0);
-	loc.asg(0, 0, 0);	//-- ポアンカレ球面x,y,z (n <= 1)
+	loc.asg(0, 0, 0);	//
 	rot.asg(0, 0, 0);
 	lspX.asg(0, 0, 0, 0);
 	rsp.asg(0 DEG, 0 DEG, 0 DEG);
@@ -1048,18 +1048,20 @@ pt3 object3d::eucToTude(pt4 vecT){	// [XYZ]W座標を[緯,経,深]座標に変換
 	return locT;
 }
 
-// Euc距離から双曲距離に変換
+// Euc距離から双曲距離に変換 (原点-任意点間)
 double object3d::ClcHypbFromEuc(double dst)
 {
-	double dstPh = dst * dst;
-	return acosh(1 + ((2 * dstPh) / (1 - dstPh)));
+	//double dstPh = dst * dst;
+	//return acosh(1 + ((2 * dstPh) / (1 - dstPh)));
+	return atanh(dst);
 }
 
-// 双曲距離からEuc距離に変換
+// 双曲距離からEuc距離に変換 (原点-任意点間)
 double object3d::ClcEucFromHypb(double dst)
 {
-	double dstSrc = cosh(dst);
-	return sqrt((dstSrc - 1) / (1 + dstSrc));
+	//double dstSrc = cosh(dst);
+	//return sqrt((dstSrc - 1) / (1 + dstSrc));
+	return tanh(dst);
 }
 
 // 移動用ベクトル作成 S3

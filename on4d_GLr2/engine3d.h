@@ -18,9 +18,9 @@ public:
 	const double SIN_1R;
 
 	
-	const double H3_STD_LEN;	// ポアンカレstd長 (EUC長)
-	double H3_MAX_RADIUS;		// ポアンカレ有効半径 (EUC長)
-	double H3_REF_RADIUS;		// ポアンカレ鏡映半径 (EUC長)
+	const double H3_STD_LEN;	// クラインstd長 (EUC長)
+	double H3_MAX_RADIUS;		// クライン有効半径 (EUC長)
+	double H3_REF_RADIUS;		// クライン鏡映半径 (EUC長)
 
 	enum CLS_TYPE
 	{
