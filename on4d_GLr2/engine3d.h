@@ -130,7 +130,9 @@ public:
 	};
 	int RandLocS3(RandMode);
 	void RandLocH3(RandMode, ObjType);
-	pt3 randLoc2(int);
+	pt3 randLocUniS3(int);
+	pt3 randLocUniH3(double);
+	pt3 randVec3(double);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
 	virtual int allocMesh();

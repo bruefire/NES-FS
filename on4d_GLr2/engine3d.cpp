@@ -854,6 +854,8 @@ void engine3d::InitWorld()	// 世界初期化
 
 int engine3d::InitH3()	// 双曲世界用初期化
 {
+	// todo★ (優先度低) 双曲距離1.0と比較したradiusの正しい値
+
 	// 残弾
 	player.ep = ENR_QTY;
 
@@ -912,7 +914,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].draw = 2;
 	}
 	// ランダムな位置
-	RandLocH3(RandMode::Cluster, ObjType::Energy);
+	RandLocH3(RandMode::Uniform, ObjType::Energy);
 
 	///-- 共通
 	for (h = 0; h < OBJ_QTY; h++) 
@@ -1046,8 +1048,8 @@ int engine3d::RandLocS3(engine3d::RandMode mode) {
 		}
 		else // 一様乱数
 		{
-			objs[h].loc = randLoc2(0);
-			pt3 tmp = randLoc2(0);
+			objs[h].loc = randLocUniS3(0);
+			pt3 tmp = randLocUniS3(0);
 			objs[h].mkLspX_S3( pt4(SPEED_MAX, tmp.x, tmp.y, tmp.z) );
 		}
 		objs[h].fc.asg(0, 0, 0, 0);	//必要?
@@ -1075,18 +1077,19 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 		end = OBJ_QTY;
 	}
 
+	double maxRad = object3d::ClcHypbFromEuc(H3_MAX_RADIUS);
 	for (int h = bgn; h < end; h++)
 	{
+		pt3 eucPt;
 		if (mode == RandMode::Cluster) // 乱数 (極座標)
 		{
 			// ランダム位置決定
-			double maxRad = object3d::ClcHypbFromEuc(H3_MAX_RADIUS);
 			double hypDst = ((double)rand() / RAND_MAX) * maxRad;		// 長さ (双曲)
 			double dst = object3d::ClcEucFromHypb(hypDst);				// 長さ
 			double po1 = ((double)rand() / RAND_MAX) * PIE;				// 極1
 			double po2 = (((double)rand() / RAND_MAX) * 2 - 1) * PIE;	// 極2
 
-			pt3 eucPt = pt3(0, 0, dst);
+			eucPt = pt3(0, 0, dst);
 			tudeRst(&eucPt.y, &eucPt.z, po1, 1);
 			tudeRst(&eucPt.x, &eucPt.y, po2, 1);
 
@@ -1098,18 +1101,20 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 			tudeRst(&spdDrc.x, &spdDrc.y, pox2, 1);
 			objs[h].lspX = spdDrc;
 
-			// 結果を反映
-			objs[h].ParallelMove(eucPt, true);
-
 		}
 		else // todo★ 一様乱数
 		{
-
+			eucPt = randLocUniH3(maxRad);
+			objs[h].lspX.asgPt3(randVec3(H3_STD_LEN));
+			objs[h].lspX.w = SPEED_MAX;
 		}
+
+		// 結果を反映
+		objs[h].ParallelMove(eucPt, true);
 	}
 }
 
-pt3 engine3d::randLoc2(int cnt) {	//-- objのランダム配置
+pt3 engine3d::randLocUniS3(int cnt) {	//-- objのランダム配置
 
 	///-- 放出オブジェクト ------
 
@@ -1123,13 +1128,71 @@ pt3 engine3d::randLoc2(int cnt) {	//-- objのランダム配置
 	if (
 		(pyth4(rnd) > 1.0) && cnt != 100
 		) {
-		return randLoc2(cnt + 1);
+		return randLocUniS3(cnt + 1);
 
 	}
 	else {
 		return object3d::eucToTude(rnd);
 	}
 
+}
+
+pt3 engine3d::randLocUniH3(double maxRad)
+{
+	pt3 rstPt;
+	// 双曲球体積
+	double volume = 4 * PIE * (0.25 * sinh(2 * maxRad) - 0.5 * maxRad);
+	// 双曲球面積算出関数
+	auto GetSpArea = [](double r) { return 4 * PIE * powi(sinh(r), 2); };
+	// 最遠球面積
+	double maxSpArea = GetSpArea(maxRad);
+
+	// 半径を決定
+	double eucDst;
+	while (true)
+	{
+		double hypDst = ((double)rand() / RAND_MAX) * maxRad;		// 長さ (双曲)
+		double ratio = GetSpArea(hypDst) / maxSpArea;
+		if (ratio > ((double)rand() / RAND_MAX))
+		{
+			eucDst = object3d::ClcEucFromHypb(hypDst);
+			break;
+		}
+	}
+
+	// 球面上分布位置決定
+	rstPt = randVec3(eucDst);
+
+	return rstPt;
+}
+
+// ランダムベクトル (長さ一定)
+pt3 engine3d::randVec3(double r)
+{
+	pt3 rstPt = pt3(0, 0, r);
+
+	while (true)
+	{
+		pt3 rnd(
+		(((double)rand() / RAND_MAX) * 2 - 1),
+			(((double)rand() / RAND_MAX) * 2 - 1),
+			(((double)rand() / RAND_MAX) * 2 - 1)
+		);
+
+		if (pyth3(rnd) < 1)
+		{
+			double rot[2];
+			rot[0] = atan2(pyth2(rnd.x, rnd.y), rnd.z);
+			rot[1] = atan2(rnd.x, rnd.y);
+
+			tudeRst(&rstPt.y, &rstPt.z, rot[0], 1);
+			tudeRst(&rstPt.x, &rstPt.y, rot[1], 1);
+
+			break;
+		}
+	}
+
+	return rstPt;
 }
 
 // オブジェクトの姿勢を動的に変更
