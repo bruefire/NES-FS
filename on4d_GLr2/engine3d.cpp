@@ -897,7 +897,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].draw = 2;
 	}
 	// ランダムな位置
-	RandLocH3(RandMode::Cluster, ObjType::Player);
+	RandLocH3(RandMode::Uniform, ObjType::Player);
 	// 一期は中心に
 	objs[BWH_QTY].loc = pt3(0, 0, 0);
 	objs[BWH_QTY].init_stdH3(0);
