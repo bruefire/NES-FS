@@ -50,6 +50,7 @@ engine3d::engine3d()
 	, H3_STD_LEN(0.1)
 	, H3_MAX_RADIUS(0.995) // 双曲長で約6.0	//=0.9
 	, H3_REF_RADIUS(0.999) // 双曲長で約7.7	//=0.97
+	, h3objLoop(true)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -488,7 +489,7 @@ void engine3d::UpdFloatObjsH3()
 				if (pyth3(drc) < H3_MAX_RADIUS)
 					curObj->ParallelMove(drc, true);
 				else
-					curObj->used = false;
+					curObj->DealH3OohObj(h3objLoop);
 			}
 
 			// 元の位置に戻す
@@ -798,7 +799,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 				curObj->loc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
 			}
 			else
-				curObj->used = false;
+				curObj->DealH3OohObj(h3objLoop);
 		}
 
 		// プレイヤーの回転リセット

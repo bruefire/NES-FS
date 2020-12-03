@@ -179,6 +179,21 @@ void object3d::ParallelMove(pt3 tLoc, bool mode)
 	lspX   = rst.lspX;
 }
 
+void object3d::DealH3OohObj(bool loopFlg)
+{
+	if (loopFlg)
+	{
+		// ”½‘Î‘¤‚ÖˆÚ“®
+		double nmlz = owner->H3_MAX_RADIUS / pyth3(loc) * 0.99999;
+
+		pt3 lLoc = loc.mtp(nmlz).mtp(-1);
+		ParallelMove(loc, false);
+		ParallelMove(lLoc, true);
+	}
+	else
+		used = false;
+}
+
 // ToDoš: •W€‚Ì‰Šúİ’è H3
 void object3d::init_stdH3(bool randSW)
 {
