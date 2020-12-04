@@ -50,7 +50,7 @@ engine3d::engine3d()
 	, H3_STD_LEN(0.1)
 	, H3_MAX_RADIUS(0.995) // 双曲長で約6.0	//=0.9
 	, H3_REF_RADIUS(0.999) // 双曲長で約7.7	//=0.97
-	, h3objLoop(true)
+	, h3objLoop(false)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -885,7 +885,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
 		objs[h].init_stdH3(0);	//-- std
-		objs[h].used = true;	//-- 有効化
+		objs[h].used = false;	//-- 有効化
 	}
 
 	///-- プレイヤー ----------

@@ -418,18 +418,48 @@ int engine3dGL::DrawEachObjsH3()
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
 
-		glVertexAttribPointer(  //---- 属性1    
+		int fltLen = 21;
+		glVertexAttribPointer(  //---- Loc
 			0, 3, GL_FLOAT, GL_FALSE,
-			8 * sizeof(GLfloat), (void*)0
+			fltLen * sizeof(GLfloat), (void*)0
 			);
-		glVertexAttribPointer(    //---- 属性2
+		glVertexAttribPointer(    //---- 色
 			1, 3, GL_FLOAT, GL_FALSE,
-			8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
+			fltLen * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
 			);
-		glVertexAttribPointer(    //---- 属性3 テクスチャ
-			2, 2, GL_FLOAT, GL_FALSE,
-			8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
+
+		//---- 位置算出用Loc1, 2, 3
+		glVertexAttribPointer(
+			2, 3, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
+			);
+		glVertexAttribPointer(
+			3, 3, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(9 * sizeof(GLfloat))
+			);
+		glVertexAttribPointer(
+			4, 3, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(12 * sizeof(GLfloat))
+			);
+
+		//---- 位置算出用tex1, 2, 3
+		glVertexAttribPointer(
+			5, 2, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(15 * sizeof(GLfloat))
+			);
+		glVertexAttribPointer(
+			6, 2, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(17 * sizeof(GLfloat))
+			);
+		glVertexAttribPointer(
+			7, 2, GL_FLOAT, GL_FALSE,
+			fltLen * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat))
 			);
 
 
@@ -449,6 +479,11 @@ int engine3dGL::DrawEachObjsH3()
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(3);
+		glDisableVertexAttribArray(4);
+		glDisableVertexAttribArray(5);
+		glDisableVertexAttribArray(6);
+		glDisableVertexAttribArray(7);
 
 	}
 

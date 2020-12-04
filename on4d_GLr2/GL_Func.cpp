@@ -55,6 +55,7 @@ int engine3dGL::GL_Init()
 	}
 	else
 	{
+		qyMode = QY_MODE::LOW;
 		shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
 	}
 	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );

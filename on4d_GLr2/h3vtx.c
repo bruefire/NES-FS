@@ -3,7 +3,13 @@
 // transfared vertices
 layout(location = 0) in vec3 vPosition;
 layout(location = 1) in vec3 vColor;
-layout(location = 2) in vec2 TXR;
+
+layout(location = 2) in vec3 vPos1;
+layout(location = 3) in vec3 vPos2;
+layout(location = 4) in vec3 vPos3;
+layout(location = 5) in vec2 tPos1;
+layout(location = 6) in vec2 tPos2;
+layout(location = 7) in vec2 tPos3;
 
 // uniform data
 uniform mat4 MVP;
@@ -15,8 +21,11 @@ uniform float H3_REF_RADIUS;
 
 // to pixel shader
 out vec3 vPos;
-out vec2 txr;
 out vec3 fCol;
+out vec2 txr[3];
+out vec3 ptsE[3];
+
+// constant
 float PIE = 3.1415926535;
 
 
@@ -31,8 +40,8 @@ float pyth3OS(vec3 pts, float hLen);
 float atan2(float x, float y);
 float ClcHypbFromEuc(float dst);
 float ClcEucFromHypb(float dst);
-vec3 ParallelMove(vec3 tLoc, vec3 ctr, vec3 mvPt);
-vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt);
+void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len);
+void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len);
 vec4 ClcReflected(vec4 grdPt, vec3 trg);
 
 // function definition (実装)
@@ -88,7 +97,7 @@ float ClcEucFromHypb(float dst)
 /// <summary>
 /// H3 平行移動 鏡映2回
 /// </summary>
-vec3 ParallelMove(vec3 tLoc, bool mode, vec3 mvPt)
+void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len)
 {
 	float tLocPh = pyth3(tLoc);
 	vec3 refVec = (tLocPh < 0.001)
@@ -107,16 +116,13 @@ vec3 ParallelMove(vec3 tLoc, bool mode, vec3 mvPt)
 		endPt = vec3(0.0, 0.0, 0.0);
 	}
 
-	vec3 mrr = ReflectionH3(refVec, bgnPt, mvPt);
-	vec3 rst = ReflectionH3(endPt, refVec, mrr);
-
-	// 結果反映
-	return rst;
+	ReflectionH3(refVec, bgnPt, mvPt, len);
+	ReflectionH3(endPt, refVec, mvPt, len);
 }
 
 // 鏡映 (H3)
 // dstPts: 移動方向ベクトル (原点から離れた点を指定する)
-vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt)
+void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len)
 {
 	// 鏡映用球面上の点 src, dst
 	vec4 ctrR = vec4( ctr.x, ctr.y, ctr.z, pyth3OS(ctr));
@@ -137,9 +143,10 @@ vec3 ReflectionH3(vec3 dst, vec3 ctr, vec3 mvPt)
 
 
 	// 鏡映結果を算出
-	vec4 mvptR = ClcReflected(grdPt, mvPt);
-
-	return mvptR.xyz;
+	for (int i=0; i<len; i++)
+	{
+		mvPt[i] = ClcReflected(grdPt, mvPt[0]).xyz;
+	}
 }
 
 // 鏡映結果を算出
@@ -185,8 +192,9 @@ void main()
 	tudeRst(pts.x, pts.y, objStd[0], 1);	// 方向1
 
 	// 元の位置に戻す
-	pts = ParallelMove(locR, true, pts);
-
+	vec3 pmVec[3] = vec3[](pts, vec3(0, 0, 0), vec3(0, 0, 0));
+	ParallelMove(locR, true, pmVec, 1);
+	pts = pmVec[0];
 
 	// 右手/左手系互換
 	float tmptY = pts.y;
@@ -196,6 +204,17 @@ void main()
 
 	// 結果をピクセルシェーダへ
 	gl_Position = MVP * vec4(pts, 1);
-	txr = TXR;
+
+	// 色情報
 	fCol = vColor;
+
+	//-- 位置情報
+	ptsE[0] = vPos1;
+	ptsE[1] = vPos2;
+	ptsE[2] = vPos3;
+
+	//-- テスクチャ
+	txr[0] = tPos1;
+	txr[1] = tPos2;
+	txr[2] = tPos3;
 }
