@@ -1,11 +1,10 @@
 #version 330 core
 
 // from vertex shader
-in vec3 vPos;
 in vec3 fCol;
 in vec2 txr[3];
 in vec3 ptsE[3];
-in vec3 fNome;
+in vec3 fNome, fnRadius;
 in float inscR;
 
 // uniform data
@@ -68,15 +67,17 @@ void main()
 
 	float ip = dot(gaze, -1.0 * normalize(fNome));
 	vec3 gazeK = gaze * pyth3(fNome) * abs(1.0 / ip);
-	// ポアンカレ座標に変換
-	vec3 gazeP = toPoinCoord(gazeK);
 
 	// 深度の算出
 	float dec = ClcHypbFromEuc(pyth3(gazeK)) / ClcHypbFromEuc(H3_REF_RADIUS);
-	//...
 
-	//float dec = pyth3(gazeP);
-	color = vec3(0.0, 0.5, 1.0) * dec + fCol * (1.0 - dec);
+	// Lighting
+	// ポアンカレ座標に変換
+	vec3 gazeP = toPoinCoord(gazeK);
+	vec3 fnrNome = gazeP - fnRadius;
+	float nDeg = dot(normalize(fnrNome), -normalize(gazeP));
+
+	color = vec3(0.0, 0.5, 1.0) * dec + fCol * nDeg * (1.0 - dec);
 	//gl_FragDepth = 1.001 - dec;
 
 }

@@ -20,11 +20,10 @@ uniform vec3 locR;
 uniform float H3_REF_RADIUS;
 
 // to pixel shader
-out vec3 vPos;
 out vec3 fCol;
 out vec2 txr[3];
 out vec3 ptsE[3];
-out vec3 fNome;
+out vec3 fNome, fnRadius;
 out float inscR;
 
 // constant
@@ -239,8 +238,8 @@ void main()
 	float restL = normLos * tan(0.5 * PIE - atan(normL / normLos));
 
 	float inscR = pyth2(normLos, restL);
-	fNome = norm0n * (normL);
-	//fNome = norm0n * (normL + restL);
+	fNome = norm0n * normL;
+	fnRadius = norm0n * (normL + restL);
 
 	//-- à íuèÓïÒ
 	ptsE[0] = pmVec[0];
