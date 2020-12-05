@@ -24,6 +24,8 @@ out vec3 vPos;
 out vec3 fCol;
 out vec2 txr[3];
 out vec3 ptsE[3];
+out vec3 fNome;
+out float inscR;
 
 // constant
 float PIE = 3.1415926535;
@@ -36,13 +38,15 @@ float pyth2(float x, float y);
 float pyth3(float x, float y, float z);
 float pyth3(vec3 pts);
 float pyth4(vec4 vec);
-float pyth3OS(vec3 pts, float hLen);
+float pyth3OS(vec3 pts);
+float pythOS(float val);
 float atan2(float x, float y);
 float ClcHypbFromEuc(float dst);
 float ClcEucFromHypb(float dst);
 void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len);
 void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len);
 vec4 ClcReflected(vec4 grdPt, vec3 trg);
+vec3 RelocPts(vec3 pts0);
 
 // function definition (実装)
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)
@@ -67,6 +71,10 @@ float pyth4(vec4 vec) {
 float pyth3OS(vec3 pts)
 {
 	return sqrt(1.0 - (pts.x * pts.x + pts.y * pts.y + pts.z * pts.z));
+}
+float pythOS(float val)
+{
+	return sqrt(1.0 - val * val);
 }
 float atan2(float x, float y) {///ok
 	float deg = atan(x / y); deg += PIE * float(y < 0);
@@ -145,7 +153,7 @@ void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len)
 	// 鏡映結果を算出
 	for (int i=0; i<len; i++)
 	{
-		mvPt[i] = ClcReflected(grdPt, mvPt[0]).xyz;
+		mvPt[i] = ClcReflected(grdPt, mvPt[i]).xyz;
 	}
 }
 
@@ -167,19 +175,17 @@ vec4 ClcReflected(vec4 grdPt, vec3 trg)
 	return result;
 };
 
-
-
-// ---------> エントリ関数 <-----------
-void main()
+// 頂点位置再構築
+vec3 RelocPts(vec3 pts0)
 {
 	// 頂点位置反映
 	vec3 pts = vec3(
 		0.0,
-		ClcEucFromHypb(scl_rad[0] * vPosition.z / scl_rad[1]),
+		ClcEucFromHypb(scl_rad[0] * pts0.z / scl_rad[1]),
 		0.0
-	);
-	tudeRst(pts.z, pts.y, vPosition.y, 1);	// 角度1
-	tudeRst(pts.x, pts.z, vPosition.x, 1);	// 角度2
+		);
+	tudeRst(pts.z, pts.y, pts0.y, 1);	// 角度1
+	tudeRst(pts.x, pts.z, pts0.x, 1);	// 角度2
 
 	// 自転の反映
 	tudeRst(pts.x, pts.y, objRot.z, 1);	// 角度3
@@ -191,8 +197,19 @@ void main()
 	tudeRst(pts.y, pts.z, objStd[1], 1);	// 方向2
 	tudeRst(pts.x, pts.y, objStd[0], 1);	// 方向1
 
+	return pts;
+}
+
+
+
+// ---------> エントリ関数 <-----------
+void main()
+{
+	// 頂点位置反映
+	vec3 pts = RelocPts(vPosition);
+
 	// 元の位置に戻す
-	vec3 pmVec[3] = vec3[](pts, vec3(0, 0, 0), vec3(0, 0, 0));
+	vec3 pmVec[3] = vec3[](pts, vec3(0.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));	// 後ろ2つは捨て値
 	ParallelMove(locR, true, pmVec, 1);
 	pts = pmVec[0];
 
@@ -208,10 +225,27 @@ void main()
 	// 色情報
 	fCol = vColor;
 
+	//-- 法線算出
+	pmVec[0] = RelocPts(vPos1);
+	pmVec[1] = RelocPts(vPos2);
+	pmVec[2] = RelocPts(vPos3);
+	ParallelMove(locR, true, pmVec, 3);
+
+	vec3 norm0 = cross(pmVec[1]-pmVec[0], pmVec[2]-pmVec[1]);	// 法線
+	vec3 norm0n = normalize(norm0);
+	float ratio = abs(dot(norm0n, normalize(pmVec[0])));
+	float normL = pyth3(pmVec[0]) * ratio;
+	float normLos = pythOS(normL);
+	float restL = normLos * tan(0.5 * PIE - atan(normL / normLos));
+
+	float inscR = pyth2(normLos, restL);
+	fNome = norm0n * (normL);
+	//fNome = norm0n * (normL + restL);
+
 	//-- 位置情報
-	ptsE[0] = vPos1;
-	ptsE[1] = vPos2;
-	ptsE[2] = vPos3;
+	ptsE[0] = pmVec[0];
+	ptsE[1] = pmVec[1];
+	ptsE[2] = pmVec[2];
 
 	//-- テスクチャ
 	txr[0] = tPos1;

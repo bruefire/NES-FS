@@ -126,8 +126,8 @@ void engine3dGL::SimulateH3GL()
 
 	// ユニフォーム変数設定
 	glUseProgram(shader[5]);
-	//GLint xID = glGetUniformLocation(shader[3], "WH_CR");
-	//glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
+	GLint xID = glGetUniformLocation(shader[5], "WH_CR");
+	glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
 
 	// MVPマトリックス設定
 	glm::mat4 Projection = glm::perspective((float)CR_RANGE_Y, (float)(cRangeX / cRangeY), 0.00001f, 2.0f);
