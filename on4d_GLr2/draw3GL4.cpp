@@ -402,8 +402,8 @@ int engine3dGL::DrawEachObjsH3()
 		//else		glUniform1i(xID, 3);
 		//xID = glGetUniformLocation(shader[SDR], "bgMode");
 		//glUniform1i(xID, bgCol);
-		//xID = glGetUniformLocation(shader[SDR], "texJD");
-		//glUniform1i(xID, curObj->mesh->texJD);
+		xID = glGetUniformLocation(shader[SDR], "texJD");
+		glUniform1i(xID, curObj->mesh->texJD);
 
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[curObj->mesh->texNo]);

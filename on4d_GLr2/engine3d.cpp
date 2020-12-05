@@ -50,7 +50,7 @@ engine3d::engine3d()
 	, H3_STD_LEN(0.1)
 	, H3_MAX_RADIUS(0.995) // ‘o‹È’·‚Å–ñ6.0	//=0.9
 	, H3_REF_RADIUS(0.999) // ‘o‹È’·‚Å–ñ7.7	//=0.97
-	, h3objLoop(false)
+	, h3objLoop(true)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -1371,7 +1371,7 @@ void engine3d::shoot()
 	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++) 
 	{
 		if (!objs[i].used)
-			if (0 < player.ep)
+			//if (0 < player.ep) //”pŽ~
 			{
 				objs[i].used = true;
 
