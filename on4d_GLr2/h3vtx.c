@@ -1,4 +1,4 @@
-#version 400 core
+#version 330 core
 
 // transfared vertices
 layout(location = 0) in vec3 vPosition;
@@ -17,150 +17,143 @@ uniform vec2 scl_rad;
 uniform vec3 objRot;
 uniform vec3 objStd;
 uniform vec3 locR;
-uniform float H3_REF_RADIUS;
 
 // to pixel shader
 out vec3 fCol;
 out vec2 txr[3];
 out vec3 ptsE[3];
 out vec3 fNome, fnRadius;
-out double inscR;
+out float inscR;
 
 // constant
-double PIE = 3.1415926535;
+float PIE = 3.1415926535;
+float H3_REF_RADIUS = 0.999;	// cpp側とは無関係
 
 
 
 // function definition (ヘッダ)
-double sin_d(double val);
-double cos_d(double val);
-double tan_d(double val);
-double atan_d(double val);
-double tanh_d(double val);
-double atanh_d(double val);
-
-void tudeRst(inout double vec_1, inout double vec_2, double locT, int mode);
-double pyth2(double x, double y);
-double pyth3(double x, double y, double z);
-double pyth3(dvec3 pts);
-double pyth4(dvec4 vec);
-double pyth3OS(dvec3 pts);
-double pythOS(double val);
-double atan2(double x, double y);
-double ClcHypbFromEuc(double dst);
-double ClcEucFromHypb(double dst);
-void ParallelMove(dvec3 tLoc, bool mode, inout dvec3 mvPt[3], int len);
-void ReflectionH3(dvec3 dst, dvec3 ctr, inout dvec3 mvPt[3], int len);
-dvec4 ClcReflected(dvec4 grdPt, dvec3 trg);
-dvec3 RelocPts(dvec3 pts0);
+void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode);
+float pyth2(float x, float y);
+float pyth3(float x, float y, float z);
+float pyth3(vec3 pts);
+float pyth4(vec4 vec);
+float pyth3OS(vec3 pts);
+float pythOS(float val);
+float atan2(float x, float y);
+float ClcHypbFromEuc(float dst);
+float ClcEucFromHypb(float dst);
+void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len);
+void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len);
+vec4 ClcReflected(vec4 grdPt, vec3 trg);
+vec3 RelocPts(vec3 pts0);
 
 // function definition (実装)
-double sin_d(double val) { return double(sin(float(val))); };
-double cos_d(double val) { return double(cos(float(val))); };
-double tan_d(double val) { return double(tan(float(val))); };
-double atan_d(double val) { return double(atan(float(val))); };
-double tanh_d(double val) { return double(tanh(float(val))); };
-double atanh_d(double val) { return double(atanh(float(val))); };
-
-void tudeRst(inout double vec_1, inout double vec_2, double locT, int mode)
+void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)
 {//-- 緯,経,深リセット回転
-	double tRot = atan2(vec_1, vec_2);
-	double R = pyth2(vec_1, vec_2);
+	float tRot = atan2(vec_1, vec_2);
+	float R = pyth2(vec_1, vec_2);
 	if (0 == mode) {
-		vec_1 = R * sin_d(tRot - locT);
-		vec_2 = R * cos_d(tRot - locT);
+		vec_1 = R * sin(tRot - locT);
+		vec_2 = R * cos(tRot - locT);
 	}
 	else {
-		vec_1 = R * sin_d(tRot + locT);
-		vec_2 = R * cos_d(tRot + locT);
+		vec_1 = R * sin(tRot + locT);
+		vec_2 = R * cos(tRot + locT);
 	}
 }
-double pyth2(double x, double y) { return sqrt(x * x + y * y); }///ok
-double pyth3(double x, double y, double z) { return sqrt(x * x + y * y + z * z); }///ok
-double pyth3(dvec3 pts) { return sqrt(pts.x * pts.x + pts.y * pts.y + pts.z * pts.z); }///ok
-double pyth4(dvec4 vec) {
+float pyth2(float x, float y) { return sqrt(x * x + y * y); }///ok
+float pyth3(float x, float y, float z) { return sqrt(x * x + y * y + z * z); }///ok
+float pyth3(vec3 pts) { return sqrt(pts.x * pts.x + pts.y * pts.y + pts.z * pts.z); }///ok
+float pyth4(vec4 vec) {
 	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }///ok
-double pyth3OS(dvec3 pts)
+float pyth3OS(vec3 pts)
 {
 	return sqrt(1.0 - (pts.x * pts.x + pts.y * pts.y + pts.z * pts.z));
 }
-double pythOS(double val)
+float pythOS(float val)
 {
 	return sqrt(1.0 - val * val);
 }
-double atan2(double x, double y) {///ok
-	double deg = atan_d(x / y); deg += PIE * double(y < 0);
+float atan2(float x, float y) {///ok
+	float deg = atan(x / y); deg += PIE * float(y < 0);
 	if (x == 0) {
-		deg = 0.0; deg += PIE * double(y < 0);
+		deg = 0.0; deg += PIE * float(y < 0);
 	}
 	if (y == 0) {
-		deg = 0.5 * PIE; deg += PIE * double(x < 0);
+		deg = 0.5 * PIE; deg += PIE * float(x < 0);
 	}
 	return deg;
 }
 
 // Euc距離から双曲距離に変換
-double ClcHypbFromEuc(double dst)
+float ClcHypbFromEuc(float dst)
 {
-	//double dstPh = dst * dst;
+	//float dstPh = dst * dst;
 	//return acosh(1.0 + ((2.0 * dstPh) / (1.0 - dstPh)));
-	return atanh_d(dst);
+	return atanh(dst);
 }
 // 双曲距離からEuc距離に変換
-double ClcEucFromHypb(double dst)
+float ClcEucFromHypb(float dst)
 {
-	//double dstSrc = cosh(dst);
+	//float dstSrc = cosh(dst);
 	//return sqrt((dstSrc - 1.0) / (1.0 + dstSrc));
-	return tanh_d(dst);
+	return tanh(dst);
 }
 
 /// <summary>
 /// H3 平行移動 鏡映2回
 /// </summary>
-void ParallelMove(dvec3 tLoc, bool mode, inout dvec3 mvPt[3], int len)
+void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len)
 {
-	double tLocPh = pyth3(tLoc);
-	dvec3 refVec = (tLocPh < 0.001)
-		? dvec3(0.0, 0.0, H3_REF_RADIUS)
-		: tLoc * (H3_REF_RADIUS / tLocPh);
+	float tLocPh = pyth3(tLoc);
 
-	dvec3 bgnPt, endPt;
+	// 鏡映1回目の位置決定
+	vec3 refVec;
+	if (tLocPh < 0.001)
+		refVec = vec3(0.0, 0.0, H3_REF_RADIUS);
+	else if (tLocPh < H3_REF_RADIUS * 0.9)
+		refVec = tLoc * (H3_REF_RADIUS / tLocPh);
+	else
+		refVec = tLoc * (H3_REF_RADIUS / tLocPh) * 0.5;
+
+	vec3 bgnPt, endPt;
 	if (mode)
 	{
-		bgnPt = dvec3(0.0, 0.0, 0.0);
+		bgnPt = vec3(0.0, 0.0, 0.0);
 		endPt = tLoc;
 	}
 	else
 	{
 		bgnPt = tLoc;
-		endPt = dvec3(0.0, 0.0, 0.0);
+		endPt = vec3(0.0, 0.0, 0.0);
 	}
 
+	// 平行移動
 	ReflectionH3(refVec, bgnPt, mvPt, len);
 	ReflectionH3(endPt, refVec, mvPt, len);
 }
 
 // 鏡映 (H3)
 // dstPts: 移動方向ベクトル (原点から離れた点を指定する)
-void ReflectionH3(dvec3 dst, dvec3 ctr, inout dvec3 mvPt[3], int len)
+void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len)
 {
 	// 鏡映用球面上の点 src, dst
-	dvec4 ctrR = dvec4( ctr.x, ctr.y, ctr.z, pyth3OS(ctr));
-	dvec4 dstR = dvec4(dst.x, dst.y, dst.z, pyth3OS(dst));
+	vec4 ctrR = vec4( ctr.x, ctr.y, ctr.z, pyth3OS(ctr));
+	vec4 dstR = vec4(dst.x, dst.y, dst.z, pyth3OS(dst));
 
 	// locR, dstRを通りクライン球面に接する直線
 	// 切片、傾き算出
-	dvec4 ldDif = ctrR - dstR;
-	double slopeX = ldDif.x / ldDif.w;
-	double slopeY = ldDif.y / ldDif.w;
-	double slopeZ = ldDif.z / ldDif.w;
-	double segmX = ctrR.x - ctrR.w * slopeX;
-	double segmY = ctrR.y - ctrR.w * slopeY;
-	double segmZ = ctrR.z - ctrR.w * slopeZ;
+	vec4 ldDif = ctrR - dstR;
+	float slopeX = ldDif.x / ldDif.w;
+	float slopeY = ldDif.y / ldDif.w;
+	float slopeZ = ldDif.z / ldDif.w;
+	float segmX = ctrR.x - ctrR.w * slopeX;
+	float segmY = ctrR.y - ctrR.w * slopeY;
+	float segmZ = ctrR.z - ctrR.w * slopeZ;
 
 	// 各切片を成分とした点が接地点
-	dvec4 grdPt = dvec4(segmX, segmY, segmZ, 0.0);
+	vec4 grdPt = vec4(segmX, segmY, segmZ, 0.0);
 
 
 	// 鏡映結果を算出
@@ -171,28 +164,28 @@ void ReflectionH3(dvec3 dst, dvec3 ctr, inout dvec3 mvPt[3], int len)
 }
 
 // 鏡映結果を算出
-dvec4 ClcReflected(dvec4 grdPt, dvec3 trg)
+vec4 ClcReflected(vec4 grdPt, vec3 trg)
 {
 	// 鏡映用球面上の点 std1, std2
-	dvec4 trgPt = dvec4(trg.x, trg.y, trg.z, pyth3OS(trg));
+	vec4 trgPt = vec4(trg.x, trg.y, trg.z, pyth3OS(trg));
 
 	// 球面原点からの垂線ベクトル (接点)
-	dvec4 trgToGrd = grdPt - trgPt;
-	double ip = dot(normalize(trgToGrd), normalize(trgPt));
-	double ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
-	dvec4 ttgNorm = trgToGrd * ttgRate * ip;
+	vec4 trgToGrd = grdPt - trgPt;
+	float ip = dot(normalize(trgToGrd), normalize(trgPt));
+	float ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
+	vec4 ttgNorm = trgToGrd * ttgRate * ip;
 
 	// 結果
-	dvec4 result = trgPt - ttgNorm - ttgNorm;
+	vec4 result = trgPt - ttgNorm - ttgNorm;
 
 	return result;
 };
 
 // 頂点位置再構築
-dvec3 RelocPts(dvec3 pts0)
+vec3 RelocPts(vec3 pts0)
 {
 	// 頂点位置反映
-	dvec3 pts = dvec3(
+	vec3 pts = vec3(
 		0.0,
 		ClcEucFromHypb(scl_rad[0] * pts0.z / scl_rad[1]),
 		0.0
@@ -219,15 +212,15 @@ dvec3 RelocPts(dvec3 pts0)
 void main()
 {
 	// 頂点位置反映
-	dvec3 pts = RelocPts(vPosition);
+	vec3 pts = RelocPts(vPosition);
 
 	// 元の位置に戻す
-	dvec3 pmVec[3] = dvec3[](pts, dvec3(0.0, 0.0, 0.0), dvec3(0.0, 0.0, 0.0));	// 後ろ2つは捨て値
+	vec3 pmVec[3] = vec3[](pts, vec3(0.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));	// 後ろ2つは捨て値
 	ParallelMove(locR, true, pmVec, 1);
 	pts = pmVec[0];
 
 	// 右手/左手系互換
-	double tmptY = pts.y;
+	float tmptY = pts.y;
 	pts.y = pts.z;
 	pts.z = tmptY;
 
@@ -236,7 +229,7 @@ void main()
 	gl_Position = MVP * vec4(pts, 1);
 
 	// 色情報
-	fCol = vec3(vColor);
+	fCol = vColor;
 
 	//-- 法線算出
 	pmVec[0] = RelocPts(vPos1);
@@ -244,24 +237,24 @@ void main()
 	pmVec[2] = RelocPts(vPos3);
 	ParallelMove(locR, true, pmVec, 3);
 
-	dvec3 norm0 = cross(pmVec[1]-pmVec[0], pmVec[2]-pmVec[1]);	// 法線
-	dvec3 norm0n = normalize(norm0);
-	double ratio = abs(dot(norm0n, normalize(pmVec[0])));
-	double normL = pyth3(pmVec[0]) * ratio;
-	double normLos = pythOS(normL);
-	double restL = normLos * tan_d(0.5 * PIE - atan_d(normL / normLos));
+	vec3 norm0 = cross(pmVec[1]-pmVec[0], pmVec[2]-pmVec[1]);	// 法線
+	vec3 norm0n = normalize(norm0);
+	float ratio = abs(dot(norm0n, normalize(pmVec[0])));
+	float normL = pyth3(pmVec[0]) * ratio;
+	float normLos = pythOS(normL);
+	float restL = normLos * tan(0.5 * PIE - atan(normL / normLos));
 
-	double inscR = pyth2(normLos, restL);
-	fNome = vec3(norm0n * normL);
-	fnRadius = vec3(norm0n * (normL + restL));
+	float inscR = pyth2(normLos, restL);
+	fNome = norm0n * normL;
+	fnRadius = norm0n * (normL + restL);
 
 	//-- 位置情報
-	ptsE[0] = vec3(pmVec[0]);
-	ptsE[1] = vec3(pmVec[1]);
-	ptsE[2] = vec3(pmVec[2]);
+	ptsE[0] = pmVec[0];
+	ptsE[1] = pmVec[1];
+	ptsE[2] = pmVec[2];
 
 	//-- テスクチャ
-	txr[0] = vec2(tPos1);
-	txr[1] = vec2(tPos2);
-	txr[2] = vec2(tPos3);
+	txr[0] = tPos1;
+	txr[1] = tPos2;
+	txr[2] = tPos3;
 }

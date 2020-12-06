@@ -18,7 +18,7 @@ using namespace std::chrono;
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
 	, PLR_QTY(10)	// プレイヤー
-	, ENR_QTY(100)	// 隕石()
+	, ENR_QTY(500)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
 	, ATK_QTY(1)	// ﾌﾟﾚｲﾔと敵の攻撃
@@ -48,8 +48,8 @@ engine3d::engine3d()
 	, markObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
-	, H3_MAX_RADIUS(0.999995) // 双曲長で約6.0	//=0.9
-	, H3_REF_RADIUS(0.999999) // 双曲長で約7.7	//=0.97
+	, H3_MAX_RADIUS(0.999995) // 双曲長で約12.9	//=0.995 約6.0
+	, H3_REF_RADIUS(0.999999) // 双曲長で約??.?	//=0.999 約7.7
 	, h3objLoop(true)
 {
 	adjTime[0] = adjTime[1] = 0;

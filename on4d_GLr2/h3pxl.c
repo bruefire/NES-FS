@@ -1,4 +1,4 @@
-#version 400 core
+#version 330 core
 
 // from vertex shader
 in vec3 fCol;
@@ -10,12 +10,15 @@ in float inscR;
 // uniform data
 uniform vec3 locR;
 uniform vec4 WH_CR;
- float H3_REF_RADIUS = 0.999;	// cpp側のh3_max_radがこれ以上の場合、同じ位置のサーフェスに副作用？
 uniform sampler2D sfTex;
 uniform int texJD;
+uniform float H3_MAX_RADIUS;
 
 // output data
 out vec3 color;
+
+// constant
+float H3_REF_RADIUS = 0.999;	// cpp側とは無関係
 
 
 // functions (declare)
@@ -82,9 +85,15 @@ float pyth3OS(vec3 pts)
 void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len)
 {
 	float tLocPh = pyth3(tLoc);
-	vec3 refVec = (tLocPh < 0.001)
-		? vec3(0.0, 0.0, H3_REF_RADIUS)
-		: tLoc * (H3_REF_RADIUS / tLocPh);
+
+	// 鏡映1回目の位置決定
+	vec3 refVec;
+	if (tLocPh < 0.001)
+		refVec = vec3(0.0, 0.0, H3_REF_RADIUS);
+	else if (tLocPh < H3_REF_RADIUS * 0.9)
+		refVec = tLoc * (H3_REF_RADIUS / tLocPh);
+	else
+		refVec = tLoc * (H3_REF_RADIUS / tLocPh) * 0.5;
 
 	vec3 bgnPt, endPt;
 	if (mode)
@@ -166,7 +175,7 @@ void main()
 	vec3 gazeK = gaze * pyth3(fNome) * abs(1.0 / ip);
 
 	//-----> 深度の算出
-	float dec = ClcHypbFromEuc(pyth3(gazeK)) / ClcHypbFromEuc(H3_REF_RADIUS);
+	float dec = ClcHypbFromEuc(pyth3(gazeK)) / ClcHypbFromEuc(H3_MAX_RADIUS);
 
 
 	//-----> Lighting

@@ -184,7 +184,7 @@ void object3d::DealH3OohObj(bool loopFlg)
 	if (loopFlg)
 	{
 		// ”½‘Î‘¤‚ÖˆÚ“®
-		double nmlz = owner->H3_MAX_RADIUS / pyth3(loc) * 0.99999;
+		double nmlz = owner->H3_MAX_RADIUS / pyth3(loc) * 0.9999999999;
 
 		pt3 lLoc = loc.mtp(nmlz).mtp(-1);
 		ParallelMove(loc, false);
