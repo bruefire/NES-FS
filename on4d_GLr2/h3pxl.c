@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 // from vertex shader
 in vec3 fCol;
@@ -10,7 +10,7 @@ in float inscR;
 // uniform data
 uniform vec3 locR;
 uniform vec4 WH_CR;
-uniform float H3_REF_RADIUS;
+ float H3_REF_RADIUS = 0.999;	// cpp側のh3_max_radがこれ以上の場合、同じ位置のサーフェスに副作用？
 uniform sampler2D sfTex;
 uniform int texJD;
 
@@ -218,9 +218,9 @@ void main()
 	vec3 oCol = fCol;
 	if (texJD == 1) oCol = texture(sfTex, txVec).rgb;	//--( texture end
 
+	gl_FragDepth = dec;
 
-
-	color = vec3(0.0, 0.5, 1.0) * dec + oCol * nDeg * (1.0 - dec);
-	//gl_FragDepth = 1.001 - dec;
+	color = oCol * nDeg;
+	//color = vec3(0.0, 0.5, 1.0) * dec + oCol * nDeg * (1.0 - dec);
 
 }

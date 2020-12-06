@@ -45,25 +45,31 @@ int engine3dGL::GL_Init()
 	glGetIntegerv(GL_MAX_VARYING_VECTORS, &varing);
 	cout << "varing :" << varing << endl;
 
-	// S3シェーダ
-	if (!GLEW_EXT_geometry_shader4 || varing < 31)
+	if (worldGeo == WorldGeo::HYPERBOLIC)
 	{
+		// H3シェーダ
 		qyMode = QY_MODE::LOW;
-		cout << "the geometry shader will not be used." << endl;
-
-		shader[0] = LoadShaders("vartex_low.c", "pixel_low.c");
+		shader[5] = LoadShaders("h3vtx.c", "h3pxl.c");
 	}
+	// S3シェーダ
 	else
 	{
-		qyMode = QY_MODE::LOW;
-		shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
+		if (!GLEW_EXT_geometry_shader4 || varing < 31)
+		{
+			qyMode = QY_MODE::LOW;
+			cout << "the geometry shader will not be used." << endl;
+
+			shader[0] = LoadShaders("vartex_low.c", "pixel_low.c");
+		}
+		else
+		{
+			shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
+		}
 	}
 	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );
 	shader[2] = LoadShaders( "vtx3D.c", "pxl3D.c" );
 	shader[3] = LoadShaders2( "vartex.c", "lineG.c", "lineF.c" , 1);
 	shader[4] = LoadShaders2( "vartex.c", "lineG2.c", "lineF2.c" , 2);
-	// H3シェーダ
-	shader[5] = LoadShaders("h3vtx.c", "h3pxl.c");
 
 	///-- テクスチャ --///
 	glEnable(GL_TEXTURE_2D);
