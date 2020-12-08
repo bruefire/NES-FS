@@ -354,7 +354,7 @@ int engine3dGL::update()
 		glEnable(GL_BLEND);
 
 		DrawDistances();
-		DrawCoordinate();
+		DrawCoordinateS3();
 
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
@@ -366,6 +366,16 @@ int engine3dGL::update()
 	else if (worldGeo == WorldGeo::HYPERBOLIC)
 	{
 		SimulateH3GL();
+
+		// GUIï`âÊ
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+
+		// ç¿ïWï`âÊ
+		DrawCoordinateH3();
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
 
 		// mapï`âÊ
 		if (VIEW_ON4) DrawMapH3();
@@ -562,7 +572,7 @@ double engine3dGL::GetAsp()
 }
 
 // ÉvÉåÉCÉÑÅ[ç¿ïWÇÃï`âÊ
-void engine3dGL::DrawCoordinate()
+void engine3dGL::DrawCoordinateS3()
 {
 	//
 	double asp = GetAsp();
@@ -671,6 +681,48 @@ void engine3dGL::DrawCoordinate()
 
 		guiStr.drawArea.t += guiStr.fontSz * asp;
 		guiStr.content = rot3;
+		DrawChars(guiStr);
+	}
+}
+
+void engine3dGL::DrawCoordinateH3()
+{
+	//
+	double asp = GetAsp();
+	GuiString guiStr;
+	guiStr.drawArea.l = 0.01;
+	guiStr.drawArea.t = 0.01 * asp;
+	guiStr.fontSz = 0.030;
+	guiStr.fontSpan = 0.8;
+	guiStr.padding.l = 0;
+	guiStr.padding.t = 0;
+
+	if (VIEW_XYZ)
+	{
+		// ì‡óeê›íË
+		string locMode = "", loc_X = "", loc_Y = "", loc_Z = "", loc_W = "";
+		locMode = "Coordinate";
+		loc_X = "Radius   : ";
+		loc_Y = "Longitude: ";
+		loc_Z = "Latitude : ";
+		loc_X.append(to_string((long double)(cmCo.x)));
+		loc_Y.append(to_string((long double)(cmCo.y / PIE * 180)));
+		loc_Z.append(to_string((long double)(-cmCo.z / PIE * 180 + 90)));
+
+		// ï`âÊèàóù
+		guiStr.content = locMode;
+		DrawChars(guiStr);
+
+		guiStr.drawArea.t += guiStr.fontSz * asp;
+		guiStr.content = loc_X;
+		DrawChars(guiStr);
+
+		guiStr.drawArea.t += guiStr.fontSz * asp;
+		guiStr.content = loc_Y;
+		DrawChars(guiStr);
+
+		guiStr.drawArea.t += guiStr.fontSz * asp;
+		guiStr.content = loc_Z;
 		DrawChars(guiStr);
 	}
 }

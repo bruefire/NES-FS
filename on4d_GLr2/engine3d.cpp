@@ -48,9 +48,11 @@ engine3d::engine3d()
 	, markObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
+	//, H3_MAX_RADIUS(0.995) // 双曲長で 約6.0
+	//, H3_REF_RADIUS(0.999) // 双曲長で 約7.7
 	, H3_MAX_RADIUS(0.999995) // 双曲長で約12.9	//=0.995 約6.0
 	, H3_REF_RADIUS(0.999999) // 双曲長で約??.?	//=0.999 約7.7
-	, h3objLoop(true)
+	, h3objLoop(false)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -251,7 +253,9 @@ void engine3d::simulateH3()
 
 	// 相対位置計算
 	ClcRelaivePosH3(nullptr);
-	//
+
+	// 基objとの相対位置計算 (表示座標)
+	ClcCoordinate();
 }
 
 ///=============== >>>ループ(球面空間)<<< ==================
@@ -837,6 +841,36 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 	}
 }
 
+// 現プレイヤー座標計算
+void engine3d::ClcCoordinate()
+{
+	object3d* baseObj = objs + 0;
+	pt3 baseLoc = baseObj->loc;
+	object3d* plrObj = &objs[PLR_No];
+
+	if (!baseObj->used)
+	{
+		cmCo = pt3(0, 0, 0);
+		return;
+	}
+
+	object3d plrCpy(*plrObj);	// コピー
+	object3d baseCpy(*baseObj);	// コピー
+	plrCpy.ParallelMove(baseLoc, false);	// 原点に移動
+	baseCpy.ParallelMove(baseLoc, false);	// 原点に移動
+	double rotOn[3];
+	baseCpy.clcStd(baseCpy.std[0], baseCpy.std[1], rotOn);
+	// 回転をリセット
+	tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[0], 0);
+	tudeRst(&plrCpy.loc.y, &plrCpy.loc.z, rotOn[1], 0);
+	tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[2], 0);
+
+	// 結果を格納
+	cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc));
+	cmCo.y = atan2(plrCpy.loc.x, plrCpy.loc.y);
+	cmCo.z = atan2(pyth2(plrCpy.loc.x, plrCpy.loc.y), plrCpy.loc.z);
+}
+
 
 
 //============== 初期化 =================
@@ -913,7 +947,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].rsp.asg(1 DEG, 0, 0);
 		objs[h].used = true;	//-- 有効化
 		objs[h].draw = 2;
-		objs[h].scale = 30;
+		objs[h].scale = 11;
 	}
 	// ランダムな位置
 	RandLocH3(RandMode::Uniform, ObjType::Energy);

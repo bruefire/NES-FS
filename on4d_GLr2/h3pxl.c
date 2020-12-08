@@ -18,7 +18,8 @@ uniform float H3_MAX_RADIUS;
 out vec3 color;
 
 // constant
-float H3_REF_RADIUS = 0.999;	// cpp‘¤‚Æ‚Í–³ŠÖŒW
+float H3_REF_RADIUS = 0.99;	// cpp‘¤‚Æ‚Í–³ŠÖŒW
+float refBrRatio = 0.8;
 
 
 // functions (declare)
@@ -90,7 +91,7 @@ void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len)
 	vec3 refVec;
 	if (tLocPh < 0.001)
 		refVec = vec3(0.0, 0.0, H3_REF_RADIUS);
-	else if (tLocPh < H3_REF_RADIUS * 0.9)
+	else if (tLocPh < H3_REF_RADIUS * refBrRatio)
 		refVec = tLoc * (H3_REF_RADIUS / tLocPh);
 	else
 		refVec = tLoc * (H3_REF_RADIUS / tLocPh) * 0.5;

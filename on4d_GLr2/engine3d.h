@@ -68,6 +68,7 @@ public:
 	double radius_min;
 	// OBJ_LEN_MAX 0.499*PIE*RADIUS_MIN
 	empObj cmData;	//if(on4D)地図で使用
+	pt3 cmCo;		// 基objとの相対座標 H3で使用
 
 	// Map
 	int mapMeshLen;
@@ -117,6 +118,7 @@ public:
 	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
+	void ClcCoordinate();
 	int physics();
 
 	enum class RandMode

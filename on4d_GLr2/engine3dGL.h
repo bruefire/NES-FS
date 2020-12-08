@@ -82,7 +82,8 @@ public:
 	
 	void MakeCharVBO();
 	void DisposeCharVBO();
-	void DrawCoordinate();	// À•W•`‰æ
+	void DrawCoordinateS3();	// À•W•`‰æ
+	void DrawCoordinateH3();	// À•W•`‰æ h3
 	void DrawDistances();	// ‹——£•`‰æ
 	void DrawChar(uint8_t dChar, double x, double y, double w, double h);
 	void DrawChars(GuiString);
