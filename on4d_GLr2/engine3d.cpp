@@ -52,7 +52,7 @@ engine3d::engine3d()
 	//, H3_REF_RADIUS(0.999) // 双曲長で 約7.7
 	, H3_MAX_RADIUS(0.999995) // 双曲長で約12.9	//=0.995 約6.0
 	, H3_REF_RADIUS(0.999999) // 双曲長で約??.?	//=0.999 約7.7
-	, h3objLoop(false)
+	, h3objLoop(true)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -87,7 +87,8 @@ int engine3d::init()
 	meshNames[4] = "cube8", 
 	meshNames[5] = "horse", 
 	meshNames[6] = "sun", 
-	meshNames[7] = "sphereM", 
+	//meshNames[7] = "plane",
+	meshNames[7] = "sphereM",
 	meshNames[8] = "earth2", 
 	meshNames[9] = "cube8", 
 	meshNames[10] = "p120", 
@@ -469,6 +470,8 @@ void engine3d::UpdFloatObjsS3()
 // 射撃オブジェクト更新 H3
 void engine3d::UpdFloatObjsH3()
 {
+	if (!obMove) return;
+	
 	//-----------オブジェクトごとの速度更新----------//
 	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
 	{
@@ -476,29 +479,33 @@ void engine3d::UpdFloatObjsH3()
 		if (!curObj->used) continue;
 
 		//-- 位置,速度,傾きのデータ更新
-		if (obMove)
+		//-----------> 位置,速度,基準位置の更新 <-------------
+		pt3 preLoc = curObj->loc;
+		// 原点に移動
+		curObj->ParallelMove(curObj->loc, false);
+
+		// 速度方向に移動
+		double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w * adjSpd / radius);
+		if (lspEuc > abs(0.000000001))
 		{
-			//-----------> 位置,速度,基準位置の更新 <-------------
-			pt3 preLoc = curObj->loc;
-			// 原点に移動
-			curObj->ParallelMove(curObj->loc, false);
+			pt3 drc = curObj->lspX.xyz().norm().mtp(lspEuc);
 
-			// 速度方向に移動
-			double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w / radius);
-			if (lspEuc > abs(0.000000001))
-			{
-				pt3 drc = curObj->lspX.xyz().norm().mtp(lspEuc);
-
-				// 有効範囲チェック
-				if (pyth3(drc) < H3_MAX_RADIUS)
-					curObj->ParallelMove(drc, true);
-				else
-					curObj->DealH3OohObj(h3objLoop);
-			}
-
-			// 元の位置に戻す
-			curObj->ParallelMove(preLoc, true);
+			// 有効範囲チェック
+			if (pyth3(drc) < H3_MAX_RADIUS)
+				curObj->ParallelMove(drc, true);
+			else
+				curObj->DealH3OohObj(h3objLoop);
 		}
+
+		// 元の位置に戻す
+		curObj->ParallelMove(preLoc, true);
+	}
+
+	for (int h = 0; h < OBJ_QTY; h++)
+	{
+		///----------- 傾きの更新 -------------
+		object3d* curObj = objs + h;
+		curObj->rot = curObj->rot.pls(curObj->rsp.mtp(adjSpd));
 	}
 }
 
@@ -800,7 +807,9 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 			// プレイヤーの場合範囲内に留める
 			if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
 			{
-				curObj->loc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
+				pt3 adjLoc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
+				curObj->ParallelMove(curObj->loc, false);
+				curObj->ParallelMove(adjLoc, true);
 			}
 			else
 				curObj->DealH3OohObj(h3objLoop);
@@ -866,7 +875,7 @@ void engine3d::ClcCoordinate()
 	tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[2], 0);
 
 	// 結果を格納
-	cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc));
+	cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc)) * radius;
 	cmCo.y = atan2(plrCpy.loc.x, plrCpy.loc.y);
 	cmCo.z = atan2(pyth2(plrCpy.loc.x, plrCpy.loc.y), plrCpy.loc.z);
 }
@@ -927,7 +936,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	{
 		objs[h].objInitH3(meshs + 1);
 
-		objs[h].rsp.asg(0, 0, 1 DEG);
+		objs[h].rsp.asg(1 DEG, 0, 0);
 		objs[h].used = true;	//-- 有効化
 		objs[h].draw = 2;
 	}
@@ -944,10 +953,10 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].objInitH3(meshs + 4);
 
 		objs[h].rot.asg(0, 1 DEG, 0);
-		objs[h].rsp.asg(1 DEG, 0, 0);
+		objs[h].rsp.asg(0 DEG, 0, 0);
 		objs[h].used = true;	//-- 有効化
 		objs[h].draw = 2;
-		objs[h].scale = 11;
+		objs[h].scale = 3;
 	}
 	// ランダムな位置
 	RandLocH3(RandMode::Uniform, ObjType::Energy);

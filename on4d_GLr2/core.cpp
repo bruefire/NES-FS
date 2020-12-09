@@ -651,9 +651,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				newEngine.ope.cmRot.x = (0.02 < abs(gRot.x)) ? gRot.x * newEngine.adjSpd : 0.0;
 				newEngine.ope.cmRot.y = (0.02 < abs(gRot.y)) ? gRot.y * newEngine.adjSpd : 0.0;
 				if (JoyInfoEx.dwButtons == 16)
-					newEngine.ope.cmRot.z = -0.1;
+					newEngine.ope.cmRot.z = newEngine.adjSpd * -0.1;
 				else if (JoyInfoEx.dwButtons == 32)
-					newEngine.ope.cmRot.z = 0.1;
+					newEngine.ope.cmRot.z = newEngine.adjSpd * 0.1;
 				else
 					newEngine.ope.cmRot.z = 0.0;
 
