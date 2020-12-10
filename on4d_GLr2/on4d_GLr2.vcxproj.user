@@ -3,4 +3,7 @@
   <PropertyGroup>
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebuggerFlavor>PythonDebugLaunchProvider</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

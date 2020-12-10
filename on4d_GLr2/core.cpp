@@ -1,3 +1,7 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#include "CppPythonIF.h"
+
 #include <Windows.h>
 #include <Complex>
 #include <iostream>
@@ -83,6 +87,15 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	menuCheckDef(hMenu, &menuItemInfo);
 	//
 
+	// Python初期化
+	bool initPyFlg;
+	if (PyImport_AppendInittab("h3simAPI", PyInit_CppModule) == -1)
+		initPyFlg = false;
+	else
+	{
+		Py_InitializeEx(1);	// todo★ python実行環境ごとこっちで用意する
+		initPyFlg = true;
+	}
 
 	// S3シミュレータクラス 初期化
 	if(!newEngine.init(preWnd))
@@ -115,8 +128,9 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 	///-- 後処理 --//
 	newEngine.dispose();
-
+	if(initPyFlg) Py_FinalizeEx();
 	FreeConsole();
+
 	///--
 	
 

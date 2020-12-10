@@ -153,6 +153,9 @@
     <ClCompile Include="player.cpp">
       <Filter>c++ソース\コア演算部</Filter>
     </ClCompile>
+    <ClCompile Include="CppPythonIF.cpp">
+      <Filter>c++ソース\コア演算部</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -213,6 +216,9 @@
       <Filter>c++ ヘッダ\コア演算部</Filter>
     </ClInclude>
     <ClInclude Include="point.h">
+      <Filter>c++ ヘッダ\コア演算部</Filter>
+    </ClInclude>
+    <ClInclude Include="CppPythonIF.h">
       <Filter>c++ ヘッダ\コア演算部</Filter>
     </ClInclude>
   </ItemGroup>
