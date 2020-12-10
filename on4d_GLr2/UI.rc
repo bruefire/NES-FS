@@ -17,6 +17,7 @@ BEGIN
 			MENUITEM "日本語"			UI_LANG_JA
 			MENUITEM "English"			UI_LANG_EN
 		END
+        MENUITEM "スクリプト実行",      UI_CALL_SCRIPT
 		MENUITEM SEPARATOR 
         MENUITEM "終了",                UI_END
     END

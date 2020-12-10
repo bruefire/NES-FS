@@ -13,6 +13,10 @@
 #define UI_LANG_JA 21
 #define UI_LANG_EN 22
 
+// Pythonスクリプト
+#define UI_CALL_SCRIPT 30
+
+// その他設定
 #define UI_CR_S 100
 #define UI_CR_M 101
 #define UI_CR_L 102

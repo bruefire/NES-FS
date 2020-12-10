@@ -14,6 +14,7 @@
 #include "UI_DEF.h"
 #include "rcFunc.h"
 #include "modlgRc.h"
+#include "editor.h"
 #include <glew.h>
 #include <GL/gl.h>
 using namespace std;
@@ -23,6 +24,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
+INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 
 //
 ATOM InitApp(HINSTANCE);
@@ -39,6 +41,7 @@ char* menuName = "KITTY";	// メニュー名
 char* titleName = "超球面遊泳シミュレータ";	// ウィンドウタイトル
 
 HWND preWnd;
+HWND editDlg = nullptr;
 char cmJD = 0;
 POINTS cm_rot[2] = {{}, {}};
 
@@ -117,6 +120,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		if((PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) != 0){
 			if(msg.message == WM_QUIT) break;
 			else{
+				// まず子ダイアログにメッセージ処理を試す
+				if (editDlg && IsDialogMessage(editDlg, &msg))
+					continue;
+
 				TranslateMessage(&msg);	//メッセージを変換
 				DispatchMessage(&msg);	//メッセージを送出
 			}
@@ -130,7 +137,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	newEngine.dispose();
 	if(initPyFlg) Py_FinalizeEx();
 	FreeConsole();
-
 	///--
 	
 
@@ -554,6 +560,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					DialogBox(curInst, "INFO_DLG", preWnd, DialogProc); break;
 				case UI_CALL_MODLG:
 					DialogBox(curInst, "MOVE_OBJ_DLG", preWnd, moveObjProc); break;
+				case UI_CALL_SCRIPT:
+					if (editDlg == nullptr)
+					{
+						editDlg = CreateDialog(curInst, "EDITOR_DLG", preWnd, EditorProc);
+						ShowWindow(editDlg, SW_NORMAL);
+					}
+					break;
 				}
 			}
 			break;
@@ -741,10 +754,32 @@ INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 				EndDialog(hDlg, IDOK);
 				return true;
 			}
+			break;
 		case WM_DESTROY:
 			EndDialog(hDlg, IDOK);
 			return true;
 		
+	}
+	return false;
+
+};
+// Pythonエディタプロシージャ
+INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) {
+
+	switch (msg) {
+	case WM_COMMAND:
+		switch (LOWORD(wp)) {
+		case IDOK:
+			return true;
+		case IDCANCEL:
+			DestroyWindow(editDlg);
+			return true;
+		}
+		break;
+	case WM_DESTROY:
+		editDlg = nullptr;
+		return true;
+
 	}
 	return false;
 

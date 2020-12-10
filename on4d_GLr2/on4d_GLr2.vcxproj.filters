@@ -221,6 +221,9 @@
     <ClInclude Include="CppPythonIF.h">
       <Filter>c++ ヘッダ\コア演算部</Filter>
     </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>c++ ヘッダ\OS依存部%28Windows%29\フォーム系</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UI_EN.rc">
@@ -236,6 +239,9 @@
       <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
     <ResourceCompile Include="UI.rc">
+      <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="editor.rc">
       <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
   </ItemGroup>

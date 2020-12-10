@@ -1,0 +1,25 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include <Windows.h>
+#include "editor.h"
+/////////////////////////////////////////////////////////////////////////////
+
+// Dialog
+//
+
+EDITOR_DLG DIALOGEX 0, 0, 255, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Pythonスクリプト実行"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+LTEXT           "コード", IDC_STATIC, 23, 12, 48, 8
+EDITTEXT        EDITDLG_PATH_TXT, 17, 25, 200, 95, ES_MULTILINE | ES_WANTRETURN | ES_AUTOVSCROLL | WS_VSCROLL
+
+LTEXT           "ファイル読込", IDC_STATIC, 23, 128, 43, 8
+
+DEFPUSHBUTTON   "実行", IDOK, 137, 175, 50, 14
+PUSHBUTTON      "キャンセル", IDCANCEL, 198, 175, 50, 14
+
+END
+
+
