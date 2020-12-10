@@ -92,11 +92,28 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 	// Python初期化
 	bool initPyFlg;
-	if (PyImport_AppendInittab("h3simAPI", PyInit_CppModule) == -1)
+	PyObject* pModule;
+	PyObject* catcher;
+	if (PyImport_AppendInittab("h3sim", PyInit_CppModule) == -1)
 		initPyFlg = false;
 	else
 	{
-		Py_InitializeEx(1);	// todo★ python実行環境ごとこっちで用意する
+		string stdOutErr = "\
+import sys\n\
+import h3sim\n\
+class CatchOutErr :\n\
+	def __init__(self) :\n\
+		self.value = ''\n\
+	def write(self, txt) :\n\
+		self.value += txt\n\
+catchOutErr = CatchOutErr()\n\
+sys.stdout = catchOutErr\n\
+sys.stderr = catchOutErr\n";
+
+		Py_InitializeEx(0);	// todo★ python実行環境ごとこっちで用意する
+		pModule = PyImport_AddModule("__main__");
+		PyRun_SimpleString(stdOutErr.c_str());
+		catcher = PyObject_GetAttrString(pModule, "catchOutErr");
 		initPyFlg = true;
 	}
 
@@ -128,6 +145,21 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 				DispatchMessage(&msg);	//メッセージを送出
 			}
 		}else{
+			if (initPyFlg && CppPythonIF::rawCode[0] != 0)
+			{
+				PyRun_SimpleString(CppPythonIF::rawCode);
+				
+				PyObject* output = PyObject_GetAttrString(catcher, "value");
+				PyObject* ascStr = PyUnicode_AsASCIIString(output);
+				auto cnvStr = PyBytes_AsString(ascStr);
+				if(cnvStr != nullptr)
+					cout << cnvStr << endl;
+
+				ZeroMemory(CppPythonIF::rawCode, 8186);
+				Py_XDECREF(output);
+				Py_XDECREF(ascStr);
+				PyRun_SimpleString("sys.stdout.value = ''");//todo★ Py関連の解放を行う
+			}
 			// S3更新
 			newEngine.update();
 		}
@@ -135,7 +167,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 	///-- 後処理 --//
 	newEngine.dispose();
-	if(initPyFlg) Py_FinalizeEx();
+
+	if (initPyFlg) {
+		Py_XDECREF(catcher);
+		Py_FinalizeEx();
+	}
 	FreeConsole();
 	///--
 	
@@ -765,11 +801,12 @@ INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 };
 // Pythonエディタプロシージャ
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) {
-
+	
 	switch (msg) {
 	case WM_COMMAND:
 		switch (LOWORD(wp)) {
 		case IDOK:
+			GetDlgItemText(editDlg, EDITDLG_CODE_TXT, CppPythonIF::rawCode, 8186);
 			return true;
 		case IDCANCEL:
 			DestroyWindow(editDlg);
