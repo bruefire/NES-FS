@@ -250,4 +250,9 @@
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="pyInit.py">
+      <Filter>リソース ファイル</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

@@ -92,29 +92,24 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 	// Python初期化
 	bool initPyFlg;
-	PyObject* pModule;
 	PyObject* catcher;
 	if (PyImport_AppendInittab("h3sim", PyInit_CppModule) == -1)
 		initPyFlg = false;
 	else
 	{
-		string stdOutErr = "\
-import sys\n\
-import h3sim\n\
-class CatchOutErr :\n\
-	def __init__(self) :\n\
-		self.value = ''\n\
-	def write(self, txt) :\n\
-		self.value += txt\n\
-catchOutErr = CatchOutErr()\n\
-sys.stdout = catchOutErr\n\
-sys.stderr = catchOutErr\n";
+		// python初期化ファイル
+		string pyInitFle = "pyInit.py";
+		FILE* pyInitFp = fopen(pyInitFle.c_str(), "rb");
 
 		Py_InitializeEx(0);	// todo★ python実行環境ごとこっちで用意する
-		pModule = PyImport_AddModule("__main__");
-		PyRun_SimpleString(stdOutErr.c_str());
-		catcher = PyObject_GetAttrString(pModule, "catchOutErr");
+		CppPythonIF::pModule = PyImport_AddModule("__main__");
+		CppPythonIF::pDict = PyModule_GetDict(CppPythonIF::pModule);
+		PyRun_SimpleFile(pyInitFp, pyInitFle.c_str());
+		catcher = PyObject_GetAttrString(CppPythonIF::pModule, "catchOutErr");
+		CppPythonIF::engine = &newEngine;
 		initPyFlg = true;
+
+		fclose(pyInitFp);
 	}
 
 	// S3シミュレータクラス 初期化

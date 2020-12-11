@@ -104,6 +104,11 @@
   <ItemGroup>
     <Image Include="s3sim.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="pyInit.py">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </Text>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BA463831-02FC-46CE-B106-7B2FDB7C0B43}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
