@@ -209,6 +209,7 @@ bool object3d::SetLocRelative(object3d* trgObj, pt3 nLoc, double dst)
 	reObj.objInitH3(nullptr);
 	reObj.std[0] = trgCpy.std[0];
 	reObj.std[1] = trgCpy.std[1];
+	reObj.lspX.asgPt3(reObj.std[0]);
 	reObj.lspX.w = owner->SPEED_MAX;
 
 	pt3 std1N = trgCpy.std[0].norm();
@@ -237,6 +238,51 @@ bool object3d::SetLocRelative(object3d* trgObj, pt3 nLoc, double dst)
 	this->lspX = reObj.lspX;
 
 	return true;
+}
+
+// 相対的に角度再設定
+bool object3d::SetRotRelative(pt3 nRot)
+{
+	pt3 preLoc = loc;
+	ParallelMove(preLoc, false);
+
+	//---> 新規回転の反映
+	// 軸ベクトル定義
+	pt3 std1N = std[0].norm();
+	pt3 std2N = std[1].norm();
+	pt3 sideN = pt3::cross(std2N, std1N);
+
+	// 軸方向の回転
+	object3d::RotVecs(&std2N, &sideN, nRot.z);	// 正面固定回転
+	object3d::RotVecs(&std1N, &std2N, nRot.y);	// 上下方向回転
+	object3d::RotVecs(&std1N, &sideN, nRot.x);	// 左右方向回転
+
+	// 結果の反映
+	std[0] = std1N.mtp(owner->H3_STD_LEN);
+	std[1] = std2N.mtp(owner->H3_STD_LEN);
+
+	ParallelMove(preLoc, true);
+
+	return true;
+}
+
+// std更新
+void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot)
+{
+	pt3 tmpN[2];
+	pt2 tmpRt = pt2(0, 1);
+
+	tudeRst(&tmpRt.x, &tmpRt.y, rot, 1);
+
+	tmpN[0] = pt3()
+		.pls(vec1->mtp(tmpRt.y))
+		.pls(vec2->mtp(tmpRt.x));
+	tmpN[1] = pt3()
+		.pls(vec1->mtp(tmpRt.x).mtp(-1))
+		.pls(vec2->mtp(tmpRt.y));
+
+	*vec1 = tmpN[0];
+	*vec2 = tmpN[1];
 }
 
 // ToDo★: 標準の初期設定 H3

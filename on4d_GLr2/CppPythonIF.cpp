@@ -82,6 +82,42 @@ PyObject* CppPythonIF::SetLocRelative(PyObject* self, PyObject* args)
 
 
 // 相対的な位置設定
+PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
+{
+
+    if (engine == nullptr)
+        return NULL;
+
+    PyObject* src;
+    pt3 nLoc;
+    if (!PyArg_ParseTuple(args, "Oddd", &src, &nLoc.x, &nLoc.y, &nLoc.z))
+        return NULL;
+
+    // 型チェック
+    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
+    if (!PyObject_IsInstance(src, objDataType))
+        return PyLong_FromLong(1);  // エラーにはしない
+
+
+    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
+
+    if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+    {
+        // 位置再設定
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+
+        if (!selfObj->SetRotRelative(nLoc))
+            return PyLong_FromLong(1);  // エラーにはしない
+    }
+
+    Py_XDECREF(selfIdx);
+
+
+    return PyLong_FromLong(1);
+}
+
+
+// 相対的な位置設定
 PyObject* CppPythonIF::GetPlayerObj(PyObject* self, PyObject* args)
 {
     if (engine == nullptr)
@@ -117,6 +153,12 @@ PyMethodDef methods[] =
     {
         "SetLocRelative",
         CppPythonIF::SetLocRelative,
+        METH_VARARGS,
+        "explanation."
+    },
+    {
+        "SetRotRelative",
+        CppPythonIF::SetRotRelative,
         METH_VARARGS,
         "explanation."
     },

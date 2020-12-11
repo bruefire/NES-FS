@@ -673,26 +673,9 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	pt3 sideN = pt3::cross(std2N, std1N);
 
 	// ²•ûŒü‚Ì‰ñ“]
-	auto RotVecs = [](pt3* vec1, pt3* vec2, double rot)
-	{
-		pt3 tmpN[2];
-		pt2 tmpRt = pt2(0, 1);
-
-		tudeRst(&tmpRt.x, &tmpRt.y, rot, 1);
-
-		tmpN[0] = pt3()
-			.pls(vec1->mtp(tmpRt.y))
-			.pls(vec2->mtp(tmpRt.x));
-		tmpN[1] = pt3()
-			.pls(vec1->mtp(tmpRt.x).mtp(-1))
-			.pls(vec2->mtp(tmpRt.y));
-
-		*vec1 = tmpN[0];
-		*vec2 = tmpN[1];
-	};
-	RotVecs(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
-	RotVecs(&std1N, &std2N, curObj->rot.y);	// ã‰º•ûŒü‰ñ“]
-	RotVecs(&std1N, &sideN, curObj->rot.x);	// ¶‰E•ûŒü‰ñ“]
+	object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
+	object3d::RotVecs(&std1N, &std2N, curObj->rot.y);	// ã‰º•ûŒü‰ñ“]
+	object3d::RotVecs(&std1N, &sideN, curObj->rot.x);	// ¶‰E•ûŒü‰ñ“]
 
 	curObj->std[0] = std1N.mtp(H3_STD_LEN);
 	curObj->std[1] = std2N.mtp(H3_STD_LEN);
@@ -952,7 +935,7 @@ int engine3d::InitH3()	// ‘o‹È¢ŠE—p‰Šú‰»
 	{
 		objs[h].objInitH3(meshs + 4);
 
-		objs[h].rot.asg(0, 1 DEG, 0);
+		objs[h].rot.asg(0, 0 DEG, 0);
 		objs[h].rsp.asg(0 DEG, 0, 0);
 		objs[h].used = true;	//-- —LŒø‰»
 		objs[h].draw = 2;

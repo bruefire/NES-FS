@@ -153,7 +153,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 				ZeroMemory(CppPythonIF::rawCode, 8186);
 				Py_XDECREF(output);
 				Py_XDECREF(ascStr);
-				PyRun_SimpleString("sys.stdout.value = ''");//todo★ Py関連の解放を行う
+				PyRun_SimpleString("sys.stdout.value = ''");
 			}
 			// S3更新
 			newEngine.update();

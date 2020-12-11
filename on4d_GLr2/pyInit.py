@@ -18,5 +18,7 @@ class ObjData :
 		self.idx = val
 	def SetLocRelative(self, trg, dst, x, y, z) :
 		h3sim.SetLocRelative(self, trg, dst, x, y, z)
+	def SetRotRelative(self, x, y, z) :
+		h3sim.SetRotRelative(self, x, y, z)
 
 

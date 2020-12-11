@@ -13,6 +13,7 @@ public:
     static char rawCode[8186];
     static PyObject* GetObjData(PyObject* self, PyObject* args);
     static PyObject* SetLocRelative(PyObject* self, PyObject* args);
+    static PyObject* SetRotRelative(PyObject* self, PyObject* args);
     static PyObject* GetPlayerObj(PyObject* self, PyObject* args);
 
     // Pythonオブジェクト
