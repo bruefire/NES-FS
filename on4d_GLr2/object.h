@@ -45,6 +45,7 @@ public:
 	static double ClcEucFromHypb(double);	// H3 双曲極座標をEUC[X,Y,Z]座標に変換
 	void mkLspX_S3(pt4);		// S3用
 	void mkLspX_H3(pt4);	// H3用
+	bool SetLocRelative(object3d* trgObj, pt3 nLoc, double dst);	// H3
 
 	void clcStd(pt3, pt3, double*);
 	void clcStd(pt4, pt4, double*);

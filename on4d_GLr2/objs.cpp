@@ -194,6 +194,51 @@ void object3d::DealH3OohObj(bool loopFlg)
 		used = false;
 }
 
+// 相対的に位置再設定
+bool object3d::SetLocRelative(object3d* trgObj, pt3 nLoc, double dst)
+{
+	if (!trgObj->used)
+		return false;
+
+	// 位置再設定
+	object3d trgCpy(*trgObj);
+	pt3 preLoc = trgCpy.loc;
+	trgCpy.ParallelMove(preLoc, false);
+
+	object3d reObj(owner);
+	reObj.objInitH3(nullptr);
+	reObj.std[0] = trgCpy.std[0];
+	reObj.std[1] = trgCpy.std[1];
+	reObj.lspX.w = owner->SPEED_MAX;
+
+	pt3 std1N = trgCpy.std[0].norm();
+	pt3 std2N = trgCpy.std[1].norm();
+	pt3 sideN = pt3::cross(std2N, std1N);
+	pt3 nLocK = pt3(0, 0, 0)
+		.pls(std1N.mtp(nLoc.z))
+		.pls(std2N.mtp(nLoc.y))
+		.pls(sideN.mtp(nLoc.x))
+		.norm()
+		.mtp(object3d::ClcEucFromHypb(dst));
+
+	reObj.ParallelMove(nLocK, true);
+	reObj.ParallelMove(preLoc, true);
+
+	// 有効範囲チェック
+	double rstDst = pyth3(reObj.loc);
+	if (rstDst > owner->H3_MAX_RADIUS || isnan(rstDst))
+		return false;
+
+	// 結果を反映
+	this->used = true;
+	this->loc = reObj.loc;
+	this->std[0] = reObj.std[0];
+	this->std[1] = reObj.std[1];
+	this->lspX = reObj.lspX;
+
+	return true;
+}
+
 // ToDo★: 標準の初期設定 H3
 void object3d::init_stdH3(bool randSW)
 {
