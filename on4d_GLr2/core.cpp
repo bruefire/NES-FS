@@ -140,19 +140,18 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 				DispatchMessage(&msg);	//メッセージを送出
 			}
 		}else{
+			// Pythonスクリプト処理
 			if (initPyFlg && CppPythonIF::rawCode[0] != 0)
 			{
 				PyRun_SimpleString(CppPythonIF::rawCode);
 				
 				PyObject* output = PyObject_GetAttrString(catcher, "value");
-				PyObject* ascStr = PyUnicode_AsASCIIString(output);
-				auto cnvStr = PyBytes_AsString(ascStr);
+				const char* cnvStr = PyUnicode_AsUTF8AndSize(output, nullptr);
 				if(cnvStr != nullptr)
 					cout << cnvStr << endl;
 
 				ZeroMemory(CppPythonIF::rawCode, 8186);
 				Py_XDECREF(output);
-				Py_XDECREF(ascStr);
 				PyRun_SimpleString("sys.stdout.value = ''");
 			}
 			// S3更新
