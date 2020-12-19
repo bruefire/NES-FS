@@ -1017,6 +1017,11 @@ pt2::pt2(double x, double y)
 	this->x = x; this->y = y;
 }
 pt2 pt2::mtp(double mt) { pt2 tmpt(x * mt, y * mt); return tmpt; };
+pt2i::pt2i() {}
+pt2i::pt2i(int x, int y)
+{
+	this->x = x; this->y = y;
+}
 
 ///▼ 3D関係 ====================
 void object3d::pSet(pt3* pt, uint32_t len){ for(uint32_t i=0;i<len;i++) mesh->pts[i] = pt[i]; }	//オブジェクトのpt設定

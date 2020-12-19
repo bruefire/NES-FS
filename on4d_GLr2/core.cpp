@@ -600,6 +600,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				}
 			}
 			break;
+
+		case WM_LBUTTONDOWN:
+			POINTS tmp = MAKEPOINTS(lp);
+			newEngine.clickCoord = pt2i(tmp.x, newEngine.HEIGHT-(tmp.y+1));
+			break;
 			
 		case WM_MBUTTONDOWN:
 			if((wp&0x0004) != 0x0004) cmJD = 1; else cmJD = 2;

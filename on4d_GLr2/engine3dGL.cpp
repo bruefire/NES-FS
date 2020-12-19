@@ -365,7 +365,10 @@ int engine3dGL::update()
 	}
 	else if (worldGeo == WorldGeo::HYPERBOLIC)
 	{
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		SimulateH3GL();
+		glDisable(GL_STENCIL_TEST);
 
 		// GUIï`âÊ
 		glDisable(GL_DEPTH_TEST);
@@ -422,6 +425,7 @@ engine3dGL::engine3dGL()
 	, VIEW_DST(false)
 	, VIEW_LocRot(false)
 	, ptDel4d(0)
+	, clickCoord(pt2i(-1, -1))
 	, qyMode(QY_MODE::HIGH)
 {
 	///Å• 3DÉXÉNÉäÅ[Éì

@@ -140,8 +140,9 @@ int engine3dWin::GL_CreateContextPls()
     pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cColorBits = 32;
-    pfd.cAlphaBits = 8; // アルファチャンネル8bit (0にするとアルファチャンネル無しになる)
-    pfd.cDepthBits = 24; // デプスバッファ24bit
+    pfd.cAlphaBits = 8;		// アルファチャンネル8bit
+    pfd.cDepthBits = 24;	// デプスバッファ24bit
+	pfd.cStencilBits = 8;	// ステンシルバッファ8bit
     pfd.iLayerType = PFD_MAIN_PLANE;
     int pixelFormatIndex = ChoosePixelFormat(hdc, &pfd);
 

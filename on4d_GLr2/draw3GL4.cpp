@@ -123,6 +123,8 @@ void engine3dGL::SimulateH3GL()
 	glClearColor(0, 0, 0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glClearStencil(0);
 
 	// ユニフォーム変数設定
 	glUseProgram(shader[5]);
@@ -143,7 +145,27 @@ void engine3dGL::SimulateH3GL()
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 	// 各オブジェクトの描画
-	DrawEachObjsH3();
+	DrawEachObjsH3(0);
+
+	// クリックしたオブジェクトの特定
+	if (0 <= clickCoord.x && clickCoord.x < WIDTH
+		&& 0 <= clickCoord.y && clickCoord.y < HEIGHT)
+	{
+		unsigned char tmpIdx;
+		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
+		int objidx = tmpIdx;
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearStencil(0);
+
+		glScissor(clickCoord.x, clickCoord.y, 1, 1);
+		DrawEachObjsH3(1);
+		glScissor(0, 0, WIDTH, HEIGHT);
+
+		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
+		objidx += tmpIdx * 256;
+		clickCoord.x = -1;
+	}
 
 }
 
@@ -371,7 +393,7 @@ int engine3dGL::DrawEachObjsS3_LQY()
 	return 1;
 }
 
-int engine3dGL::DrawEachObjsH3()
+int engine3dGL::DrawEachObjsH3(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = 0; h < objCnt; h++)
@@ -410,6 +432,10 @@ int engine3dGL::DrawEachObjsH3()
 		glBindTexture(GL_TEXTURE_2D, texNames[curObj->mesh->texNo]);
 
 
+		if(loop == 0)
+			glStencilFunc(GL_ALWAYS, (h + 1) % 256, -1);
+		else
+			glStencilFunc(GL_ALWAYS, (h + 1) % (256*256) / 256, -1);
 
 		glEnable(GL_TEXTURE_2D);
 

@@ -58,6 +58,7 @@ public:
 	bool LOC_MODE;
 	bool VIEW_DST;
 	bool VIEW_LocRot;
+	pt2i clickCoord;	// オブジェクトをクリック選択
 	QY_MODE qyMode;
 
 	GuiFont guiFont;
@@ -77,7 +78,7 @@ public:
 	void SimulateH3GL();
 	int DrawEachObjsS3();
 	int DrawEachObjsS3_LQY();
-	int DrawEachObjsH3();
+	int DrawEachObjsH3(int);
 	double GetAsp();
 	
 	void MakeCharVBO();

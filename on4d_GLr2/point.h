@@ -13,6 +13,8 @@ class pt2i {
 public:
 	int x;
 	int y;
+	pt2i();
+	pt2i(int, int);
 };
 class pt3 {
 public:
