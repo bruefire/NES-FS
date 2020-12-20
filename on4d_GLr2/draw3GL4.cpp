@@ -121,7 +121,10 @@ void engine3dGL::SimulateH3GL()
 	objs[0].scale = 0.5 * radius;	//-- Т▓Ро
 	/*if (sun.used) glClearColor(0.2, 0.8, 1, 0.0);
 	else if (bgCol) glClearColor(1, 1, 1, 0.0);*/
-	glClearColor(0, 0, 0, 0.0);
+	if (bgCol) 
+		glClearColor(1, 1, 1, 0.0);
+	else 
+		glClearColor(0, 0, 0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClear(GL_STENCIL_BUFFER_BIT);

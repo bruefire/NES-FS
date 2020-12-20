@@ -40,6 +40,7 @@
     <ResourceCompile Include="UI.rc">
       <FileType>Text</FileType>
     </ResourceCompile>
+    <ResourceCompile Include="UIH3.rc" />
     <ResourceCompile Include="UI_EN.rc">
       <FileType>Text</FileType>
     </ResourceCompile>

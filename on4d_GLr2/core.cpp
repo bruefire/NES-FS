@@ -70,7 +70,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if(awIdx <= awakeCmd.length()){
 		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{
-			menuName = "KITTY";
+			menuName = "KITTY_H3";
 			titleName = "‘o‹È–Ê—V‰jƒVƒ~ƒ…ƒŒ[ƒ^";
 			newEngine.lang = UI_LANG_JA;
 			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
