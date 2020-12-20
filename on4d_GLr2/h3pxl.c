@@ -13,6 +13,7 @@ uniform vec4 WH_CR;
 uniform sampler2D sfTex;
 uniform int texJD;
 uniform float H3_MAX_RADIUS;
+uniform int decMode;
 
 // output data
 out vec3 color;
@@ -230,7 +231,12 @@ void main()
 
 	gl_FragDepth = dec;
 
-	color = oCol * nDeg;
+	if (decMode == 0)
+		color = oCol;
+	else if (decMode == 1)
+		color = oCol * (1.0 - dec);
+	else 
+		color = oCol * nDeg;
 	//color = vec3(0.0, 0.5, 1.0) * dec + oCol * nDeg * (1.0 - dec);
 
 }

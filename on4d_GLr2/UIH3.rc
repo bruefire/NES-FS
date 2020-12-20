@@ -30,12 +30,12 @@ BEGIN
 MENUITEM "白", UI_BG_WH
 MENUITEM "黒", UI_BG_BK
 END
-POPUP "表示座標"
-BEGIN
-MENUITEM "極座標", UI_LOC_TUDE
-MENUITEM "直行座標", UI_LOC_EUC
-END
-POPUP "超球半径"
+//POPUP "表示座標"
+//BEGIN
+//MENUITEM "極座標", UI_LOC_TUDE
+//MENUITEM "直行座標", UI_LOC_EUC
+//END
+POPUP "空間スケール"
 BEGIN
 MENUITEM "20", UI_RDS_SS
 MENUITEM "30", UI_RDS_S
@@ -52,8 +52,8 @@ POPUP "深度効果"
 BEGIN
 MENUITEM "なし", UI_SD_0
 MENUITEM "ﾘﾆｱ減衰(遠いほど暗く)", UI_SD_1
-MENUITEM "陰影1(光源＝視点)", UI_SD_2
-MENUITEM "陰影2(光源＝視点)", UI_SD_4
+MENUITEM "陰影(光源＝視点)", UI_SD_2
+//MENUITEM "陰影2(光源＝視点)", UI_SD_4
 END
 //POPUP "レンダリング"
 //BEGIN
@@ -65,7 +65,7 @@ END
 END
 POPUP "オブジェクト"
 BEGIN
-MENUITEM "プレイヤー位置変更"			UI_CALL_MODLG
+//MENUITEM "プレイヤー位置変更"			UI_CALL_MODLG
 POPUP "オブジェクト変更"
 BEGIN
 POPUP "ベースオブジェクト"
@@ -96,30 +96,29 @@ END
 END
 POPUP "射撃オブジェクト配置"
 BEGIN
-MENUITEM "ランダム配置(集中)", UI_THROW_RANDOM
+//MENUITEM "ランダム配置(集中)", UI_THROW_RANDOM
 MENUITEM "ランダム配置(一様)", UI_THROW_RANDOM2
 MENUITEM "クリア", UI_THROW_CLEAR
 END
-POPUP "物体の運動"
-BEGIN
-MENUITEM "等速直線", UI_MV_CONST
-MENUITEM "引力", UI_MV_ATTRACT
-MENUITEM "斥力", UI_MV_REPULSE
-END
+//POPUP "物体の運動"
+//BEGIN
+//MENUITEM "等速直線", UI_MV_CONST
+//MENUITEM "引力", UI_MV_ATTRACT
+//MENUITEM "斥力", UI_MV_REPULSE
+//END
 END
 POPUP "表示"
 BEGIN
 MENUITEM "座標", UI_XYZ
 MENUITEM "操作オブジェクト", UI_PLR
 MENUITEM "マップ", UI_MAP
-MENUITEM "移動/回転方向", UI_LR_RESULT
-MENUITEM "距離", UI_DST
-MENUITEM "軌跡", UI_PAST
+//MENUITEM "移動/回転方向", UI_LR_RESULT
+//MENUITEM "距離", UI_DST
+//MENUITEM "軌跡", UI_PAST
 END
 POPUP "ヘルプ"
 BEGIN
 MENUITEM "操作方法", UI_HOWTO_DLG
-//MENUITEM "超球面の性質",            40041
-MENUITEM "超球面遊泳シミュレータについて", UI_INFO_DLG
+MENUITEM "双曲面遊泳シミュレータについて", UI_INFO_DLG
 END
 END

@@ -430,8 +430,8 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		xID = glGetUniformLocation(shader[SDR], "H3_MAX_RADIUS");
 		glUniform1f(xID, H3_MAX_RADIUS);
 		//else		glUniform1i(xID, 3);
-		//xID = glGetUniformLocation(shader[SDR], "bgMode");
-		//glUniform1i(xID, bgCol);
+		xID = glGetUniformLocation(shader[SDR], "decMode");
+		glUniform1i(xID, decMode);
 		xID = glGetUniformLocation(shader[SDR], "texJD");
 		glUniform1i(xID, curObj->mesh->texJD);
 
