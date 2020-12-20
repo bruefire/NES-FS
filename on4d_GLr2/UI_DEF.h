@@ -8,10 +8,11 @@
 #define UI_FPS_60 12
 #define UI_FPS_VFR 13
 
-//-- UI言語
+//-- シミュレータ選択
 #define UI_LANG 20
 #define UI_LANG_JA 21
-#define UI_LANG_EN 22
+#define UI_H3_JA 22
+#define UI_LANG_EN 23
 
 // Pythonスクリプト
 #define UI_CALL_SCRIPT 30

@@ -12,10 +12,11 @@ BEGIN
 			MENUITEM "30(固定)"			UI_FPS_30
 			MENUITEM "60(固定)"			UI_FPS_60
 		END
-		POPUP "言語"					//UI_LANG
+		POPUP "シミュレータ選択"		//UI_LANG
 		BEGIN
-			MENUITEM "日本語"			UI_LANG_JA
-			MENUITEM "English"			UI_LANG_EN
+			MENUITEM "超球面 (日本語)"		UI_LANG_JA
+            MENUITEM "双曲面 (日本語)"	    UI_H3_JA
+			MENUITEM "Spherical (English)"	UI_LANG_EN
 		END
         MENUITEM "スクリプト実行",      UI_CALL_SCRIPT
 		MENUITEM SEPARATOR 

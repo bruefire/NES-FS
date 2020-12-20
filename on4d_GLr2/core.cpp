@@ -68,16 +68,26 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	int awIdx = awakeCmd.find_last_of(" ") +1;
 	
 	if(awIdx <= awakeCmd.length()){
-		if(awakeCmd.substr(awIdx) == "lang:EN")
+		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
+		{
+			menuName = "KITTY";
+			titleName = "‘o‹È–Ê—V‰jƒVƒ~ƒ…ƒŒ[ƒ^";
+			newEngine.lang = UI_LANG_JA;
+			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+		}
+		else if(awakeCmd.substr(awIdx) == "lang:EN")
 		{
 			menuName = "KITTY_EN";
 			titleName = "S3 wondering simlator";
 			newEngine.lang = UI_LANG_EN;
-		}else
+			newEngine.worldGeo = engine3d::WorldGeo::SPHERICAL;
+		}
+		else
 		{
 			menuName = "KITTY";
 			titleName = "’´‹…–Ê—V‰jƒVƒ~ƒ…ƒŒ[ƒ^";
 			newEngine.lang = UI_LANG_JA;
+			newEngine.worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}
 		cout << awakeCmd.substr(awIdx) << endl;
 	}
@@ -327,6 +337,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					fName = myPath;
 					mpIdx = fName.find_last_of("\\") +1;
 					fName = fName.substr(mpIdx) + " lang:EN";
+
+					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					PostQuitMessage(0);
+					break;
+
+				case UI_H3_JA:
+					GetModuleFileName(NULL, myPath, myPathLen);
+					fName = myPath;
+					mpIdx = fName.find_last_of("\\") + 1;
+					fName = fName.substr(mpIdx) + " sim:H3;lang:JA";
 
 					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
 					PostQuitMessage(0);
