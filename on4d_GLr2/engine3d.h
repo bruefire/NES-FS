@@ -67,8 +67,9 @@ public:
 	double radius;		//if(ON4D)超球半径
 	double radius_min;
 	// OBJ_LEN_MAX 0.499*PIE*RADIUS_MIN
-	empObj cmData;	//if(on4D)地図で使用
-	pt3 cmCo;		// 基objとの相対座標 H3で使用
+	empObj cmData;		//if(on4D)地図で使用
+	pt3 cmCo;			// 基objとの相対座標 H3で使用
+	int selectedIdx;	// 選択オブジェクト
 
 	// Map
 	int mapMeshLen;

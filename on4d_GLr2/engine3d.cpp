@@ -48,6 +48,7 @@ engine3d::engine3d()
 	, markObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
+	, selectedIdx(-1)
 	//, H3_MAX_RADIUS(0.995) // ‘o‹È’·‚Å –ñ6.0
 	//, H3_REF_RADIUS(0.999) // ‘o‹È’·‚Å –ñ7.7
 	, H3_MAX_RADIUS(0.999995) // ‘o‹È’·‚Å–ñ12.9	//=0.995 –ñ6.0

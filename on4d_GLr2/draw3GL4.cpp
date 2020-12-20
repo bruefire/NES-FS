@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <Complex>
 #include <algorithm>
+#include <iostream>
 #include "constants.h"
 #include "engine3dGL.h"
 #include "functions.h"
@@ -153,7 +154,7 @@ void engine3dGL::SimulateH3GL()
 	{
 		unsigned char tmpIdx;
 		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
-		int objidx = tmpIdx;
+		selectedIdx = tmpIdx - 1;
 		glClear(GL_STENCIL_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glClearStencil(0);
@@ -163,8 +164,12 @@ void engine3dGL::SimulateH3GL()
 		glScissor(0, 0, WIDTH, HEIGHT);
 
 		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
-		objidx += tmpIdx * 256;
+		selectedIdx += tmpIdx * 256;
 		clickCoord.x = -1;
+
+		// 選択オブジェクト情報をコンソール表示
+		if(selectedIdx != -1)
+			cout << "selected object index : " << selectedIdx << endl;
 	}
 
 }
