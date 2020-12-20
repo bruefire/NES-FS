@@ -20,5 +20,7 @@ class ObjData :
 		h3sim.SetLocRelative(self, trg, dst, x, y, z)
 	def SetRotRelative(self, x, y, z) :
 		h3sim.SetRotRelative(self, x, y, z)
+	def SetScale(self, val) :
+		h3sim.SetScale(self, val)
 
 

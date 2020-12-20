@@ -266,6 +266,13 @@ bool object3d::SetRotRelative(pt3 nRot)
 	return true;
 }
 
+// スケール更新
+bool object3d::SetScale(double scale)
+{
+	this->scale = scale;
+	return true;
+}
+
 // std更新
 void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot)
 {

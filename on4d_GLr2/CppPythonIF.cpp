@@ -57,9 +57,10 @@ PyObject* CppPythonIF::SetLocRelative(PyObject* self, PyObject* args)
         PyObject_IsInstance(src, objDataType)
         && PyObject_IsInstance(trg, objDataType);
     if (!typeCheck)
-        return PyLong_FromLong(1);  // エラーにはしない
+        return NULL;  // エラーにはしない
 
 
+    PyObject* result = NULL;
     PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
     PyObject* trgIdx  = PyObject_GetAttrString(trg, "idx");
 
@@ -69,15 +70,15 @@ PyObject* CppPythonIF::SetLocRelative(PyObject* self, PyObject* args)
         object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
         object3d* trgObj  = &engine->objs[PyLong_AsLong(trgIdx)];
 
-        if (!selfObj->SetLocRelative(trgObj, nLoc, dst))
-            return PyLong_FromLong(1);  // エラーにはしない
+        if (selfObj->SetLocRelative(trgObj, nLoc, dst))
+            result = PyLong_FromLong(0);  // エラーにはしない
     }
 
     Py_XDECREF(selfIdx);
     Py_XDECREF(trgIdx);
     
 
-    return PyLong_FromLong(1);
+    return result;
 }
 
 
@@ -99,6 +100,7 @@ PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
         return PyLong_FromLong(1);  // エラーにはしない
 
 
+    PyObject* result = NULL;
     PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
 
     if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
@@ -106,14 +108,14 @@ PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
         // 位置再設定
         object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
 
-        if (!selfObj->SetRotRelative(nLoc))
-            return PyLong_FromLong(1);  // エラーにはしない
+        if (selfObj->SetRotRelative(nLoc))
+            result = PyLong_FromLong(0);  // エラーにはしない
     }
 
     Py_XDECREF(selfIdx);
 
 
-    return PyLong_FromLong(1);
+    return result;
 }
 
 
@@ -130,6 +132,38 @@ PyObject* CppPythonIF::GetPlayerObj(PyObject* self, PyObject* args)
     Py_XDECREF(setMeth);
 
     return objData;
+}
+
+
+// オブジェクトスケール変更
+PyObject* CppPythonIF::SetScale(PyObject* self, PyObject* args)
+{
+    if (engine == nullptr)
+        return NULL;
+
+    PyObject* src;
+    double scale;
+    if (!PyArg_ParseTuple(args, "Od", &src, &scale))
+        return NULL;
+
+    // 型チェック
+    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
+    if (!PyObject_IsInstance(src, objDataType))
+        return NULL;  // エラーにはしない
+
+    PyObject* result = NULL;
+    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
+    if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+    {
+        // スケール再設定
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+
+        if (selfObj->SetScale(scale))
+            result = PyLong_FromLong(0);
+    }
+
+    Py_XDECREF(selfIdx);
+    return result;
 }
 
 
@@ -165,6 +199,12 @@ PyMethodDef methods[] =
     {
         "GetPlayerObj",
         CppPythonIF::GetPlayerObj,
+        METH_VARARGS,
+        "explanation."
+    },
+    {
+        "SetScale",
+        CppPythonIF::SetScale,
         METH_VARARGS,
         "explanation."
     },

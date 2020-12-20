@@ -15,6 +15,7 @@ public:
     static PyObject* SetLocRelative(PyObject* self, PyObject* args);
     static PyObject* SetRotRelative(PyObject* self, PyObject* args);
     static PyObject* GetPlayerObj(PyObject* self, PyObject* args);
+    static PyObject* SetScale(PyObject* self, PyObject* args);
 
     // Pythonオブジェクト
     static PyObject* pModule;

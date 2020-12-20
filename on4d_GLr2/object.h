@@ -47,6 +47,7 @@ public:
 	void mkLspX_H3(pt4);	// H3—p
 	bool SetLocRelative(object3d* trgObj, pt3 nLoc, double dst);	// H3
 	bool SetRotRelative(pt3 nRot);	// H3
+	bool SetScale(double);
 	static void RotVecs(pt3* vec1, pt3* vec2, double rot);
 
 	void clcStd(pt3, pt3, double*);
