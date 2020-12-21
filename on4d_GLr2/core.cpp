@@ -361,7 +361,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				case UI_THROW_RANDOM2:
 					newEngine.player.ep = 0;
-					newEngine.RandLocS3(engine3d::RandMode::Uniform);
+					if (newEngine.worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+					{
+						object3d* plrObj = &newEngine.objs[newEngine.PLR_No];
+						for (int h = newEngine.BWH_QTY + newEngine.PLR_QTY; h < newEngine.OBJ_QTY; h++)
+						{
+							newEngine.objs[h].loc = plrObj->loc;
+							newEngine.objs[h].std[0] = plrObj->std[0];
+							newEngine.objs[h].std[1] = plrObj->std[1];
+							newEngine.objs[h].lspX = plrObj->lspX;
+							newEngine.objs[h].used = true;
+						}
+						newEngine.RandLocH3(engine3d::RandMode::Uniform, engine3d::ObjType::Energy);
+					}
+					else 
+						newEngine.RandLocS3(engine3d::RandMode::Uniform);
+					
 					break;
 
 				case UI_CR_S:
