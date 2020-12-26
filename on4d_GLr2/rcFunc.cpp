@@ -21,6 +21,7 @@ void menuCheckDef(HMENU hMenu, MENUITEMINFO* miInfo){	//--デフォルトのチェック項
 	SetMenuItemInfo(hMenu, UI_THROW_CUBE, 0, miInfo);
 	SetMenuItemInfo(hMenu, UI_SD_2, 0, miInfo);		//fog effect
 	SetMenuItemInfo(hMenu, UI_MV_CONST, 0, miInfo);
+	SetMenuItemInfo(hMenu, UI_OBJ_LOOP, 0, miInfo);
 
 	SetMenuItemInfo(hMenu, UI_XYZ, 0, miInfo);
 	SetMenuItemInfo(hMenu, UI_PLR, 0, miInfo);

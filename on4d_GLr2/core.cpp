@@ -632,6 +632,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						ShowWindow(editDlg, SW_NORMAL);
 					}
 					break;
+				case UI_OBJ_LOOP:
+					menuCheck2(hMenu, &menuItemInfo, UI_OBJ_LOOP);
+					newEngine.h3objLoop = !newEngine.h3objLoop;
+					break;
 				}
 			}
 			break;

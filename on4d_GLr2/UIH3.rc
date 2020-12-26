@@ -65,6 +65,7 @@ END
 END
 POPUP "オブジェクト"
 BEGIN
+MENUITEM "オブジェクトループ"	UI_OBJ_LOOP
 //MENUITEM "プレイヤー位置変更"			UI_CALL_MODLG
 POPUP "オブジェクト変更"
 BEGIN

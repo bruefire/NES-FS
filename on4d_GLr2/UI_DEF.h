@@ -80,3 +80,4 @@
 #define UI_PAST 1400
 
 #define UI_CALL_MODLG 1500
+#define UI_OBJ_LOOP 1600
