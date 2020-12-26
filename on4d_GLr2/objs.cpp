@@ -274,10 +274,10 @@ bool object3d::SetScale(double scale)
 }
 
 // stdXV
-void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot)
+void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot, double len)
 {
 	pt3 tmpN[2];
-	pt2 tmpRt = pt2(0, 1);
+	pt2 tmpRt = pt2(0, len);
 
 	tudeRst(&tmpRt.x, &tmpRt.y, rot, 1);
 
@@ -1043,7 +1043,7 @@ pt3 pt3::mtp(pt3 mt){ mt.x *= x, mt.y *= y, mt.z *= z; return mt; }	//æZ
 pt3 pt3::norm()
 {
 	double len = pyth3(*this);
-	return (len == 0) ? pt3(0, 0, 1) : this->mtp(1 / len);
+	return (len < 0.000000000001) ? pt3(0, 0, 1) : this->mtp(1 / len);
 }
 // “àÏ
 double pt3::dot(pt3 a, pt3 b)

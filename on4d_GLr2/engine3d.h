@@ -98,6 +98,7 @@ public:
 	bool obMove;
 	int PLR_No;
 	bool useJoyPad;
+	int viewTrackIdx;	// 観測対象オブジェクト
 
 	bool mvObjFlg;		// obj位置変更フラグ
 	struct MvObjParam	// obj位置変更パラメータ

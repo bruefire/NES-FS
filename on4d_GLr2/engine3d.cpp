@@ -54,6 +54,7 @@ engine3d::engine3d()
 	, H3_MAX_RADIUS(0.999995) // ‘o‹È’·‚Å–ñ12.9	//=0.995 –ñ6.0
 	, H3_REF_RADIUS(0.999999) // ‘o‹È’·‚Å–ñ??.?	//=0.999 –ñ7.7
 	, h3objLoop(true)
+	, viewTrackIdx(-1)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -673,10 +674,27 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	pt3 std2N = curObj->std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
-	// Ž²•ûŒü‚Ì‰ñ“]
-	object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
-	object3d::RotVecs(&std1N, &std2N, curObj->rot.y);	// ã‰º•ûŒü‰ñ“]
-	object3d::RotVecs(&std1N, &sideN, curObj->rot.x);	// ¶‰E•ûŒü‰ñ“]
+	if (selectedIdx == -1 || selectedIdx >= OBJ_QTY || !objs[selectedIdx].used)
+	{
+		// Ž²•ûŒü‚Ì‰ñ“]
+		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
+		object3d::RotVecs(&std1N, &std2N, curObj->rot.y);	// ã‰º•ûŒü‰ñ“]
+		object3d::RotVecs(&std1N, &sideN, curObj->rot.x);	// ¶‰E•ûŒü‰ñ“]
+	}
+	else
+	{
+		// ‘ÎÛƒIƒuƒWƒFƒNƒg•ûŒü‚ðŒü‚­
+		object3d* trgObj = &objs[selectedIdx];
+		pt3 rotvN = pt3(trgObj->loc.x, trgObj->loc.y, 0).norm();
+
+		double rpLen = pt3::dot(std2N, rotvN);
+		pt3 std2N_rp = rotvN.mtp(rpLen);
+		pt3 std2N_rs = std2N.mns(std2N_rp);
+
+		double rot = atan2(pyth2(trgObj->loc.x, trgObj->loc.y), trgObj->loc.z);
+		object3d::RotVecs(&std1N, &rotvN, rot);			// ‘ÎÛ•ûŒü‚Ö‰ñ“]
+		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+	}
 
 	curObj->std[0] = std1N.mtp(H3_STD_LEN);
 	curObj->std[1] = std2N.mtp(H3_STD_LEN);

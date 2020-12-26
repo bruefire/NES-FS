@@ -48,7 +48,7 @@ public:
 	bool SetLocRelative(object3d* trgObj, pt3 nLoc, double dst);	// H3
 	bool SetRotRelative(pt3 nRot);	// H3
 	bool SetScale(double);
-	static void RotVecs(pt3* vec1, pt3* vec2, double rot);
+	static void RotVecs(pt3* vec1, pt3* vec2, double rot, double len = 1);
 
 	void clcStd(pt3, pt3, double*);
 	void clcStd(pt4, pt4, double*);
