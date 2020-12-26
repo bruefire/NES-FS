@@ -815,13 +815,27 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
 		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[2], 0);
 
-		curObj->locr = curObj->loc;
+		//-- 後方カメラなら
+		pt3 locT = curObj->loc;
+		object3d backObj(*curObj);
+		if (ope.cmBack) {
+			tudeRst(&backObj.loc.x, &backObj.loc.z, PIE, 1);
+			tudeRst(&backObj.std[0].x, &backObj.std[0].z, PIE, 1);
+			tudeRst(&backObj.std[1].x, &backObj.std[1].z, PIE, 1);
+			locT = backObj.loc;
+			backObj.ParallelMove(backObj.loc, false);
+		}
+
+		curObj->locr = locT;
 
 		// std算出、調整、保存
 		pt3 locOld = curObj->loc;
 		curObj->ParallelMove(curObj->loc, false);
 		double objStd[3];
-		curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
+		if(ope.cmBack)
+			curObj->clcStd(backObj.std[0], backObj.std[1], objStd);
+		else
+			curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
 		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
 
 		// std調整
