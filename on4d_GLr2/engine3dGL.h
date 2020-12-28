@@ -58,7 +58,6 @@ public:
 	bool LOC_MODE;
 	bool VIEW_DST;
 	bool VIEW_LocRot;
-	pt2i clickCoord;	// オブジェクトをクリック選択
 	QY_MODE qyMode;
 
 	GuiFont guiFont;
@@ -90,6 +89,7 @@ public:
 	void DrawChars(GuiString);
 	int DrawMapS3();
 	int DrawMapH3();
+	void ClickProc();
 
 	// OpenGL
 	int GL_Init();

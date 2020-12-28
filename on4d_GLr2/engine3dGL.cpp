@@ -425,7 +425,6 @@ engine3dGL::engine3dGL()
 	, VIEW_DST(false)
 	, VIEW_LocRot(false)
 	, ptDel4d(0)
-	, clickCoord(pt2i(-1, -1))
 	, qyMode(QY_MODE::HIGH)
 {
 	///▼ 3Dスクリーン
@@ -861,6 +860,45 @@ void engine3dGL::end4D()
 	delete[] tMesh.pts;	///4D 後始末
 
 	tMesh.setNull();
+}
+
+// クリック処理
+void engine3dGL::ClickProc()
+{
+	if (ope.clickState == Operation::ClickState::None)
+		return;
+
+	if (0 <= ope.clickCoord.x && ope.clickCoord.x < WIDTH
+		&& 0 <= ope.clickCoord.y && ope.clickCoord.y < HEIGHT)
+	{
+		unsigned char tmpIdx;
+		int chkIdx = -1;
+		glReadPixels(ope.clickCoord.x, ope.clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
+		chkIdx += tmpIdx;
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearStencil(0);
+
+		// 1ピクセル再描画
+		glScissor(ope.clickCoord.x, ope.clickCoord.y, 1, 1);
+		DrawEachObjsH3(1);
+		glScissor(0, 0, WIDTH, HEIGHT);
+
+		glReadPixels(ope.clickCoord.x, ope.clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
+		chkIdx += tmpIdx * 256;
+
+		// クリックしたオブジェクトの特定
+		if (ope.clickState == Operation::ClickState::Left)
+			viewTrackIdx = chkIdx;
+		else if (ope.clickState == Operation::ClickState::Right)
+			selectedIdx = chkIdx;
+
+		//// 選択オブジェクト情報をコンソール表示
+		//if (selectedIdx != -1)
+		//	cout << "selected object index : " << selectedIdx << endl;
+	}
+
+	ope.clickState = Operation::ClickState::None;
 }
 
 

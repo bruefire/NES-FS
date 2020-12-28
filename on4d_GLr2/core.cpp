@@ -44,6 +44,8 @@ HWND preWnd;
 HWND editDlg = nullptr;
 char cmJD = 0;
 POINTS cm_rot[2] = {{}, {}};
+HMENU hpMenu;
+HMENU subMenu;
 
 
 
@@ -91,6 +93,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		}
 		cout << awakeCmd.substr(awIdx) << endl;
 	}
+
+	// ポップアップメニュー初期化
+	hpMenu = LoadMenu(hCurInst, "POPUP");
+	subMenu = GetSubMenu(hpMenu, 0);
 	//------------
 
 	if(!InitApp(hCurInst)) return FALSE;
@@ -641,8 +647,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 
 		case WM_LBUTTONDOWN:
+		{
 			POINTS tmp = MAKEPOINTS(lp);
-			newEngine.clickCoord = pt2i(tmp.x, newEngine.HEIGHT-(tmp.y+1));
+			newEngine.ope.clickState = Operation::ClickState::Left;
+			newEngine.ope.clickCoord = pt2i(tmp.x, newEngine.HEIGHT - (tmp.y + 1));
+		}
 			break;
 			
 		case WM_MBUTTONDOWN:
@@ -684,8 +693,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 
 		case WM_RBUTTONDOWN:
-			//DRAW_MODE = !DRAW_MODE;
-			//MIST = !MIST;
+			POINTS tmp = MAKEPOINTS(lp);
+			newEngine.ope.clickState = Operation::ClickState::Right;
+			newEngine.ope.clickCoord = pt2i(tmp.x, newEngine.HEIGHT - (tmp.y + 1));
+			break;
+		case WM_RBUTTONUP:
+		{
+			if (!newEngine.CheckSelectedEnable())
+				break;
+			POINT po;
+			po.x = LOWORD(lp);
+			po.y = HIWORD(lp);
+			ClientToScreen(hWnd, &po);
+
+			MENUITEMINFO miInfo = menuItemInfo;
+			miInfo.cbSize = sizeof(MENUITEMINFO);
+			miInfo.fMask = MIIM_TYPE;
+			miInfo.fType = MFT_STRING;
+
+			string itemStr = "オブジェクトNo." + to_string(newEngine.selectedIdx) + "の設定";
+			char* cstr = new char[itemStr.size() + 1];
+			strcpy(cstr, itemStr.c_str());
+			miInfo.dwTypeData = cstr;
+			miInfo.cch = itemStr.size() + 1;
+
+			SetMenuItemInfo(hpMenu, SUBUI_SETTING_OBJ, 0, &miInfo);
+			TrackPopupMenu(subMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN,
+				po.x, po.y, 0, hWnd, NULL
+			);
+			delete[] cstr;
+		}
 			break;
 			
 		case WM_KEYDOWN:///------------ キーメッセージ (down) -----------

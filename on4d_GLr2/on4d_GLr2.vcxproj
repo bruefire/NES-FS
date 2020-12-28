@@ -106,6 +106,7 @@
     <Image Include="s3sim.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="Popup.rc" />
     <Text Include="pyInit.py">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Text>

@@ -17,6 +17,14 @@ public:
 	int chgMapState;
 	bool inputByKey;	// ÉLÅ[Ç…ÇÊÇÈì¸óÕ
 
+	enum class ClickState
+	{
+		None,
+		Right,
+		Left
+	} clickState;
+	pt2i clickCoord;
+
 	int updLocationParam(double x, double y, int opt);
 	int updRotationParam(double x, double y, int opt);
 	void ClearLocRotParam();

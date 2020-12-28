@@ -674,7 +674,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	pt3 std2N = curObj->std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
-	if (selectedIdx == -1 || selectedIdx >= OBJ_QTY || !objs[selectedIdx].used)
+	if (!CheckTrackedEnable())
 	{
 		// 軸方向の回転
 		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
@@ -684,7 +684,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	else
 	{
 		// 対象オブジェクト方向を向く
-		object3d* trgObj = &objs[selectedIdx];
+		object3d* trgObj = &objs[viewTrackIdx];
 		pt3 rotvN = pt3(trgObj->loc.x, trgObj->loc.y, 0).norm();
 
 		double rpLen = pt3::dot(std2N, rotvN);
@@ -1580,5 +1580,23 @@ pt4 pt4::cross(pt4 a, pt4 b, pt4 c)
 		+ a.x * b.w * c.y + a.y * b.x * c.w + a.w * b.y * c.x
 	);
 
+}
+
+// オブジェクト有効性チェック
+bool engine3d::CheckSelectedEnable()
+{
+	if (selectedIdx == -1 || selectedIdx >= OBJ_QTY || !objs[selectedIdx].used)
+		return false;
+
+	return true;
+}
+
+// オブジェクト有効性チェック
+bool engine3d::CheckTrackedEnable()
+{
+	if (viewTrackIdx == -1 || viewTrackIdx >= OBJ_QTY || !objs[viewTrackIdx].used)
+		return false;
+
+	return true;
 }
 

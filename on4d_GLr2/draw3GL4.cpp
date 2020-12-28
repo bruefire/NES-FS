@@ -151,29 +151,8 @@ void engine3dGL::SimulateH3GL()
 	// 各オブジェクトの描画
 	DrawEachObjsH3(0);
 
-	// クリックしたオブジェクトの特定
-	if (0 <= clickCoord.x && clickCoord.x < WIDTH
-		&& 0 <= clickCoord.y && clickCoord.y < HEIGHT)
-	{
-		unsigned char tmpIdx;
-		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
-		selectedIdx = tmpIdx - 1;
-		glClear(GL_STENCIL_BUFFER_BIT);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glClearStencil(0);
-
-		glScissor(clickCoord.x, clickCoord.y, 1, 1);
-		DrawEachObjsH3(1);
-		glScissor(0, 0, WIDTH, HEIGHT);
-
-		glReadPixels(clickCoord.x, clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);
-		selectedIdx += tmpIdx * 256;
-		clickCoord.x = -1;
-
-		// 選択オブジェクト情報をコンソール表示
-		if(selectedIdx != -1)
-			cout << "selected object index : " << selectedIdx << endl;
-	}
+	// クリック処理
+	ClickProc();
 
 }
 

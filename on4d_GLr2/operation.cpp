@@ -7,6 +7,8 @@ Operation::Operation()
 	, chgMapStateOld(0)
 	, chgMapState(0)
 	, inputByKey(false)
+	, clickState(Operation::ClickState::None)
+	, clickCoord(pt2i(-1, -1))
 {
 	cmLoc = pt3(0, 0, 0);
 	cmRot = pt3(0, 0, 0);

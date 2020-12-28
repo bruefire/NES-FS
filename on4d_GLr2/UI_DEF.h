@@ -1,5 +1,6 @@
 #pragma once
 
+// -----------> メインメニュー <-------------
 #define UI_END 0
 
 //-- フレームレート
@@ -81,3 +82,9 @@
 
 #define UI_CALL_MODLG 1500
 #define UI_OBJ_LOOP 1600
+
+
+// -----------> サブメニュー <-------------
+#define SUBUI_SETTING_OBJ 100
+#define SUBUI_CLEAR_OBJ 101
+

@@ -1,0 +1,13 @@
+#pragma once
+#include "UI_DEF.h"
+
+
+
+POPUP MENU
+BEGIN
+	POPUP "テスト"
+	BEGIN
+		MENUITEM "'object00X'の設定"	SUBUI_SETTING_OBJ
+		MENUITEM "クリア"				SUBUI_CLEAR_OBJ
+	END
+END

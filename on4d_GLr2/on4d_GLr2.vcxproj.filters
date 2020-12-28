@@ -247,6 +247,9 @@
     <ResourceCompile Include="UIH3.rc">
       <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="Popup.rc">
+      <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico">
