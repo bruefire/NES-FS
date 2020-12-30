@@ -250,6 +250,9 @@
     <ResourceCompile Include="Popup.rc">
       <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="objSetting.rc">
+      <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico">
@@ -259,6 +262,9 @@
   <ItemGroup>
     <Text Include="pyInit.py">
       <Filter>リソース ファイル</Filter>
+    </Text>
+    <Text Include="objSetting.h">
+      <Filter>c++ ヘッダ\OS依存部%28Windows%29\フォーム系</Filter>
     </Text>
   </ItemGroup>
 </Project>

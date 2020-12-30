@@ -642,6 +642,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					menuCheck2(hMenu, &menuItemInfo, UI_OBJ_LOOP);
 					newEngine.h3objLoop = !newEngine.h3objLoop;
 					break;
+
+				case SUBUI_CLEAR_OBJ:
+					if (newEngine.CheckSelectedEnable())
+						newEngine.objs[newEngine.selectedIdx].used = false;
+					break;
 				}
 			}
 			break;
@@ -711,7 +716,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			miInfo.fMask = MIIM_TYPE;
 			miInfo.fType = MFT_STRING;
 
-			string itemStr = "オブジェクトNo." + to_string(newEngine.selectedIdx) + "の設定";
+			string itemStr = "Object." + to_string(newEngine.selectedIdx) + "の設定";
 			char* cstr = new char[itemStr.size() + 1];
 			strcpy(cstr, itemStr.c_str());
 			miInfo.dwTypeData = cstr;

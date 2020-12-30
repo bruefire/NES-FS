@@ -85,6 +85,6 @@
 
 
 // -----------> サブメニュー <-------------
-#define SUBUI_SETTING_OBJ 100
-#define SUBUI_CLEAR_OBJ 101
+#define SUBUI_SETTING_OBJ 10000
+#define SUBUI_CLEAR_OBJ 10001
 
