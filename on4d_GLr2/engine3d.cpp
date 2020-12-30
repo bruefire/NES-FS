@@ -1583,9 +1583,12 @@ pt4 pt4::cross(pt4 a, pt4 b, pt4 c)
 }
 
 // オブジェクト有効性チェック
-bool engine3d::CheckSelectedEnable()
+bool engine3d::CheckSelectedEnable(int idx)
 {
-	if (selectedIdx == -1 || selectedIdx >= OBJ_QTY || !objs[selectedIdx].used)
+	if (idx == -1)
+		idx = selectedIdx;
+
+	if (idx == -1 || idx >= OBJ_QTY || !objs[idx].used)
 		return false;
 
 	return true;

@@ -3,6 +3,7 @@
 #include "CppPythonIF.h"
 
 #include <Windows.h>
+#include <windowsx.h>
 #include <Complex>
 #include <iostream>
 #include <String>
@@ -15,6 +16,7 @@
 #include "rcFunc.h"
 #include "modlgRc.h"
 #include "editor.h"
+#include "objSetting.h"
 #include <glew.h>
 #include <GL/gl.h>
 using namespace std;
@@ -25,6 +27,7 @@ INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
+INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 
 //
 ATOM InitApp(HINSTANCE);
@@ -42,6 +45,7 @@ char* titleName = "超球面遊泳シミュレータ";	// ウィンドウタイトル
 
 HWND preWnd;
 HWND editDlg = nullptr;
+HWND modObjDlg = nullptr;
 char cmJD = 0;
 POINTS cm_rot[2] = {{}, {}};
 HMENU hpMenu;
@@ -150,6 +154,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			else{
 				// まず子ダイアログにメッセージ処理を試す
 				if (editDlg && IsDialogMessage(editDlg, &msg))
+					continue;
+				else if (modObjDlg && IsDialogMessage(modObjDlg, &msg))
 					continue;
 
 				TranslateMessage(&msg);	//メッセージを変換
@@ -647,6 +653,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					if (newEngine.CheckSelectedEnable())
 						newEngine.objs[newEngine.selectedIdx].used = false;
 					break;
+				case SUBUI_SETTING_OBJ:
+					if (modObjDlg == nullptr)
+					{
+						modObjDlg = CreateDialog(curInst, "MODOBJ_DLG", preWnd, ModObjProc);
+						ShowWindow(modObjDlg, SW_NORMAL);
+					}
+					break;
 				}
 			}
 			break;
@@ -716,7 +729,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			miInfo.fMask = MIIM_TYPE;
 			miInfo.fType = MFT_STRING;
 
-			string itemStr = "Object." + to_string(newEngine.selectedIdx) + "の設定";
+			string itemStr = "object." + to_string(newEngine.selectedIdx) + "の設定";
 			char* cstr = new char[itemStr.size() + 1];
 			strcpy(cstr, itemStr.c_str());
 			miInfo.dwTypeData = cstr;
@@ -895,6 +908,111 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) {
 		break;
 	case WM_DESTROY:
 		editDlg = nullptr;
+		return true;
+
+	}
+	return false;
+
+};
+
+// オブジェクト設定ダイアログ
+INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	// スライダー変数
+	LONG_PTR sVal;
+	LONG_PTR sMin = 0;
+	LONG_PTR sMax = 100;
+	const double velocMax = 10;
+	const double scaleMax = 30;
+	double sRst;
+	static int trgObjIdx;
+
+
+	switch (msg) {
+	case WM_INITDIALOG:
+	{
+		trgObjIdx = newEngine.selectedIdx;
+		SendDlgItemMessage(hDlg, MODOBJ_SCALE_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
+		SendDlgItemMessage(hDlg, MODOBJ_VELOC_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
+
+		if (!newEngine.CheckSelectedEnable())
+		{
+			DestroyWindow(modObjDlg);
+			return true;
+		}
+
+		// 現在の速度, スケールを取得してダイアログに反映
+		auto SetSliderVal = [sMin, sMax, hDlg](double inVal, int sliderID, double maxVal)
+		{
+			LONG_PTR sVal = (int)((inVal / maxVal) * sMax);
+			if (sVal < sMin) sVal = sMin; else if (sMax < sVal) sVal = sMax;	// adjust
+			SendDlgItemMessage(
+				hDlg,
+				sliderID,
+				TBM_SETPOS,
+				true,
+				sVal
+				);
+		};
+		// scale
+		sRst = newEngine.objs[newEngine.selectedIdx].scale;
+		SetSliderVal(sRst, MODOBJ_SCALE_SLIDER, scaleMax);
+		SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
+		// velocity
+		sRst = newEngine.objs[newEngine.selectedIdx].lspX.w;
+		SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
+		SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+
+		// add comboBox strings
+		HWND cmb = GetDlgItem(hDlg, MODOBJ_MESH_CBOX);
+		for (int i=0; i<newEngine.meshLen; i++)
+		{
+			ComboBox_AddString(cmb, newEngine.meshNames[i]);
+		}
+		return true;
+	}
+
+	case WM_DESTROY:
+		modObjDlg = nullptr;
+		return true;
+
+	case WM_COMMAND:
+		switch (LOWORD(wp)) {
+		case IDOK:
+			//GetDlgItemText(modObjDlg, EDITDLG_CODE_TXT, CppPythonIF::rawCode, 8186);
+			return true;
+		case IDCANCEL:
+			DestroyWindow(modObjDlg);
+			return true;
+		}
+		break;
+
+	case WM_HSCROLL:
+		if (!newEngine.CheckSelectedEnable(trgObjIdx))
+			break;
+
+		if (lp != 0)
+		{
+			sVal = SendMessage((HWND)lp, (UINT)TBM_GETPOS, NULL, NULL);
+			// スライダー特定
+			int sliderID = GetDlgCtrlID((HWND)lp);
+
+			// スライダーに応じた処理
+			switch (sliderID)
+			{
+			case MODOBJ_SCALE_SLIDER:
+				sRst = (double)sVal / sMax * scaleMax;
+				newEngine.objs[trgObjIdx].scale = sRst;
+				SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
+				break;
+
+			case MODOBJ_VELOC_SLIDER:
+				sRst = (double)sVal / sMax * velocMax;
+				newEngine.objs[trgObjIdx].lspX.w = sRst;
+				SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+				break;
+			}
+		}
 		return true;
 
 	}

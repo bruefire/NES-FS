@@ -122,7 +122,7 @@ public:
 	void ClcRelaivePosH3(double*);	// ‘Š‘ÎˆÊ’uŒvŽZH3
 	void ClcCoordinate();
 	int physics();
-	bool CheckSelectedEnable();
+	bool CheckSelectedEnable(int idx = -1);
 	bool CheckTrackedEnable();
 
 	enum class RandMode
