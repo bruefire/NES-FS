@@ -973,7 +973,10 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		HWND cmb = GetDlgItem(hDlg, MODOBJ_MESH_CBOX);
 		for (int i=0; i<newEngine.meshLen; i++)
 		{
-			ComboBox_AddString(cmb, newEngine.meshNames[i]);
+			mesh3d* curMesh = &newEngine.meshs[i];
+			if (curMesh->coorType != mesh3d::COOR::POLAR || curMesh->faceLen == 0)
+				continue;
+			ComboBox_AddString(cmb, newEngine.meshs[i].objNameS.c_str());
 		}
 		return true;
 	}
@@ -989,6 +992,26 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			return true;
 		case IDCANCEL:
 			DestroyWindow(modObjDlg);
+			return true;
+
+		case MODOBJ_MESH_CBOX:
+			if (!newEngine.CheckSelectedEnable(trgObjIdx))
+				break;
+
+			if (HIWORD(wp) == CBN_SELCHANGE)
+			{
+				// get selected string
+				char tmpc[256];
+				HWND cmb = GetDlgItem(hDlg, MODOBJ_MESH_CBOX);
+				LRESULT idx = SendMessage(cmb, CB_GETCURSEL, 0, 0);
+				SendMessage(cmb, CB_GETLBTEXT, idx, (LPARAM)tmpc);
+
+				for (int i = 0; i < newEngine.meshLen; i++)
+				{
+					if (newEngine.meshs[i].objNameS == tmpc)
+						newEngine.objs[trgObjIdx].mesh = &newEngine.meshs[i];
+				}
+			}
 			return true;
 		}
 		break;
