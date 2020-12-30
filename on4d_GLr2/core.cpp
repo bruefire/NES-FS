@@ -923,6 +923,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	LONG_PTR sMin = 0;
 	LONG_PTR sMax = 100;
 	const double velocMax = 10;
+	const double rotvMax = 15;
 	const double scaleMax = 30;
 	double sRst;
 	static int trgObjIdx;
@@ -934,6 +935,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		trgObjIdx = newEngine.selectedIdx;
 		SendDlgItemMessage(hDlg, MODOBJ_SCALE_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
 		SendDlgItemMessage(hDlg, MODOBJ_VELOC_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
+		SetDlgItemText(hDlg, MODOBJ_OBJNO_TXT, to_string(trgObjIdx).c_str());
 
 		if (!newEngine.CheckSelectedEnable())
 		{
@@ -962,6 +964,10 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		sRst = newEngine.objs[newEngine.selectedIdx].lspX.w;
 		SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
 		SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+		// rot x velocity
+		sRst = newEngine.objs[newEngine.selectedIdx].rsp.x / PIE * 180;
+		SetSliderVal(sRst, MODOBJ_ROTX_SLIDER, rotvMax);
+		SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
 
 		// add comboBox strings
 		HWND cmb = GetDlgItem(hDlg, MODOBJ_MESH_CBOX);
@@ -1010,6 +1016,12 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				sRst = (double)sVal / sMax * velocMax;
 				newEngine.objs[trgObjIdx].lspX.w = sRst;
 				SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+				break;
+
+			case MODOBJ_ROTX_SLIDER:
+				sRst = (double)sVal / sMax * rotvMax;
+				newEngine.objs[trgObjIdx].rsp.x = sRst / 180 * PIE;
+				SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
 				break;
 			}
 		}
