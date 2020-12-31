@@ -50,6 +50,7 @@ int engine3dGL::GL_Init()
 		// H3シェーダ
 		qyMode = QY_MODE::LOW;
 		shader[5] = LoadShaders("h3vtx.c", "h3pxl.c");
+		shader[3] = LoadShaders("h3vtxPt.c", "h3pxlPt.c");
 	}
 	// S3シェーダ
 	else
@@ -65,10 +66,10 @@ int engine3dGL::GL_Init()
 		{
 			shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
 		}
+		shader[3] = LoadShaders2("vartex.c", "lineG.c", "lineF.c", 1);
 	}
 	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );
 	shader[2] = LoadShaders( "vtx3D.c", "pxl3D.c" );
-	shader[3] = LoadShaders2( "vartex.c", "lineG.c", "lineF.c" , 1);
 	shader[4] = LoadShaders2( "vartex.c", "lineG2.c", "lineF2.c" , 2);
 
 	///-- テクスチャ --///

@@ -206,7 +206,7 @@ int mesh3dGL::makeDataForGL_LQY(engine3d* owner)
 
 	}
 	else {			//-- 無ければ辺
-		int fltLen = 21;
+		int fltLen = 12;
 		pts2 = new float[lLen * fltLen * 2];
 		ptsGl = new int[1];//未使用
 
@@ -235,51 +235,6 @@ int mesh3dGL::makeDataForGL_LQY(engine3d* owner)
 				pts2[idx + 9]  = pts[lines[i].y].x;
 				pts2[idx + 10] = pts[lines[i].y].y;
 				pts2[idx + 11] = pts[lines[i].y].z;
-
-				if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
-				{
-					auto TudeToEuc = [](pt3 locT)
-					{
-						double sinZ = sin(locT.y);
-
-						pt3 vecT = pt3(
-							sinZ * cos(locT.x),		//X
-							sinZ * sin(locT.x),		//Y
-							cos(locT.y));			//Z
-
-						return vecT.mtp(object3d::ClcEucFromHypb(locT.z));
-					};
-					pt3 sidePt = pt3::cross(TudeToEuc(pts[lines[i].x]), TudeToEuc(pts[lines[i].y]))
-						.norm()
-						.mtp(owner->H3_MAX_RADIUS);
-					auto EucToTude = [](pt3 vecT)
-					{
-						pt3 locT;
-						locT.x = atan2(vecT.x, vecT.y);
-						locT.y = atan2(pyth2(vecT.x, vecT.y), vecT.z);
-						locT.z = object3d::ClcHypbFromEuc(pyth3(vecT));
-						return locT;
-					};
-					pt3 rstPt = EucToTude(sidePt);
-
-					pts2[idx + 12] = rstPt.x;
-					pts2[idx + 13] = rstPt.y;
-					pts2[idx + 14] = rstPt.z;
-				}
-				else 
-				{
-					pts2[idx + 12] = 0;
-					pts2[idx + 13] = 0;
-					pts2[idx + 14] = 0;
-				}
-
-				// 位置算出用tex
-				pts2[idx + 15] = 0;
-				pts2[idx + 16] = 0;
-				pts2[idx + 17] = 0;
-				pts2[idx + 18] = 0;
-				pts2[idx + 19] = 0;
-				pts2[idx + 20] = 0;
 			}
 		}
 		bufLen = lLen * fltLen * 2;

@@ -941,7 +941,7 @@ int engine3d::InitH3()	// ‘o‹È¢ŠE—p‰Šú‰»
 	// todoš Šî€ü
 	for (h; h < BWH_QTY; h++) 
 	{
-		objs[h].objInitH3(meshs + 21);
+		objs[h].objInitH3(meshs + 0);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
 		objs[h].init_stdH3(0);	//-- std

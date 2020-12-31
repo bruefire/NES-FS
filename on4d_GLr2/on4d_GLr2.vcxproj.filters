@@ -112,6 +112,12 @@
     <None Include="h3vtx.c">
       <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
     </None>
+    <None Include="h3vtxPt.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="h3pxlPt.c">
+      <Filter>リソース ファイル\GL部\GLSLシェーダ\H3</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rcFunc.cpp">

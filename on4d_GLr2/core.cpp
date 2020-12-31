@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	string awakeCmd = GetCommandLine();
 	cout << awakeCmd << endl;
 	int awIdx = awakeCmd.find_last_of(" ") +1;
-	
+	 
 	if(awIdx <= awakeCmd.length()){
 		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{

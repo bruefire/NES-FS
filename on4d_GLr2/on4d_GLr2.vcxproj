@@ -108,6 +108,12 @@
   <ItemGroup>
     <ResourceCompile Include="Popup.rc" />
     <ResourceCompile Include="objSetting.rc" />
+    <None Include="h3pxlPt.c">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="h3vtxPt.c">
+      <FileType>CppCode</FileType>
+    </None>
     <Text Include="pyInit.py">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Text>
