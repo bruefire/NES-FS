@@ -479,9 +479,9 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		if (curObj->draw == 2)
 			glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// OŠpŒ`‚ğ•`‚­
 		else if (curObj->draw == 1 || curObj->draw == 0) {
-			glPointSize(2.0);
+			glLineWidth(2.0);
 			glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// ü‚ğ•`‚­
-			glPointSize(1.0);
+			glLineWidth(1.0);
 		}
 		else {
 			glPointSize(2.0);

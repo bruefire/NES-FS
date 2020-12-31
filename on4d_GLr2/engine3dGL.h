@@ -16,7 +16,7 @@ class mesh3dGL : public mesh3d
 public:
 	~mesh3dGL();
 	int makeDataForGL();
-	int makeDataForGL_LQY();
+	int makeDataForGL_LQY(engine3d*);
 	int transBuffers(uint32_t*, uint32_t*);
 };
 

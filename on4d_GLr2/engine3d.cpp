@@ -80,7 +80,7 @@ int engine3d::init()
 	PLR_No = BWH_QTY;	
 
 	// メッシュ定義
-	meshLen = 21;
+	meshLen = 22;
 	meshNames = new char*[meshLen];
 	meshNames[0] = "wLines", 
 	meshNames[1] = "player", 
@@ -104,6 +104,7 @@ int engine3d::init()
 	meshNames[18] = "mapElm2";
 	meshNames[19] = "mapElm3";
 	meshNames[20] = "mapElm4";
+	meshNames[21] = "plane";
 
 	///-- 雛形メッシュ
 	allocMesh();
@@ -940,11 +941,11 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	// todo★ 基準線
 	for (h; h < BWH_QTY; h++) 
 	{
-		objs[h].objInitH3(meshs + 0);
+		objs[h].objInitH3(meshs + 21);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
 		objs[h].init_stdH3(0);	//-- std
-		objs[h].used = false;	//-- 有効化
+		objs[h].used = true;	//-- 有効化
 	}
 
 	///-- プレイヤー ----------

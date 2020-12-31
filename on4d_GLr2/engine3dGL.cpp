@@ -150,7 +150,7 @@ int mesh3dGL::makeDataForGL()
 }
 
 
-int mesh3dGL::makeDataForGL_LQY()
+int mesh3dGL::makeDataForGL_LQY(engine3d* owner)
 {
 	if (0 < faceLen)	//-- 主に面
 	{
@@ -206,34 +206,83 @@ int mesh3dGL::makeDataForGL_LQY()
 
 	}
 	else {			//-- 無ければ辺
-		pts2 = new float[lLen * 8 * 2];
+		int fltLen = 21;
+		pts2 = new float[lLen * fltLen * 2];
 		ptsGl = new int[1];//未使用
+
 		for (int i = 0; i < lLen; i++) {
-			int idx = i * 16;
-			pts2[idx + 0] = pts[lines[i].x].x;
-			pts2[idx + 1] = pts[lines[i].x].y;
-			pts2[idx + 2] = pts[lines[i].x].z;
-			pts2[idx + 3] = 0;
-			pts2[idx + 4] = 1;
-			pts2[idx + 5] = pyth3(pts[lines[i].x]) / 6.3;
+			for (char j = 0; j < 2; j++) {
+				int idx = i * fltLen * 2 + fltLen * j;
+				if (j == 0) {
+					pts2[idx + 0] = pts[lines[i].x].x;
+					pts2[idx + 1] = pts[lines[i].x].y;
+					pts2[idx + 2] = pts[lines[i].x].z;
+				}else{
+					pts2[idx + 0] = pts[lines[i].y].x;
+					pts2[idx + 1] = pts[lines[i].y].y;
+					pts2[idx + 2] = pts[lines[i].y].z;
+				}
 
-			pts2[idx + 8] = pts[lines[i].y].x;
-			pts2[idx + 9] = pts[lines[i].y].y;
-			pts2[idx + 10] = pts[lines[i].y].z;
-			pts2[idx + 11] = 0;
-			pts2[idx + 12] = 1;
-			pts2[idx + 13] = pyth3(pts[lines[i].y]) / 6.3;
+				pts2[idx + 3] = 0;
+				pts2[idx + 4] = 1;
+				pts2[idx + 5] = 1;
 
-			pts2[idx + 6] = pts2[idx + 7] =
-				pts2[idx + 14] = pts2[idx + 15] = 0;
+				// 位置算出用Loc
+				pts2[idx + 6] = pts[lines[i].x].x;
+				pts2[idx + 7] = pts[lines[i].x].y;
+				pts2[idx + 8] = pts[lines[i].x].z;
 
-			//if(objNameS=="wLines"){
-			   // if(abs(pts0[ lines[i].x ].x) < pow(0.1,20)) pts2[idx +3] = 0; else pts2[idx +3] = 1;
-			   // if(abs(pts0[ lines[i].x ].y) < pow(0.1,20)) pts2[idx +4] = 0; else pts2[idx +4] = 1;
-			   // if(abs(pts0[ lines[i].x ].z) < pow(0.1,20)) pts2[idx +5] = 0; else pts2[idx +5] = 1;
-			//}
+				pts2[idx + 9]  = pts[lines[i].y].x;
+				pts2[idx + 10] = pts[lines[i].y].y;
+				pts2[idx + 11] = pts[lines[i].y].z;
+
+				if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+				{
+					auto TudeToEuc = [](pt3 locT)
+					{
+						double sinZ = sin(locT.y);
+
+						pt3 vecT = pt3(
+							sinZ * cos(locT.x),		//X
+							sinZ * sin(locT.x),		//Y
+							cos(locT.y));			//Z
+
+						return vecT.mtp(object3d::ClcEucFromHypb(locT.z));
+					};
+					pt3 sidePt = pt3::cross(TudeToEuc(pts[lines[i].x]), TudeToEuc(pts[lines[i].y]))
+						.norm()
+						.mtp(owner->H3_MAX_RADIUS);
+					auto EucToTude = [](pt3 vecT)
+					{
+						pt3 locT;
+						locT.x = atan2(vecT.x, vecT.y);
+						locT.y = atan2(pyth2(vecT.x, vecT.y), vecT.z);
+						locT.z = object3d::ClcHypbFromEuc(pyth3(vecT));
+						return locT;
+					};
+					pt3 rstPt = EucToTude(sidePt);
+
+					pts2[idx + 12] = rstPt.x;
+					pts2[idx + 13] = rstPt.y;
+					pts2[idx + 14] = rstPt.z;
+				}
+				else 
+				{
+					pts2[idx + 12] = 0;
+					pts2[idx + 13] = 0;
+					pts2[idx + 14] = 0;
+				}
+
+				// 位置算出用tex
+				pts2[idx + 15] = 0;
+				pts2[idx + 16] = 0;
+				pts2[idx + 17] = 0;
+				pts2[idx + 18] = 0;
+				pts2[idx + 19] = 0;
+				pts2[idx + 20] = 0;
+			}
 		}
-		bufLen = lLen * 16;
+		bufLen = lLen * fltLen * 2;
 	}
 
 	return 1;
@@ -325,7 +374,7 @@ int engine3dGL::init()
 				if (meshs[i].coorType == mesh3d::COOR::Cartesian)
 					((mesh3dGL*)&meshs[i])->makeDataForGL();
 				else
-					((mesh3dGL*)& meshs[i])->makeDataForGL_LQY();
+					((mesh3dGL*)& meshs[i])->makeDataForGL_LQY(this);
 				break;
 			}
 
@@ -690,6 +739,9 @@ void engine3dGL::DrawCoordinateS3()
 
 void engine3dGL::DrawCoordinateH3()
 {
+	if (!objs[0].used)
+		return;
+
 	//
 	double asp = GetAsp();
 	GuiString guiStr;
