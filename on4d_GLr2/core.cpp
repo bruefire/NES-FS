@@ -550,6 +550,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					newEngine.sun.used = false;
 					menuCheck(hMenu, &menuItemInfo, UI_TORUS_SURFACE, unCk_mark, unCk_mark_len);
 					break;
+				case UI_PLANE_SURFACE:
+					newEngine.objs[0].mesh = newEngine.meshs + 21;
+					newEngine.objs[0].draw = 2;
+					newEngine.objs[0].used = true;
+					newEngine.sun.used = false;
+					menuCheck(hMenu, &menuItemInfo, UI_PLANE_SURFACE, unCk_mark, unCk_mark_len);
+					break;
 				case UI_MK_EARTH:
 					newEngine.objs[0].mesh = newEngine.meshs+2; 
 					newEngine.objs[0].draw = 2;
