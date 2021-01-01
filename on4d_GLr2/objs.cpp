@@ -275,13 +275,11 @@ bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
 		.pls(dstN.mtp(tmpRt.x));
 
 	// update std1
-	double ipNS1 = pt4::dot(std1N, normN);
-	double ipDS1 = pt4::dot(std1N, dstN);
-	pt4 tNS1 = normN.mtp(owner->COS_1 * ipNS1);
-	pt4 tDS1 = dstN.mtp(owner->COS_1 * ipDS1);
-	pt4 tRS1 = std1.mns(tNS1).mns(tDS1);
+	double ipDS1 = pt4::dot(std1, dstN);
+	pt4 tDS1 = dstN.mtp(ipDS1);
+	pt4 tRS1 = std1.mns(normO).mns(tDS1);
 
-	tmpRt = pt2(pyth4(tDS1), pyth4(tNS1));
+	tmpRt = pt2(pyth4(tDS1), owner->COS_1);
 	tudeRst(&tmpRt.x, &tmpRt.y, dst / owner->radius, 1);
 	std1 = pt4()
 		.pls(normN.mtp(tmpRt.y))
@@ -289,13 +287,11 @@ bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
 		.pls(tRS1);
 
 	// update std2
-	double ipNS2 = pt4::dot(std2N, normN);
-	double ipDS2 = pt4::dot(std2N, dstN);
-	pt4 tNS2 = normN.mtp(owner->COS_1 * ipNS2);
-	pt4 tDS2 = dstN.mtp(owner->COS_1 * ipDS2);
-	pt4 tRS2 = std2.mns(tNS2).mns(tDS2);
+	double ipDS2 = pt4::dot(std2, dstN);
+	pt4 tDS2 = dstN.mtp(ipDS2);
+	pt4 tRS2 = std2.mns(normO).mns(tDS2);
 
-	tmpRt = pt2(pyth4(tDS2), pyth4(tNS2));
+	tmpRt = pt2(pyth4(tDS2), owner->COS_1);
 	tudeRst(&tmpRt.x, &tmpRt.y, dst / owner->radius, 1);
 	std2 = pt4()
 		.pls(normN.mtp(tmpRt.y))
@@ -303,10 +299,11 @@ bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
 		.pls(tRS2);
 
 	// set results
-	loc = eucToTude(locE);
-	std[0] = eucToTude(std1);
-	std[1] = eucToTude(std2);
-	lspX.asgPt3(std[0]);
+	this->used = true;
+	this->loc = eucToTude(locE);
+	this->std[0] = eucToTude(std1);
+	this->std[1] = eucToTude(std2);
+	this->lspX.asgPt3(std[0]);
 
 
 
