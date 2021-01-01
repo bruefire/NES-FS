@@ -336,6 +336,34 @@ bool object3d::SetRotRelative(pt3 nRot)
 	return true;
 }
 
+// 相対的に角度再設定
+bool object3d::SetRotRelativeS3(pt3 nRot)
+{
+	// prepare local axes etc
+	pt4 locE = tudeToEuc(loc);
+	pt4 std1 = tudeToEuc(std[0]);		// 基準位置1
+	pt4 std2 = tudeToEuc(std[1]);		// 基準位置2
+	pt4 normN = locE;
+	pt4 normO = normN.mtp(owner->COS_1);
+	pt4 std1N = std1.mns(normO).mtp(owner->SIN_1R);
+	pt4 std2N = std2.mns(normO).mtp(owner->SIN_1R);
+	pt4 sideN = pt4::cross(normN, std1N, std2N);
+
+	// rotate local axes
+	object3d::RotVecs4(&std2N, &sideN, nRot.z);	// 正面固定回転
+	object3d::RotVecs4(&std1N, &std2N, nRot.y);	// 上下方向回転
+	object3d::RotVecs4(&std1N, &sideN, nRot.x);	// 左右方向回転
+
+	// set results
+	std1 = normO.pls(std1N.mtp(owner->SIN_1));
+	std2 = normO.pls(std2N.mtp(owner->SIN_1));
+	std[0] = eucToTude(std1);
+	std[1] = eucToTude(std2);
+
+
+	return true;
+}
+
 // スケール更新
 bool object3d::SetScale(double scale)
 {

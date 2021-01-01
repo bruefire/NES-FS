@@ -48,6 +48,7 @@ public:
 	bool SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst);	// S3
 	bool SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst);	// H3
 	bool SetRotRelative(pt3 nRot);	// H3
+	bool SetRotRelativeS3(pt3 nRot);	// S3
 	bool SetScale(double);
 	static void RotVecs(pt3* vec1, pt3* vec2, double rot, double len = 1);
 	static void RotVecs4(pt4* vec1, pt4* vec2, double rot, double len = 1);

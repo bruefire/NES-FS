@@ -108,12 +108,17 @@ PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
     PyObject* result = NULL;
     PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
 
+    // 位置再設定
+    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+
     if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
     {
-        // 位置再設定
-        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
-
         if (selfObj->SetRotRelative(nLoc))
+            result = PyLong_FromLong(0);  // エラーにはしない
+    }
+    else if (engine->worldGeo == engine3d::WorldGeo::SPHERICAL)
+    {
+        if (selfObj->SetRotRelativeS3(nLoc))
             result = PyLong_FromLong(0);  // エラーにはしない
     }
 
