@@ -125,7 +125,7 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 
 		// 球面原点からの垂線ベクトル (接点)
 		pt4 trgToGrd = grdPt.mns(trgPt);
-		double ip = pt4::dot(trgToGrd.norm(), trgPt.norm());
+		double ip = pt4::dot(trgToGrd.norm(pt4(0, 0, 0, 0), 0), trgPt.norm(pt4(0, 0, 0, 0), 0));
 		double ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
 		pt4 ttgNorm = trgToGrd.mtp(ttgRate).mtp(ip);
 
@@ -195,7 +195,7 @@ void object3d::DealH3OohObj(bool loopFlg)
 }
 
 // 相対的に位置再設定
-bool object3d::SetLocRelative(object3d* trgObj, pt3 nLoc, double dst)
+bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 {
 	if (!trgObj->used)
 		return false;
@@ -236,6 +236,79 @@ bool object3d::SetLocRelative(object3d* trgObj, pt3 nLoc, double dst)
 	this->std[0] = reObj.std[0];
 	this->std[1] = reObj.std[1];
 	this->lspX = reObj.lspX;
+
+	return true;
+}
+
+// 相対的に位置再設定
+bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
+{
+	if (!trgObj->used)
+		return false;
+
+	// move obj to the same position with target
+	loc = trgObj->loc;
+	std[0] = trgObj->std[0];
+	std[1] = trgObj->std[1];
+
+	// prepare local axes etc
+	pt4 locE = trgObj->tudeToEuc(trgObj->loc);
+	pt4 std1 = trgObj->tudeToEuc(trgObj->std[0]);		// 基準位置1
+	pt4 std2 = trgObj->tudeToEuc(trgObj->std[1]);		// 基準位置2
+	pt4 normN = locE;
+	pt4 normO = normN.mtp(owner->COS_1);
+	pt4 std1N = std1.mns(normO).mtp(owner->SIN_1R);
+	pt4 std2N = std2.mns(normO).mtp(owner->SIN_1R);
+	pt4 sideN = pt4::cross(normN, std1N, std2N);
+
+	pt4 dstN = pt4(0, 0, 0, 0)
+		.pls(std1N.mtp(nLoc.z))
+		.pls(std2N.mtp(nLoc.y))
+		.pls(sideN.mtp(nLoc.x))
+		.norm(pt4(std1N));
+
+	// update loc
+	pt2 tmpRt = pt2(0, 1);
+	tudeRst(&tmpRt.x, &tmpRt.y, dst / owner->radius, 1);
+	locE = pt4()
+		.pls(normN.mtp(tmpRt.y))
+		.pls(dstN.mtp(tmpRt.x));
+
+	// update std1
+	double ipNS1 = pt4::dot(std1N, normN);
+	double ipDS1 = pt4::dot(std1N, dstN);
+	pt4 tNS1 = normN.mtp(owner->COS_1 * ipNS1);
+	pt4 tDS1 = dstN.mtp(owner->COS_1 * ipDS1);
+	pt4 tRS1 = std1.mns(tNS1).mns(tDS1);
+
+	tmpRt = pt2(pyth4(tDS1), pyth4(tNS1));
+	tudeRst(&tmpRt.x, &tmpRt.y, dst / owner->radius, 1);
+	std1 = pt4()
+		.pls(normN.mtp(tmpRt.y))
+		.pls(dstN.mtp(tmpRt.x))
+		.pls(tRS1);
+
+	// update std2
+	double ipNS2 = pt4::dot(std2N, normN);
+	double ipDS2 = pt4::dot(std2N, dstN);
+	pt4 tNS2 = normN.mtp(owner->COS_1 * ipNS2);
+	pt4 tDS2 = dstN.mtp(owner->COS_1 * ipDS2);
+	pt4 tRS2 = std2.mns(tNS2).mns(tDS2);
+
+	tmpRt = pt2(pyth4(tDS2), pyth4(tNS2));
+	tudeRst(&tmpRt.x, &tmpRt.y, dst / owner->radius, 1);
+	std2 = pt4()
+		.pls(normN.mtp(tmpRt.y))
+		.pls(dstN.mtp(tmpRt.x))
+		.pls(tRS2);
+
+	// set results
+	loc = eucToTude(locE);
+	std[0] = eucToTude(std1);
+	std[1] = eucToTude(std2);
+	lspX.asgPt3(std[0]);
+
+
 
 	return true;
 }
@@ -1059,10 +1132,10 @@ pt3 pt3::mns(pt3 pts){ pts.x = x-pts.x, pts.y = y-pts.y, pts.z = z-pts.z; return
 pt3 pt3::mtp(double mt){ pt3 pt; pt.x = x*mt, pt.y = y*mt, pt.z = z*mt; return pt; }	//乗算
 pt3 pt3::mtp(pt3 mt){ mt.x *= x, mt.y *= y, mt.z *= z; return mt; }	//乗算
 // 長さ正規化
-pt3 pt3::norm()
+pt3 pt3::norm(pt3 errPt, double lim)
 {
 	double len = pyth3(*this);
-	return (len < 0.000000000001) ? pt3(0, 0, 1) : this->mtp(1 / len);
+	return (len <= lim) ? errPt : this->mtp(1 / len);
 }
 // 内積
 double pt3::dot(pt3 a, pt3 b)
@@ -1132,10 +1205,10 @@ pt3 pt4::xyz(){
 	return pt3(x,y,z);
 }
 // 長さ正規化
-pt4 pt4::norm()
+pt4 pt4::norm(pt4 errOpt, double lim)
 {
 	double len = pyth4(*this);
-	return (len == 0) ? pt4(0, 0, 0, 0) : this->mtp(1 / len);
+	return (len <= lim) ? errOpt : this->mtp(1 / len);
 }
 void pt4::asgPt3(pt3 pts3){ x = pts3.x, y = pts3.y, z = pts3.z; }
 pt4::pt4()

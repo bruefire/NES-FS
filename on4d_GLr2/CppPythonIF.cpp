@@ -64,14 +64,19 @@ PyObject* CppPythonIF::SetLocRelative(PyObject* self, PyObject* args)
     PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
     PyObject* trgIdx  = PyObject_GetAttrString(trg, "idx");
 
+    // 位置再設定
+    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+    object3d* trgObj = &engine->objs[PyLong_AsLong(trgIdx)];
+
     if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
     {
-        // 位置再設定
-        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
-        object3d* trgObj  = &engine->objs[PyLong_AsLong(trgIdx)];
-
-        if (selfObj->SetLocRelative(trgObj, nLoc, dst))
-            result = PyLong_FromLong(0);  // エラーにはしない
+        if (selfObj->SetLocRelativeH3(trgObj, nLoc, dst))
+            result = PyLong_FromLong(0);
+    }
+    else if(engine->worldGeo == engine3d::WorldGeo::SPHERICAL)
+    {
+        if (selfObj->SetLocRelativeS3(trgObj, nLoc, dst))
+            result = PyLong_FromLong(0);
     }
 
     Py_XDECREF(selfIdx);

@@ -27,7 +27,7 @@ public:
 	pt3 mns(pt3 pts);
 	pt3 mtp(double pts);
 	pt3 mtp(pt3 pts);
-	pt3 norm();
+	pt3 norm(pt3 def=pt3(0, 0, 1), double lim= 0.000000000001);
 
 	static double dot(pt3, pt3);	// ì‡êœ
 	static pt3 cross(pt3, pt3);		// äOêœ(ÉNÉçÉXêœ)
@@ -49,7 +49,7 @@ public:
 	pt4 mtp(double pts);
 	pt4 mtp(pt4 pts);
 	pt3 xyz();
-	pt4 norm();
+	pt4 norm(pt4 errPt= pt4(1, 0, 0, 0), double lim=0.000000000001);
 	void asgPt3(pt3);
 
 	static double dot(pt4, pt4);		// ì‡êœ

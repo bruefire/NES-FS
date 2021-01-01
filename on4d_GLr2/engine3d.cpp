@@ -591,7 +591,7 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 				double ip2 = pt4::dot(std1N, rotv3.norm());
 				pt4 rotvS1 = std1N.mtp(rot3Len * ip2);
 				pt4 rotv = rotv3.mns(rotvS1);
-				pt4 rotvN = rotv.norm();
+				pt4 rotvN = rotv.norm(sideN);
 
 				double rpLen = pt4::dot(std2N, rotvN);
 				pt4 std2N_rp = rotvN.mtp(rpLen);
@@ -720,7 +720,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	{
 		// 対象オブジェクト方向を向く
 		object3d* trgObj = &objs[viewTrackIdx];
-		pt3 rotvN = pt3(trgObj->loc.x, trgObj->loc.y, 0).norm();
+		pt3 rotvN = pt3(trgObj->loc.x, trgObj->loc.y, 0).norm(sideN);
 
 		double rpLen = pt3::dot(std2N, rotvN);
 		pt3 std2N_rp = rotvN.mtp(rpLen);

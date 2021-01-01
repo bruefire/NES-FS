@@ -45,7 +45,8 @@ public:
 	static double ClcEucFromHypb(double);	// H3 双曲極座標をEUC[X,Y,Z]座標に変換
 	void mkLspX_S3(pt4);		// S3用
 	void mkLspX_H3(pt4);	// H3用
-	bool SetLocRelative(object3d* trgObj, pt3 nLoc, double dst);	// H3
+	bool SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst);	// S3
+	bool SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst);	// H3
 	bool SetRotRelative(pt3 nRot);	// H3
 	bool SetScale(double);
 	static void RotVecs(pt3* vec1, pt3* vec2, double rot, double len = 1);
