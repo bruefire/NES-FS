@@ -1576,6 +1576,10 @@ int engine3d::inPutKey(int key, int opt)
 	case IK::SPACE:
 		obMove = !obMove;
 		break;
+
+	case IK::ESCAPE:
+		viewTrackIdx = -1;
+		break;
 	}
 
 	return 1;

@@ -661,11 +661,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						newEngine.objs[newEngine.selectedIdx].used = false;
 					break;
 				case SUBUI_SETTING_OBJ:
-					if (modObjDlg == nullptr)
-					{
-						modObjDlg = CreateDialog(curInst, "MODOBJ_DLG", preWnd, ModObjProc);
-						ShowWindow(modObjDlg, SW_NORMAL);
-					}
+					if (modObjDlg != nullptr)
+						DestroyWindow(modObjDlg);
+					
+					modObjDlg = CreateDialog(curInst, "MODOBJ_DLG", preWnd, ModObjProc);
+					ShowWindow(modObjDlg, SW_NORMAL);
+					
 					break;
 				}
 			}
@@ -768,6 +769,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				newEngine.inPutKey(newEngine.IK::No_5, NULL); break;
 			case VK_SPACE:
 				newEngine.inPutKey(newEngine.IK::SPACE, NULL); break;
+			case VK_ESCAPE:
+				newEngine.inPutKey(newEngine.IK::ESCAPE, NULL); break;
 
 
 			}

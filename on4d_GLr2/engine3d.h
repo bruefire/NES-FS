@@ -177,7 +177,8 @@ public:
 		No_3,
 		No_4,
 		No_5,
-		SPACE
+		SPACE,
+		ESCAPE
 	};
 	int inPutKey(int key, int opt);
 
