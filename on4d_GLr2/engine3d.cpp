@@ -532,45 +532,79 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 	// クロス積を算出 (長さは1.0)
 	pt4 sideN = pt4::cross(normN, std1N, std2N);
 
-	// 視線固定回転
-	pt4 tmpN[2];
-	pt2 tmpRt = pt2(0, SIN_1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
-	tmpN[0] = pt4()
-		.pls(std2N.mtp(tmpRt.y))
-		.pls(sideN.mtp(tmpRt.x))
-		.mtp(SIN_1R);
-	tmpN[1] = pt4()
-		.pls(std2N.mtp(tmpRt.x).mtp(-1))
-		.pls(sideN.mtp(tmpRt.y))
-		.mtp(SIN_1R);
-	std2N = tmpN[0], sideN = tmpN[1];
+	if (!CheckTrackedEnable())
+	{
+		// 視線固定回転
+		pt4 tmpN[2];
+		pt2 tmpRt = pt2(0, SIN_1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
+		tmpN[0] = pt4()
+			.pls(std2N.mtp(tmpRt.y))
+			.pls(sideN.mtp(tmpRt.x))
+			.mtp(SIN_1R);
+		tmpN[1] = pt4()
+			.pls(std2N.mtp(tmpRt.x).mtp(-1))
+			.pls(sideN.mtp(tmpRt.y))
+			.mtp(SIN_1R);
+		std2N = tmpN[0], sideN = tmpN[1];
 
-	// 視線移動回転1
-	tmpRt = pt2(0, SIN_1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
-	tmpN[0] = pt4()
-		.pls(std1N.mtp(tmpRt.y))
-		.pls(std2N.mtp(tmpRt.x))
-		.mtp(SIN_1R);
-	tmpN[1] = pt4()
-		.pls(std1N.mtp(tmpRt.x).mtp(-1))
-		.pls(std2N.mtp(tmpRt.y))
-		.mtp(SIN_1R);
-	std1N = tmpN[0], std2N = tmpN[1];
+		// 視線移動回転1
+		tmpRt = pt2(0, SIN_1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
+		tmpN[0] = pt4()
+			.pls(std1N.mtp(tmpRt.y))
+			.pls(std2N.mtp(tmpRt.x))
+			.mtp(SIN_1R);
+		tmpN[1] = pt4()
+			.pls(std1N.mtp(tmpRt.x).mtp(-1))
+			.pls(std2N.mtp(tmpRt.y))
+			.mtp(SIN_1R);
+		std1N = tmpN[0], std2N = tmpN[1];
 
-	// 視線移動回転2
-	tmpRt = pt2(0, SIN_1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
-	tmpN[0] = pt4()
-		.pls(std1N.mtp(tmpRt.y))
-		.pls(sideN.mtp(tmpRt.x))
-		.mtp(SIN_1R);
-	tmpN[1] = pt4()
-		.pls(std1N.mtp(tmpRt.x).mtp(-1))
-		.pls(sideN.mtp(tmpRt.y))
-		.mtp(SIN_1R);
-	std1N = tmpN[0], sideN = tmpN[1];
+		// 視線移動回転2
+		tmpRt = pt2(0, SIN_1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
+		tmpN[0] = pt4()
+			.pls(std1N.mtp(tmpRt.y))
+			.pls(sideN.mtp(tmpRt.x))
+			.mtp(SIN_1R);
+		tmpN[1] = pt4()
+			.pls(std1N.mtp(tmpRt.x).mtp(-1))
+			.pls(sideN.mtp(tmpRt.y))
+			.mtp(SIN_1R);
+		std1N = tmpN[0], sideN = tmpN[1];
+	}
+	else
+	{
+		// 対象オブジェクト方向を向く
+		object3d* trgObj = &objs[viewTrackIdx];
+		pt4 trgE = object3d::tudeToEuc(trgObj->loc);
+		pt4 rotv4 = trgE.mns(normN);
+		double rot4Len = pyth4(rotv4);
+		if (rot4Len > 0.0000000001)
+		{
+			double ip = pt4::dot(normN.mtp(-1), rotv4.norm());
+			pt4 rotv3 = rotv4.mns(normN.mtp(-1 * rot4Len * ip));
+			double rot3Len = pyth4(rotv3);
+			if (rot3Len > 0.0000000001)
+			{
+				double ip2 = pt4::dot(std1N, rotv3.norm());
+				pt4 rotvS1 = std1N.mtp(rot3Len * ip2);
+				pt4 rotv = rotv3.mns(rotvS1);
+				pt4 rotvN = rotv.norm();
+
+				double rpLen = pt4::dot(std2N, rotvN);
+				pt4 std2N_rp = rotvN.mtp(rpLen);
+				pt4 std2N_rs = std2N.mns(std2N_rp);
+
+
+				double rot = atan2(pyth4(rotv), rot3Len * ip2);
+				object3d::RotVecs4(&std1N, &rotvN, rot);			// 対象方向へ回転
+				std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+			}
+		}
+	}
+
 
 	///-------- 位置,基準位置の更新 ----------
 	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(3);
@@ -597,7 +631,7 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 		pt4 std2e = std2.mns(normO).mns(std2x);
 
 		// 更新
-		tmpRt = pt2(0, 1);
+		pt2 tmpRt = pt2(0, 1);
 		tudeRst(&tmpRt.x, &tmpRt.y, cmLc.w / radius, 1);
 		locE = normN.mtp(tmpRt.y).pls(lspXN.mtp(tmpRt.x));
 

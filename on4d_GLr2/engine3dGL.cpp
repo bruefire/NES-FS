@@ -351,7 +351,10 @@ int engine3dGL::update()
 	GL_SwapBuffer();
 	if (worldGeo == WorldGeo::SPHERICAL)
 	{
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		simulateS3GL();
+		glDisable(GL_STENCIL_TEST);
 
 		// GUIï`âÊ
 		glDisable(GL_DEPTH_TEST);
@@ -888,7 +891,11 @@ void engine3dGL::ClickProc()
 
 		// 1ÉsÉNÉZÉãçƒï`âÊ
 		glScissor(ope.clickCoord.x, ope.clickCoord.y, 1, 1);
-		DrawEachObjsH3(1);
+		if(worldGeo == WorldGeo::HYPERBOLIC)
+			DrawEachObjsH3(1);
+		else
+			DrawEachObjsS3(1);
+
 		glScissor(0, 0, WIDTH, HEIGHT);
 
 		glReadPixels(ope.clickCoord.x, ope.clickCoord.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &tmpIdx);

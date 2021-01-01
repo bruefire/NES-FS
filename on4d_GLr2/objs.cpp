@@ -292,6 +292,25 @@ void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot, double len)
 	*vec2 = tmpN[1];
 }
 
+// stdXV
+void object3d::RotVecs4(pt4* vec1, pt4* vec2, double rot, double len)
+{
+	pt4 tmpN[2];
+	pt2 tmpRt = pt2(0, len);
+
+	tudeRst(&tmpRt.x, &tmpRt.y, rot, 1);
+
+	tmpN[0] = pt4()
+		.pls(vec1->mtp(tmpRt.y))
+		.pls(vec2->mtp(tmpRt.x));
+	tmpN[1] = pt4()
+		.pls(vec1->mtp(tmpRt.x).mtp(-1))
+		.pls(vec2->mtp(tmpRt.y));
+
+	*vec1 = tmpN[0];
+	*vec2 = tmpN[1];
+}
+
 // ToDoš: •W€‚Ì‰Šúİ’è H3
 void object3d::init_stdH3(bool randSW)
 {

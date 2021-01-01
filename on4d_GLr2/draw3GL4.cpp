@@ -88,7 +88,10 @@ void engine3dGL::simulateS3GL()
 	switch (qyMode)
 	{
 	case QY_MODE::HIGH:
-		DrawEachObjsS3();
+		DrawEachObjsS3(0);
+
+		// クリック処理
+		ClickProc();
 		break;
 
 	case QY_MODE::LOW:
@@ -161,7 +164,7 @@ void engine3dGL::SimulateH3GL()
 }
 
 
-int engine3dGL::DrawEachObjsS3()
+int engine3dGL::DrawEachObjsS3(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = -2; h < objCnt; h++)
@@ -204,6 +207,10 @@ int engine3dGL::DrawEachObjsS3()
 
 		glEnable(GL_TEXTURE_2D);
 
+		if (loop == 0)
+			glStencilFunc(GL_ALWAYS, (h + 1) % 256, -1);
+		else
+			glStencilFunc(GL_ALWAYS, (h + 1) % (256 * 256) / 256, -1);
 
 		// 最初の属性バッファ : 頂点
 		glEnableVertexAttribArray(0);
