@@ -102,7 +102,7 @@ PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
     // 型チェック
     PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
     if (!PyObject_IsInstance(src, objDataType))
-        return PyLong_FromLong(1);  // エラーにはしない
+        return PyLong_FromLong(1);  
 
 
     PyObject* result = NULL;
@@ -114,12 +114,12 @@ PyObject* CppPythonIF::SetRotRelative(PyObject* self, PyObject* args)
     if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
     {
         if (selfObj->SetRotRelative(nLoc))
-            result = PyLong_FromLong(0);  // エラーにはしない
+            result = PyLong_FromLong(0);  
     }
     else if (engine->worldGeo == engine3d::WorldGeo::SPHERICAL)
     {
         if (selfObj->SetRotRelativeS3(nLoc))
-            result = PyLong_FromLong(0);  // エラーにはしない
+            result = PyLong_FromLong(0);  
     }
 
     Py_XDECREF(selfIdx);
@@ -145,32 +145,80 @@ PyObject* CppPythonIF::GetPlayerObj(PyObject* self, PyObject* args)
 }
 
 
-// オブジェクトスケール変更
-PyObject* CppPythonIF::SetScale(PyObject* self, PyObject* args)
+// set one double parameter
+PyObject* CppPythonIF::Func_NoParam(PyObject* self, PyObject* args)
 {
     if (engine == nullptr)
         return NULL;
 
     PyObject* src;
-    double scale;
-    if (!PyArg_ParseTuple(args, "Od", &src, &scale))
+    int funcID;
+    if (!PyArg_ParseTuple(args, "Oi", &src, &funcID))
         return NULL;
 
     // 型チェック
     PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
     if (!PyObject_IsInstance(src, objDataType))
-        return NULL;  // エラーにはしない
+        return NULL;
 
     PyObject* result = NULL;
     PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
-    if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
-    {
-        // スケール再設定
-        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
 
-        if (selfObj->SetScale(scale))
-            result = PyLong_FromLong(0);
+    switch ((FuncObject)funcID)
+    {
+    case FuncObject::GetScale:
+        // スケール再設定
+        result = PyFloat_FromDouble(selfObj->GetScale());
+        break;
+    case FuncObject::GetVelocity:
+        // スケール再設定
+        result = PyFloat_FromDouble(selfObj->GetVelocity());
+        break;
     }
+
+
+    Py_XDECREF(selfIdx);
+    return result;
+}
+
+
+// set one double parameter
+PyObject* CppPythonIF::Func_Pram1d(PyObject* self, PyObject* args)
+{
+    if (engine == nullptr)
+        return NULL;
+
+    PyObject* src;
+    int funcID;
+    double value;
+    if (!PyArg_ParseTuple(args, "Oid", &src, &funcID, &value))
+        return NULL;
+
+    // 型チェック
+    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
+    if (!PyObject_IsInstance(src, objDataType))
+        return NULL;  
+
+    PyObject* result = NULL;
+    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
+    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+
+    switch ((FuncObject)funcID)
+    {
+    case FuncObject::SetScale:
+        // スケール再設定
+        if (selfObj->SetScale(value))
+            result = PyLong_FromLong(0);
+        break;
+
+    case FuncObject::SetVelocity:
+        // 速度再設定
+        if (selfObj->SetVelocity(value))
+            result = PyLong_FromLong(0);
+        break;
+    }
+
 
     Py_XDECREF(selfIdx);
     return result;
@@ -213,8 +261,14 @@ PyMethodDef methods[] =
         "explanation."
     },
     {
-        "SetScale",
-        CppPythonIF::SetScale,
+        "Func_NoParam",
+        CppPythonIF::Func_NoParam,
+        METH_VARARGS,
+        "explanation."
+    },
+    {
+        "Func_Pram1d",
+        CppPythonIF::Func_Pram1d,
         METH_VARARGS,
         "explanation."
     },

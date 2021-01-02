@@ -370,6 +370,20 @@ bool object3d::SetScale(double scale)
 	this->scale = scale;
 	return true;
 }
+double object3d::GetScale()
+{
+	return this->scale;
+}
+// 速度更新
+bool object3d::SetVelocity(double veloc)
+{
+	this->lspX.w = veloc;
+	return true;
+}
+double object3d::GetVelocity()
+{
+	return this->lspX.w;
+}
 
 // std更新
 void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot, double len)
