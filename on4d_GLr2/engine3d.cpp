@@ -1642,3 +1642,12 @@ bool engine3d::CheckTrackedEnable()
 	return true;
 }
 
+void engine3d::SetRadius(double radius)
+{
+	this->radius = radius;
+}
+double engine3d::GetRadius()
+{
+	return this->radius;
+}
+

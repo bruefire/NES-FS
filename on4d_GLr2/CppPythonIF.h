@@ -21,7 +21,9 @@ public:
         GetObjRotVelocity,
         SetPt3x,
         SetPt3y,
-        SetPt3z
+        SetPt3z,
+        SetWorldScale,
+        GetWorldScale
     };
     static FuncObject funcID;
 

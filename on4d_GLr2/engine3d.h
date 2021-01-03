@@ -124,6 +124,8 @@ public:
 	int physics();
 	bool CheckSelectedEnable(int idx = -1);
 	bool CheckTrackedEnable();
+	void SetRadius(double);
+	double GetRadius();
 
 	enum class RandMode
 	{

@@ -323,6 +323,26 @@ PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
 
         break;
     }
+    case FuncObject::SetWorldScale:
+    {
+        PyObject* src, *selfIdx;
+        double value;
+        if (!PyArg_ParseTuple(args, "Od", &src, &value))
+            return NULL;
+
+        engine->SetRadius(value);
+        result = PyLong_FromLong(1);
+        break;
+    }
+    case FuncObject::GetWorldScale:
+    {
+        PyObject* src;
+        if (!PyArg_ParseTuple(args, "O", &src))
+            return NULL;
+
+        result = PyFloat_FromDouble(engine->GetRadius());
+        break;
+    }
     }
     CppPythonIF::funcID = FuncObject::None;
 

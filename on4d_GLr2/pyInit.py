@@ -24,6 +24,23 @@ class FuncObject(IntEnum) :
 	SetPt3x = 6
 	SetPt3y = 7
 	SetPt3z = 8
+	SetWorldScale = 9
+	GetWorldScale = 10
+
+
+class World :
+	@property
+	def scale(self) :
+		h3sim.SetCommonFunc(int(FuncObject.GetWorldScale))
+		return h3sim.ExecCommonFunc(self)
+	@scale.setter
+	def scale(self, val) :
+		h3sim.SetCommonFunc(int(FuncObject.SetWorldScale))
+		h3sim.ExecCommonFunc(self, val)
+		
+	@property
+	def player(self) :
+		return h3sim.GetPlayerObj()
 
 
 class Dvec3 :
@@ -113,3 +130,6 @@ class ObjData :
 		h3sim.ExecCommonFunc(self, val)
 
 
+		
+world = World()
+world.objs = h3sim.GetObjData()

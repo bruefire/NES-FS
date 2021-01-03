@@ -110,6 +110,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	menuCheckDef(hMenu, &menuItemInfo);
 	//
 
+	// S3シミュレータクラス 初期化
+	if (!newEngine.init(preWnd))
+		PostQuitMessage(0);
+
+
 	// Python初期化
 	bool initPyFlg;
 	PyObject* catcher;
@@ -117,6 +122,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		initPyFlg = false;
 	else
 	{
+		CppPythonIF::engine = &newEngine;
 		// python初期化ファイル
 		string pyInitFle = "pyInit.py";
 		FILE* pyInitFp = fopen(pyInitFle.c_str(), "rb");
@@ -126,15 +132,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		CppPythonIF::pDict = PyModule_GetDict(CppPythonIF::pModule);
 		PyRun_SimpleFile(pyInitFp, pyInitFle.c_str());
 		catcher = PyObject_GetAttrString(CppPythonIF::pModule, "catchOutErr");
-		CppPythonIF::engine = &newEngine;
 		initPyFlg = true;
 
 		fclose(pyInitFp);
 	}
-
-	// S3シミュレータクラス 初期化
-	if(!newEngine.init(preWnd))
-		PostQuitMessage(0);
 	
 
 	///-- ゲームパッド
