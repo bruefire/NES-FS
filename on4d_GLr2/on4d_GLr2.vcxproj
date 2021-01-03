@@ -119,6 +119,7 @@
     </Text>
     <Text Include="objSetting.h" />
     <Text Include="pyUpd.py" />
+    <ResourceCompile Include="UIH3EN.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BA463831-02FC-46CE-B106-7B2FDB7C0B43}</ProjectGuid>

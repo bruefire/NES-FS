@@ -14,6 +14,7 @@
 #define UI_LANG_JA 21
 #define UI_H3_JA 22
 #define UI_LANG_EN 23
+#define UI_H3_EN 24
 
 // Pythonスクリプト
 #define UI_CALL_SCRIPT 30

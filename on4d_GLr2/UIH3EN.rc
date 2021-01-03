@@ -1,0 +1,104 @@
+#pragma once
+#include "UI_DEF.h"
+
+
+
+KITTY_H3_EN MENU
+BEGIN
+	POPUP "Program"
+		BEGIN
+		POPUP "Framerate"			//UI_FPS
+		BEGIN
+			MENUITEM "30"			UI_FPS_30
+			MENUITEM "60"			UI_FPS_60
+		END
+		POPUP "Select Simlator (Lang)"		//UI_LANG
+		BEGIN
+			MENUITEM "í¥ãÖñ  (ì˙ñ{åÍ)"		UI_LANG_JA
+			MENUITEM "ëoã»ñ  (ì˙ñ{åÍ)"	    UI_H3_JA
+			MENUITEM "Spherical (English)"	UI_LANG_EN
+			MENUITEM "Hyperbolic (English)"	UI_H3_EN
+		END
+		MENUITEM "Run Script", UI_CALL_SCRIPT
+		MENUITEM SEPARATOR
+		MENUITEM "Exit", UI_END
+	END
+
+	POPUP "Option"
+	BEGIN
+		POPUP "Background"
+		BEGIN
+			MENUITEM "White", UI_BG_WH
+			MENUITEM "Black", UI_BG_BK
+		END
+
+		POPUP "World Scale"
+		BEGIN
+			MENUITEM "20", UI_RDS_SS
+			MENUITEM "30", UI_RDS_S
+			MENUITEM "60", UI_RDS_M
+			MENUITEM "100", UI_RDS_L
+		END
+		POPUP "Field of vision"
+		BEGIN
+			MENUITEM "Confined", UI_CR_S
+			MENUITEM "Middle", UI_CR_M
+			MENUITEM "Wide", UI_CR_L
+		END
+		POPUP "Depth effect"
+		BEGIN
+			MENUITEM "None", UI_SD_0
+			MENUITEM "Linear decay", UI_SD_1
+			MENUITEM "Shadow (light = POV)", UI_SD_2
+		END
+	END
+	POPUP "Object"
+	BEGIN
+		MENUITEM "Object loop"	UI_OBJ_LOOP
+		POPUP "Change object"
+		BEGIN
+			POPUP "Base object"
+			BEGIN
+				MENUITEM "None", UI_WL_NONE
+				MENUITEM "6 lines (points)", UI_6_POINT
+				MENUITEM "6 lines (lines)", UI_6_LINE
+				MENUITEM "Polar (points)", UI_TUDE_POINT
+				MENUITEM "Polar (lines)", UI_TUDE_LINE
+				MENUITEM "Torus(points)", UI_TORUS_POINT
+				MENUITEM "Torus(lines)", UI_TORUS_LINE
+				MENUITEM "Torus(polygons)", UI_TORUS_SURFACE
+				MENUITEM "Plane", UI_PLANE_SURFACE
+				MENUITEM "Earth", UI_MK_EARTH
+				MENUITEM SEPARATOR
+				MENUITEM "Irregular field", UI_MK_TC
+			END
+			POPUP "Shooted object"
+			BEGIN
+				MENUITEM "Box", UI_THROW_CUBE
+				MENUITEM "Earth", UI_THROW_SPHERE
+				MENUITEM "Horse?", UI_THROW_HORSE
+				MENUITEM "Rock", UI_THROW_ROCK
+				MENUITEM "Reference(.obj)", UI_THROW_REF
+			END
+		END
+		POPUP "Replace shooted-obj"
+		BEGIN
+			MENUITEM "Random (Uniform)", UI_THROW_RANDOM2
+			MENUITEM "Clear", UI_THROW_CLEAR
+		END
+	END
+	POPUP "View"
+	BEGIN
+		MENUITEM "Coordinate", UI_XYZ
+		MENUITEM "Player object", UI_PLR
+		MENUITEM "Map", UI_MAP
+		//MENUITEM "à⁄ìÆ/âÒì]ï˚å¸", UI_LR_RESULT
+		//MENUITEM "ãóó£", UI_DST
+		//MENUITEM "ãOê’", UI_PAST
+	END
+	POPUP "Help"
+	BEGIN
+		MENUITEM "How to operate", UI_HOWTO_DLG
+		MENUITEM "About", UI_INFO_DLG
+	END
+END

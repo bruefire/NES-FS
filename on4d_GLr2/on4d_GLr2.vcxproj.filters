@@ -259,6 +259,9 @@
     <ResourceCompile Include="objSetting.rc">
       <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="UIH3EN.rc">
+      <Filter>リソース ファイル\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico">
