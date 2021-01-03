@@ -118,6 +118,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	// Python初期化
 	bool initPyFlg;
 	PyObject* catcher;
+	string updPyFile = "pyUpd.py";
+	string updPyStr = "";
 	if (PyImport_AppendInittab("h3sim", PyInit_CppModule) == -1)
 		initPyFlg = false;
 	else
@@ -135,6 +137,15 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		initPyFlg = true;
 
 		fclose(pyInitFp);
+
+		// upd file
+		char tmpStr[1024];
+		FILE* pyUpdFp = fopen(updPyFile.c_str(), "rb");
+		while (fgets(tmpStr, 1024, pyUpdFp) != NULL)
+		{
+			updPyStr += tmpStr;
+		}
+		fclose(pyUpdFp);
 	}
 	
 
@@ -164,8 +175,14 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			}
 		}else{
 			// Pythonスクリプト処理
+			if (initPyFlg)
+			{
+				// exec constant script
+				PyRun_SimpleString(updPyStr.c_str());
+			}
 			if (initPyFlg && CppPythonIF::rawCode[0] != 0)
 			{
+				// exec instant script
 				PyRun_SimpleString(CppPythonIF::rawCode);
 				
 				PyObject* output = PyObject_GetAttrString(catcher, "value");

@@ -272,5 +272,8 @@
     <Text Include="objSetting.h">
       <Filter>c++ ヘッダ\OS依存部%28Windows%29\フォーム系</Filter>
     </Text>
+    <Text Include="pyUpd.py">
+      <Filter>リソース ファイル</Filter>
+    </Text>
   </ItemGroup>
 </Project>

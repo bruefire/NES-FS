@@ -133,3 +133,4 @@ class ObjData :
 		
 world = World()
 world.objs = h3sim.GetObjData()
+updateCallback = []
