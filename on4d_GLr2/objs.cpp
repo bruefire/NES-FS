@@ -384,6 +384,16 @@ double object3d::GetVelocity()
 {
 	return this->lspX.w;
 }
+// update rsp
+bool object3d::SetRsp(pt3 pts)
+{
+	this->rsp = pts;
+	return true;
+}
+pt3 object3d::GetRsp()
+{
+	return this->rsp;
+}
 
 // stdXV
 void object3d::RotVecs(pt3* vec1, pt3* vec2, double rot, double len)

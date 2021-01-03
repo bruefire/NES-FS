@@ -6,6 +6,7 @@ engine3d* CppPythonIF::engine = nullptr;
 char CppPythonIF::rawCode[8186] = "";
 PyObject* CppPythonIF::pModule;
 PyObject* CppPythonIF::pDict;
+CppPythonIF::FuncObject CppPythonIF::funcID;
 
 
 
@@ -145,85 +146,188 @@ PyObject* CppPythonIF::GetPlayerObj(PyObject* self, PyObject* args)
 }
 
 
-// set one double parameter
-PyObject* CppPythonIF::Func_NoParam(PyObject* self, PyObject* args)
+// set common func name
+PyObject* CppPythonIF::SetCommonFunc(PyObject* self, PyObject* args)
 {
     if (engine == nullptr)
         return NULL;
 
-    PyObject* src;
     int funcID;
-    if (!PyArg_ParseTuple(args, "Oi", &src, &funcID))
+    if (!PyArg_ParseTuple(args, "i", &funcID))
         return NULL;
 
-    // 型チェック
-    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
-    if (!PyObject_IsInstance(src, objDataType))
+    CppPythonIF::funcID = (CppPythonIF::FuncObject)funcID;
+
+    return PyLong_FromLong(1);
+}
+
+
+// exec common process called from python
+PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
+{
+    if (engine == nullptr)
         return NULL;
+
+
+    // get/set objobj
+    auto GetObjObj = [](PyObject** src, PyObject** selfIdx)
+    {
+        PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
+        if (!PyObject_IsInstance(*src, objDataType))
+            return false;
+        *selfIdx = PyObject_GetAttrString(*src, "idx");
+        return true;
+    };
+    auto ReleaseObjObj = [](PyObject* selfIdx)
+    {
+        Py_XDECREF(selfIdx);
+    };
+
 
     PyObject* result = NULL;
-    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
-    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
 
-    switch ((FuncObject)funcID)
+    // exec process called from python
+    switch (CppPythonIF::funcID)
     {
-    case FuncObject::GetScale:
-        // スケール再設定
+    case FuncObject::GetObjScale:
+    {
+        PyObject* src,* selfIdx;
+        if (!PyArg_ParseTuple(args, "O", &src) || !GetObjObj(&src, &selfIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
         result = PyFloat_FromDouble(selfObj->GetScale());
-        break;
-    case FuncObject::GetVelocity:
-        // スケール再設定
-        result = PyFloat_FromDouble(selfObj->GetVelocity());
+
+        ReleaseObjObj(selfIdx);
         break;
     }
-
-
-    Py_XDECREF(selfIdx);
-    return result;
-}
-
-
-// set one double parameter
-PyObject* CppPythonIF::Func_Pram1d(PyObject* self, PyObject* args)
-{
-    if (engine == nullptr)
-        return NULL;
-
-    PyObject* src;
-    int funcID;
-    double value;
-    if (!PyArg_ParseTuple(args, "Oid", &src, &funcID, &value))
-        return NULL;
-
-    // 型チェック
-    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
-    if (!PyObject_IsInstance(src, objDataType))
-        return NULL;  
-
-    PyObject* result = NULL;
-    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
-    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
-
-    switch ((FuncObject)funcID)
+    case FuncObject::GetObjVelocity:
     {
-    case FuncObject::SetScale:
-        // スケール再設定
-        if (selfObj->SetScale(value))
-            result = PyLong_FromLong(0);
-        break;
+        PyObject* src, * selfIdx;
+        if (!PyArg_ParseTuple(args, "O", &src) || !GetObjObj(&src, &selfIdx))
+            return NULL;
 
-    case FuncObject::SetVelocity:
-        // 速度再設定
-        if (selfObj->SetVelocity(value))
-            result = PyLong_FromLong(0);
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        result = PyFloat_FromDouble(selfObj->GetVelocity());
+
+        ReleaseObjObj(selfIdx);
         break;
     }
+    case FuncObject::SetObjScale:
+    {
+        PyObject* src, * selfIdx;
+        double value;
+        if (!PyArg_ParseTuple(args, "Od", &src, &value) || !GetObjObj(&src, &selfIdx))
+            return NULL;
 
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        if (selfObj->SetScale(value))
+            result = PyLong_FromLong(1);
+        else
+            result = PyLong_FromLong(0);
 
-    Py_XDECREF(selfIdx);
+        ReleaseObjObj(selfIdx);
+        break;
+    }
+    case FuncObject::SetObjVelocity:
+    {
+        PyObject* src, * selfIdx;
+        double value;
+        if (!PyArg_ParseTuple(args, "Od", &src, &value) || !GetObjObj(&src, &selfIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        if (selfObj->SetVelocity(value))
+            result = PyLong_FromLong(1);
+        else
+            result = PyLong_FromLong(0);
+
+        ReleaseObjObj(selfIdx);
+        break;
+    }
+    case FuncObject::GetObjRotVelocity:
+    {
+        PyObject* src, * selfIdx;
+        if (!PyArg_ParseTuple(args, "O", &src) || !GetObjObj(&src, &selfIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        PyObject* Dvec3 = PyDict_GetItemString(pDict, "Dvec3");
+        PyObject* dVec3 = PyObject_CallObject(Dvec3, nullptr);
+
+        pt3 pts = selfObj->GetRsp();
+        
+        PyObject* px, *py, *pz, *pt;
+        px = PyObject_CallMethod(dVec3, "SetX", "d", pts.x);
+        py = PyObject_CallMethod(dVec3, "SetY", "d", pts.y);
+        pz = PyObject_CallMethod(dVec3, "SetZ", "d", pts.z);
+        PyObject_SetAttrString(dVec3, "owIdx", selfIdx);
+        PyObject_SetAttrString(dVec3, "type", pt = PyLong_FromLong((int)FuncObject::GetObjRotVelocity));
+        Py_XDECREF(px);
+        Py_XDECREF(py);
+        Py_XDECREF(pz);
+        Py_XDECREF(pt);
+        ReleaseObjObj(selfIdx);
+
+        result = dVec3;
+        break;
+    }
+    case FuncObject::SetObjRotVelocity:
+    {
+        PyObject* src, * selfIdx, * value;
+        if (!PyArg_ParseTuple(args, "OO", &src, &value) || !GetObjObj(&src, &selfIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        PyObject* px = PyObject_GetAttrString(value, "x");
+        PyObject* py = PyObject_GetAttrString(value, "y");
+        PyObject* pz = PyObject_GetAttrString(value, "z");
+        pt3 pts = pt3(
+            PyFloat_AsDouble(px),
+            PyFloat_AsDouble(py),
+            PyFloat_AsDouble(pz));
+
+        if (selfObj->SetRsp(pts))
+            result = PyLong_FromLong(1);
+        else
+            result = PyLong_FromLong(0);
+
+        Py_XDECREF(px);
+        Py_XDECREF(py);
+        Py_XDECREF(pz);
+        ReleaseObjObj(selfIdx);
+        break;
+    }
+    case FuncObject::SetPt3x:
+    case FuncObject::SetPt3y:
+    case FuncObject::SetPt3z:
+    {
+        int srcIdx, type;
+        double value;
+        if (!PyArg_ParseTuple(args, "iid", &srcIdx, &type, &value))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[srcIdx];
+        switch ((FuncObject)type)
+        {
+        case FuncObject::GetObjRotVelocity:
+            if (CppPythonIF::funcID == FuncObject::SetPt3x)
+                selfObj->rsp.x = value;
+            else if (CppPythonIF::funcID == FuncObject::SetPt3y)
+                selfObj->rsp.y = value;
+            else if (CppPythonIF::funcID == FuncObject::SetPt3z)
+                selfObj->rsp.z = value;
+            break;
+        }
+        result = PyLong_FromLong(1);
+
+        break;
+    }
+    }
+    CppPythonIF::funcID = FuncObject::None;
+
     return result;
 }
-
 
 
 //---------▼クラス化すると色々面倒なのでグローバル------------
@@ -261,14 +365,14 @@ PyMethodDef methods[] =
         "explanation."
     },
     {
-        "Func_NoParam",
-        CppPythonIF::Func_NoParam,
+        "SetCommonFunc",
+        CppPythonIF::SetCommonFunc,
         METH_VARARGS,
         "explanation."
     },
     {
-        "Func_Pram1d",
-        CppPythonIF::Func_Pram1d,
+        "ExecCommonFunc",
+        CppPythonIF::ExecCommonFunc,
         METH_VARARGS,
         "explanation."
     },

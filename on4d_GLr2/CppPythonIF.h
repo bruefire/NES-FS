@@ -9,13 +9,22 @@
 class CppPythonIF
 {
 public:
+
     enum class FuncObject
     {
-        SetScale = 0,
-        GetScale,
-        SetVelocity,
-        GetVelocity
+        None = -1,
+        SetObjScale = 0,
+        GetObjScale,
+        SetObjVelocity,
+        GetObjVelocity,
+        SetObjRotVelocity,
+        GetObjRotVelocity,
+        SetPt3x,
+        SetPt3y,
+        SetPt3z
     };
+    static FuncObject funcID;
+
 
     static engine3d* engine;
     static char rawCode[8186];
@@ -23,8 +32,9 @@ public:
     static PyObject* SetLocRelative(PyObject* self, PyObject* args);
     static PyObject* SetRotRelative(PyObject* self, PyObject* args);
     static PyObject* GetPlayerObj(PyObject* self, PyObject* args);
-    static PyObject* Func_Pram1d(PyObject* self, PyObject* args);
-    static PyObject* Func_NoParam(PyObject* self, PyObject* args);
+
+    static PyObject* SetCommonFunc(PyObject* self, PyObject* args);
+    static PyObject* ExecCommonFunc(PyObject* self, PyObject* args);
 
     // Pythonオブジェクト
     static PyObject* pModule;

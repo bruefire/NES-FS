@@ -53,6 +53,8 @@ public:
 	double GetScale();
 	bool SetVelocity(double);
 	double GetVelocity();
+	bool SetRsp(pt3);
+	pt3 GetRsp();
 	static void RotVecs(pt3* vec1, pt3* vec2, double rot, double len = 1);
 	static void RotVecs4(pt4* vec1, pt4* vec2, double rot, double len = 1);
 
