@@ -77,6 +77,7 @@ public:
 	int meshInit(std::string, uint32_t, int);
 	int meshInitB(int, uint32_t);
 	int setNull();
+	void Init();
 
 	mesh3d();
 	~mesh3d();

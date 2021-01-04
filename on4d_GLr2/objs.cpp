@@ -41,10 +41,14 @@ poly::~poly(){
  
 }
 
-mesh3d::mesh3d()
+void mesh3d::Init()
 {
 	coorType = COOR::POLAR;
 	setNull();
+}
+mesh3d::mesh3d()
+{
+	Init();
 }
 
 int object3d::PAST_QTY = 75;

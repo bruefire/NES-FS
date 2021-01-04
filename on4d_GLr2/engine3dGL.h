@@ -72,6 +72,7 @@ public:
 	int init();
 	int update();
 	int dispose();
+	void MakeCommonVBO(int);
 	// •`‰æ
 	void simulateS3GL();
 	void SimulateH3GL();

@@ -81,6 +81,13 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			newEngine.lang = UI_LANG_JA;
 			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
 		}
+		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:EN")
+		{
+			menuName = "KITTY_H3_EN";
+			titleName = "H3 wondering simlator";
+			newEngine.lang = UI_LANG_EN;
+			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+		}
 		else if(awakeCmd.substr(awIdx) == "lang:EN")
 		{
 			menuName = "KITTY_EN";
@@ -382,6 +389,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					PostQuitMessage(0);
 					break;
 
+				case UI_H3_EN:
+					GetModuleFileName(NULL, myPath, myPathLen);
+					fName = myPath;
+					mpIdx = fName.find_last_of("\\") + 1;
+					fName = fName.substr(mpIdx) + " sim:H3;lang:EN";
+
+					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					PostQuitMessage(0);
+					break;
+
 				case UI_THROW_CLEAR:
 					newEngine.DisableShootObjs();
 					break;
@@ -614,13 +631,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					if( GetOpenFileName( &ofName ) ){	//-- ファイル参照
 						SetCurrentDirectory(curDir);
 						newEngine.meshs[9].~mesh3d();
+						newEngine.meshs[9].Init();
 						refName[ strlen(refName)-strlen(".obj") ] = 0x00;
 						if(!newEngine.meshs[9].meshInit( refName, 9+1, 1))
 						{
 							newEngine.meshs[9].meshInit( newEngine.meshNames[9], 9+1, 0);
 						}
-						if(newEngine.meshs[9].faces != nullptr)
-							((mesh3dGL*)&newEngine.meshs[9])->transBuffers(newEngine.buffers, newEngine.texNames);
+						if (newEngine.meshs[9].faces != nullptr)
+							newEngine.MakeCommonVBO(9);
 
 						for(int i=newEngine.BWH_QTY+newEngine.PLR_QTY; i<newEngine.OBJ_QTY; i++)
 							newEngine.objs[i].mesh = newEngine.meshs+9;

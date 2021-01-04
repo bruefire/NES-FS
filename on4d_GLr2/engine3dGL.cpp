@@ -286,6 +286,29 @@ int mesh3dGL::transBuffers(uint32_t* buffers, uint32_t* texNames)
 }
 
 
+void engine3dGL::MakeCommonVBO(int i)
+{
+	if (meshs[i].pts != nullptr)
+	{
+		switch (qyMode)
+		{
+		case QY_MODE::HIGH:
+			((mesh3dGL*)&meshs[i])->makeDataForGL();
+			break;
+
+		case QY_MODE::LOW:
+			if (meshs[i].coorType == mesh3d::COOR::Cartesian)
+				((mesh3dGL*)&meshs[i])->makeDataForGL();
+			else
+				((mesh3dGL*)&meshs[i])->makeDataForGL_LQY(this);
+			break;
+		}
+
+		((mesh3dGL*)&meshs[i])->transBuffers(buffers, texNames);
+	}
+
+}
+
 
 int engine3dGL::init()
 {
@@ -317,24 +340,7 @@ int engine3dGL::init()
 	//-- ƒƒbƒVƒ…“]‘—
 	for (int i = 0; i < meshLen; i++)
 	{
-		if (meshs[i].pts != nullptr)
-		{
-			switch (qyMode)
-			{
-			case QY_MODE::HIGH:
-				((mesh3dGL*)& meshs[i])->makeDataForGL();
-				break;
-
-			case QY_MODE::LOW:
-				if (meshs[i].coorType == mesh3d::COOR::Cartesian)
-					((mesh3dGL*)&meshs[i])->makeDataForGL();
-				else
-					((mesh3dGL*)& meshs[i])->makeDataForGL_LQY(this);
-				break;
-			}
-
-			((mesh3dGL*)& meshs[i])->transBuffers(buffers, texNames);
-		}
+		MakeCommonVBO(i);
 	}
 
 
