@@ -122,6 +122,6 @@ END
 POPUP "ヘルプ"
 BEGIN
 MENUITEM "操作方法", UI_HOWTO_DLG
-MENUITEM "双曲面遊泳シミュレータについて", UI_INFO_DLG
+MENUITEM "シミュレータについて", UI_INFO_DLG
 END
 END

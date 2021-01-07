@@ -5,6 +5,8 @@
 *.db
 *.exe
 .vs
+Debug/
+Release/
 on4d_GLr2/Debug/
 on4d_GLr2/Release/
 on4d_GLr2/x64/Debug/

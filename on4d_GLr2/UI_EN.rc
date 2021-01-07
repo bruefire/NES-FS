@@ -120,6 +120,6 @@ BEGIN
     BEGIN
         MENUITEM "How to operate",              UI_HOWTO_DLG
         //MENUITEM "í¥ãÖñ ÇÃê´éø",            40041
-        MENUITEM "About",            UI_INFO_DLG
+        MENUITEM "About simulator",            UI_INFO_DLG
     END
 END

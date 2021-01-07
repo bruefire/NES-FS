@@ -99,6 +99,6 @@ BEGIN
 	POPUP "Help"
 	BEGIN
 		MENUITEM "How to operate", UI_HOWTO_DLG
-		MENUITEM "About", UI_INFO_DLG
+		MENUITEM "About Simulator", UI_INFO_DLG
 	END
 END

@@ -1077,7 +1077,7 @@ int engine3d::InitS3()	// ‹…–Ê¢ŠE—p‰Šú‰»
 			((double)rand() / RAND_MAX) * PIE,
 			((double)rand() / RAND_MAX) * PIE
 		));
-		objs[h].rsp.asg(0, 0, 1 DEG);
+		objs[h].rsp.asg(1 DEG, 0, 0);
 		objs[h].init_stdS3(0);	//-- std
 		objs[h].used = true;	//-- —LŒø‰»
 		objs[h].draw = 2;

@@ -84,14 +84,14 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:EN")
 		{
 			menuName = "KITTY_H3_EN";
-			titleName = "H3 wondering simlator";
+			titleName = "NES-FS -Hyperbolic Space-";
 			newEngine.lang = UI_LANG_EN;
 			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
 		}
 		else if(awakeCmd.substr(awIdx) == "lang:EN")
 		{
 			menuName = "KITTY_EN";
-			titleName = "S3 wondering simlator";
+			titleName = "NES-FS -Spherical Space-";
 			newEngine.lang = UI_LANG_EN;
 			newEngine.worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}
@@ -139,19 +139,22 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		Py_InitializeEx(0);	// todoÅö pythoné¿çsä¬ã´Ç≤Ç∆Ç±Ç¡ÇøÇ≈ópà”Ç∑ÇÈ
 		CppPythonIF::pModule = PyImport_AddModule("__main__");
 		CppPythonIF::pDict = PyModule_GetDict(CppPythonIF::pModule);
-		PyRun_SimpleFile(pyInitFp, pyInitFle.c_str());
+		char tmpStr[1024];
+		string initPyStr = "";
+		while (fgets(tmpStr, 1024, pyInitFp) != NULL)
+			initPyStr += tmpStr;
+		
+		PyRun_SimpleString(initPyStr.c_str());
 		catcher = PyObject_GetAttrString(CppPythonIF::pModule, "catchOutErr");
 		initPyFlg = true;
 
 		fclose(pyInitFp);
 
 		// upd file
-		char tmpStr[1024];
 		FILE* pyUpdFp = fopen(updPyFile.c_str(), "rb");
 		while (fgets(tmpStr, 1024, pyUpdFp) != NULL)
-		{
 			updPyStr += tmpStr;
-		}
+		
 		fclose(pyUpdFp);
 	}
 	

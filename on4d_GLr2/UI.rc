@@ -121,6 +121,6 @@ BEGIN
     BEGIN
         MENUITEM "操作方法",              UI_HOWTO_DLG
         //MENUITEM "超球面の性質",            40041
-        MENUITEM "超球面遊泳シミュレータについて",            UI_INFO_DLG
+        MENUITEM "シミュレータについて",            UI_INFO_DLG
     END
 END
