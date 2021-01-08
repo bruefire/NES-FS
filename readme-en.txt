@@ -1,4 +1,4 @@
-(first, I am not good at english.)
+(I am not good at english.)
 
 thanks for download this software.
 this program is OSS. 
@@ -7,7 +7,8 @@ redistribtion or etc.
 
 Overview:
 this program is simulator to fly 
-in "3-sphere" space which have diferent 
+in "Spherical space" and "Hyperbolic space"
+which have diferent 
 features from Euclid space.
 the source was coded for windows.
 
@@ -19,9 +20,9 @@ content in the program.
 ================================
 
 Windows 32bit exe file location is
-./32bit-Win/s3sim.exe
+./32bit-Win/nes-fs.exe
 Windows 64bit exe file location is
-./64bit-Win/s3sim.exe
+./64bit-Win/nes-fs.exe
 
 recommended Windows version: 10
 maybe recommended GPU spec: 
@@ -73,7 +74,7 @@ models of "Izumo Oyashiro", Tori, and so on
 were downloaded and used from here:
 http://www.3dchaya.com/
 ----------------------------------
-S3-Simlator
-version: 2.5.2
-release: Apr.21.2020
+NES-FS (Non Euclidean Space Flight Simlator)
+version: 3.0.0
+release: Jan.8.2021
 creator: bruefire

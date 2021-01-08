@@ -1,5 +1,6 @@
 #pragma once
 #define EDITDLG_CODE_TXT	100
 #define EDITDLG_PATH_TXT	101
+#define EDITDLG_REF_SCRIPT	1000
 
 #define IDC_STATIC	-1

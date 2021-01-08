@@ -942,7 +942,36 @@ INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 
 };
 // Pythonエディタプロシージャ
-INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) {
+INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	char oldPath[256];
+	GetCurrentDirectory(256, oldPath);
+
+	char myPath[256];
+	GetModuleFileName(NULL, myPath, 256);
+	string sampleDir = myPath;
+	int mpIdx = sampleDir.find_last_of("\\");
+	sampleDir = sampleDir.substr(0, mpIdx) + ".\\sample_script";
+
+	static char refName[1024];
+	static OPENFILENAME ofName = {
+		sizeof(OPENFILENAME),
+		hDlg,
+		0,
+		"Python .pyファイル {*.py}\0*.py\0"
+		"All files {*.*}\0*.*\0\0",
+		0,
+		0,
+		0,
+		refName,
+		1024,
+		0,
+		0,
+		".\\sample_script\\",
+		"スクリプト参照",
+		OFN_FILEMUSTEXIST
+
+	};
 	
 	switch (msg) {
 	case WM_COMMAND:
@@ -953,6 +982,27 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) {
 		case IDCANCEL:
 			DestroyWindow(editDlg);
 			return true;
+		case EDITDLG_REF_SCRIPT:
+		{
+			if (GetOpenFileName(&ofName))
+			{
+				refName[strlen(refName)] = 0x00;
+				SetDlgItemText(editDlg, EDITDLG_PATH_TXT, refName);
+
+				// upd file
+				char tmpStr[1024];
+				string scriptStr = "";
+
+				FILE* fp = fopen(refName, "rb");
+				while (fgets(tmpStr, 1024, fp) != NULL)
+					scriptStr += tmpStr;
+				fclose(fp);
+
+				SetDlgItemText(editDlg, EDITDLG_CODE_TXT, scriptStr.c_str());
+			}
+			SetCurrentDirectory(oldPath);
+			return true;
+		}
 		}
 		break;
 	case WM_DESTROY:
