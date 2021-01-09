@@ -160,9 +160,15 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 void object3d::ParallelMove(pt3 tLoc, bool mode)
 {
 	double tLocPh = pyth3(tLoc);
-	pt3 refVec = (tLocPh < 0.001)
-		? pt3(0, 0, owner->H3_REF_RADIUS)
-		: tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
+	float refBrRatio = 0.8;
+	pt3 refVec;
+
+	if (tLocPh < 0.001)
+		refVec = pt3(0.0, 0.0, owner->H3_REF_RADIUS);
+	else if (tLocPh < owner->H3_REF_RADIUS * refBrRatio)
+		refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
+	else
+		refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh * 0.5);
 
 	pt3 bgnPt, endPt;
 	if (mode){
@@ -337,7 +343,7 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 		.pls(std2N.mtp(nLoc.y))
 		.pls(sideN.mtp(nLoc.x))
 		.norm()
-		.mtp(object3d::ClcEucFromHypb(dst));
+		.mtp(object3d::ClcEucFromHypb(dst / owner->radius));
 
 	reObj.ParallelMove(nLocK, true);
 	reObj.ParallelMove(preLoc, true);

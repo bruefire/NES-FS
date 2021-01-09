@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{
 			menuName = "KITTY_H3";
-			titleName = "双曲面遊泳シミュレータ";
+			titleName = "NES-FS -双曲空間-";
 			newEngine.lang = UI_LANG_JA;
 			newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
 		}
@@ -98,7 +98,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		else
 		{
 			menuName = "KITTY";
-			titleName = "超球面遊泳シミュレータ";
+			titleName = "NES-FS -球面空間-";
 			newEngine.lang = UI_LANG_JA;
 			newEngine.worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}

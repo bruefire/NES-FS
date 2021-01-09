@@ -1,6 +1,7 @@
 import math
 
 world.scale = 60
+scl = world.scale
 plr = world.player
 objs = world.objs
 
@@ -19,7 +20,7 @@ objs[bgn0].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)
 for line in range(0, line) :
 	objs[bgn0].SetRotRelative(1/math.sinh(rad)*0.0992, 0.0, 0.0)
 	for idx in range(bgn + span*line, bgn + span*(line+1)) :
-		objs[idx].SetLocRelative(objs[bgn0], rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
+		objs[idx].SetLocRelative(objs[bgn0], scl*rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
 
 mtp = 2
 rad = radb * mtp
@@ -29,7 +30,7 @@ objs[bgn0].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)
 for line in range(0, line) :
 	objs[bgn0].SetRotRelative(1/math.sinh(rad)*0.0992, 0.0, 0.0)
 	for idx in range(bgn + span*line, bgn + span*(line+1)) :
-		objs[idx].SetLocRelative(objs[bgn0], rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
+		objs[idx].SetLocRelative(objs[bgn0], scl*rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
 
 mtp = 3
 rad = radb * mtp
@@ -39,7 +40,7 @@ objs[bgn0].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)
 for line in range(0, line) :
 	objs[bgn0].SetRotRelative(1/math.sinh(rad)*0.0992, 0.0, 0.0)
 	for idx in range(bgn + span*line, bgn + span*(line+1)) :
-		objs[idx].SetLocRelative(objs[bgn0], rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
+		objs[idx].SetLocRelative(objs[bgn0], scl*rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
 
 mtp = 4
 rad = radb * mtp
@@ -49,9 +50,9 @@ objs[bgn0].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)
 for line in range(0, line) :
 	objs[bgn0].SetRotRelative(1/math.sinh(rad)*0.0992, 0.0, 0.0)
 	for idx in range(bgn + span*line, bgn + span*(line+1)) :
-		objs[idx].SetLocRelative(objs[bgn0], rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
+		objs[idx].SetLocRelative(objs[bgn0], scl*rad*(idx - (bgn + span*line) + 1), 0.0, 0.0, 1.0)
 
-dst = 0.102
+dst = scl*0.102
 bgn = bgnb + lineb * 10
 line = 19
 objs[bgn-1].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)

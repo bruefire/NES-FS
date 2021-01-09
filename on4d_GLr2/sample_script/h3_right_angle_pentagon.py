@@ -5,7 +5,7 @@ objs = world.objs
 
 bgn = 15
 span = 10
-dst = 0.1062
+dst = 6.372
 line = 5
 PIE = 3.1415926535
 objs[bgn-1].SetLocRelative(plr, 0, -1.0, 0.0, 0.0)
