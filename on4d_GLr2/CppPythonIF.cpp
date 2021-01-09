@@ -343,6 +343,22 @@ PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
         result = PyFloat_FromDouble(engine->GetRadius());
         break;
     }
+    case FuncObject::TrackObjDirection:
+    {
+        PyObject* src, *trg, *selfIdx, *trgIdx;
+        if (!PyArg_ParseTuple(args, "OO", &src, &trg) || !GetObjObj(&src, &selfIdx) || !GetObjObj(&trg, &trgIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        object3d* trgObj = &engine->objs[PyLong_AsLong(trgIdx)];
+
+        selfObj->TrackObjDirection(trgObj);
+        result = PyLong_FromLong(1);
+
+        ReleaseObjObj(selfIdx);
+        ReleaseObjObj(trgIdx);
+        break;
+    }
     }
     CppPythonIF::funcID = FuncObject::None;
 

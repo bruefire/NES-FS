@@ -23,7 +23,8 @@ public:
         SetPt3y,
         SetPt3z,
         SetWorldScale,
-        GetWorldScale
+        GetWorldScale,
+        TrackObjDirection
     };
     static FuncObject funcID;
 

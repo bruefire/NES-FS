@@ -198,6 +198,92 @@ void object3d::DealH3OohObj(bool loopFlg)
 		used = false;
 }
 
+void object3d::TrackObjDirection(object3d* trgObj)
+{
+	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
+	{
+		pt4 locE = tudeToEuc(loc);
+		pt4 std1 = tudeToEuc(std[0]);		// 基準位置1
+		pt4 std2 = tudeToEuc(std[1]);		// 基準位置2
+		///-------- 傾きの更新 ----------
+		//-- まず4つの基本軸を算出 (正規化済)
+		pt4 normN = locE;
+		pt4 normO = normN.mtp(owner->COS_1);
+		pt4 std1N = std1.mns(normO).mtp(owner->SIN_1R);
+		pt4 std2N = std2.mns(normO).mtp(owner->SIN_1R);
+
+		// クロス積を算出 (長さは1.0)
+		pt4 sideN = pt4::cross(normN, std1N, std2N);
+
+		// 対象オブジェクト方向を向く
+		pt4 trgE = object3d::tudeToEuc(trgObj->loc);
+		pt4 rotv4 = trgE.mns(normN);
+		double rot4Len = pyth4(rotv4);
+		if (rot4Len > 0.0000000001)
+		{
+			double ip = pt4::dot(normN.mtp(-1), rotv4.norm());
+			pt4 rotv3 = rotv4.mns(normN.mtp(-1 * rot4Len * ip));
+			double rot3Len = pyth4(rotv3);
+			if (rot3Len > 0.0000000001)
+			{
+				double ip2 = pt4::dot(std1N, rotv3.norm());
+				pt4 rotvS1 = std1N.mtp(rot3Len * ip2);
+				pt4 rotv = rotv3.mns(rotvS1);
+				pt4 rotvN = rotv.norm(sideN);
+
+				double rpLen = pt4::dot(std2N, rotvN);
+				pt4 std2N_rp = rotvN.mtp(rpLen);
+				pt4 std2N_rs = std2N.mns(std2N_rp);
+
+
+				double rot = atan2(pyth4(rotv), rot3Len * ip2);
+				object3d::RotVecs4(&std1N, &rotvN, rot);			// 対象方向へ回転
+				std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+			}
+		}
+
+		///-- 位置,基準位置を上書き (end
+		std1 = std1N.mtp(owner->SIN_1).pls(normO);
+		std2 = std2N.mtp(owner->SIN_1).pls(normO);
+		std[0] = eucToTude(std1);
+		std[1] = eucToTude(std2);
+	}
+	else if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+	{
+		pt3 preLoc = this->loc;
+		// 原点に移動
+		this->ParallelMove(preLoc, false);
+
+		// 軸ベクトル定義
+		pt3 std1N = this->std[0].norm();
+		pt3 std2N = this->std[1].norm();
+		pt3 sideN = pt3::cross(std2N, std1N);
+
+		// 対象オブジェクト方向を向く
+		object3d trgCpy(*trgObj);
+		trgCpy.ParallelMove(preLoc, false);
+		pt3 tNorm = trgCpy.loc.norm();
+		double ip = pt3::dot(std1N, tNorm);
+		pt3 tStd1 = std1N.mtp(ip);
+		pt3 tSide = tNorm.mns(tStd1);
+		pt3 rotvN = tSide.norm(sideN);
+
+		double rpLen = pt3::dot(std2N, rotvN);
+		pt3 std2N_rp = rotvN.mtp(rpLen);
+		pt3 std2N_rs = std2N.mns(std2N_rp);
+
+		double rot = atan2(pyth3(tSide), ip);
+		object3d::RotVecs(&std1N, &rotvN, rot);			// 対象方向へ回転
+		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+
+		this->std[0] = std1N.mtp(owner->H3_STD_LEN);
+		this->std[1] = std2N.mtp(owner->H3_STD_LEN);
+
+		// 元の位置に戻す
+		this->ParallelMove(preLoc, true);
+	}
+}
+
 // 相対的に位置再設定
 bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 {

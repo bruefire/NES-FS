@@ -26,6 +26,7 @@ class FuncObject(IntEnum) :
 	SetPt3z = 8
 	SetWorldScale = 9
 	GetWorldScale = 10
+	TrackObjDirection = 11
 
 
 class World :
@@ -128,6 +129,10 @@ class ObjData :
 	def rotVelocity(self, val) :
 		h3sim.SetCommonFunc(int(FuncObject.SetObjRotVelocity))
 		h3sim.ExecCommonFunc(self, val)
+
+	def TrackObjDirection(self, trg) :
+		h3sim.SetCommonFunc(int(FuncObject.TrackObjDirection))
+		return h3sim.ExecCommonFunc(self, trg)
 
 
 		

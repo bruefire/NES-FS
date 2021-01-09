@@ -719,14 +719,16 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	else
 	{
 		// 対象オブジェクト方向を向く
-		object3d* trgObj = &objs[viewTrackIdx];
-		pt3 rotvN = pt3(trgObj->loc.x, trgObj->loc.y, 0).norm(sideN);
+		object3d* _trgObj = &objs[viewTrackIdx];
+		object3d trgObj(*_trgObj);
+		trgObj.ParallelMove(preLoc, false);
+		pt3 rotvN = pt3(trgObj.loc.x, trgObj.loc.y, 0).norm(sideN);
 
 		double rpLen = pt3::dot(std2N, rotvN);
 		pt3 std2N_rp = rotvN.mtp(rpLen);
 		pt3 std2N_rs = std2N.mns(std2N_rp);
 
-		double rot = atan2(pyth2(trgObj->loc.x, trgObj->loc.y), trgObj->loc.z);
+		double rot = atan2(pyth2(trgObj.loc.x, trgObj.loc.y), trgObj.loc.z);
 		object3d::RotVecs(&std1N, &rotvN, rot);			// 対象方向へ回転
 		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
 	}

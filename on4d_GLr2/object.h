@@ -75,6 +75,7 @@ public:
 	object3d ReflectionH3(pt3, pt3);	// 平行移動 (H3)
 	void ParallelMove(pt3, bool);
 	void DealH3OohObj(bool);
+	void TrackObjDirection(object3d*);
 
 	bool copyFlg;	// 宣言、引数、戻り値からの作成
 	object3d();
