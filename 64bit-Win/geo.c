@@ -107,7 +107,7 @@ void main(){
 		drawP4[j] = tudeToEuc(drawPt_td[j]);
 		drawPt[j] = drawP4[j].xyz;
 			
-		tudeRst(drawPt[j].y, drawPt[j].z, 0.5*PIE, 1); //-- Y軸を奥行きに (互換のため)
+		tudeRst(drawPt[j].y, drawPt[j].z, 0.5*PIE, 1); //-- Y軸を奥行きに (右手系/左手系 互換のため)
 		drawPt[j].z *= -1;
 	}
 	////---計算のために値yを調整 > さらにカメラ前面の線分を切り出す ---///

@@ -612,6 +612,9 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 				std2N = std2N_rs.pls(rotvN.mtp(rpLen));
 			}
 		}
+
+		// ‹üŒÅ’è‰ñ“]
+		object3d::RotVecs4(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
 	}
 
 
@@ -740,6 +743,9 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 		double rot = atan2(pyth2(trgObj.loc.x, trgObj.loc.y), trgObj.loc.z);
 		object3d::RotVecs(&std1N, &rotvN, rot);			// ‘ÎÛ•ûŒü‚Ö‰ñ“]
 		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+
+		// ²•ûŒü‚Ì‰ñ“]
+		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// ³–ÊŒÅ’è‰ñ“]
 	}
 
 	curObj->std[0] = std1N.mtp(H3_STD_LEN);
@@ -1021,7 +1027,7 @@ int engine3d::InitH3()	// ‘o‹È¢ŠE—p‰Šú‰»
 
 		objs[h].rot.asg(0, 0 DEG, 0);
 		objs[h].rsp.asg(0 DEG, 0, 0);
-		objs[h].used = true;	//-- —LŒø‰»
+		objs[h].used = false;	//-- —LŒø‰»
 		objs[h].draw = 2;
 		objs[h].scale = 3;
 	}

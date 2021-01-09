@@ -944,16 +944,15 @@ INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 // Pythonエディタプロシージャ
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) 
 {
-	char oldPath[256];
-	GetCurrentDirectory(256, oldPath);
-
 	char myPath[256];
+	char oldPath[256];
+	static char refName[1024];
 	GetModuleFileName(NULL, myPath, 256);
 	string sampleDir = myPath;
 	int mpIdx = sampleDir.find_last_of("\\");
-	sampleDir = sampleDir.substr(0, mpIdx) + ".\\sample_script";
+	sampleDir = sampleDir.substr(0, mpIdx) + "\\sample_script\\sample";
+	strcpy(refName, sampleDir.c_str());
 
-	static char refName[1024];
 	static OPENFILENAME ofName = {
 		sizeof(OPENFILENAME),
 		hDlg,
@@ -967,7 +966,7 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		1024,
 		0,
 		0,
-		".\\sample_script\\",
+		0,
 		"スクリプト参照",
 		OFN_FILEMUSTEXIST
 
@@ -986,21 +985,20 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		{
 			if (GetOpenFileName(&ofName))
 			{
-				refName[strlen(refName)] = 0x00;
+				strcpy(oldPath, refName);
 				SetDlgItemText(editDlg, EDITDLG_PATH_TXT, refName);
 
 				// upd file
 				char tmpStr[1024];
 				string scriptStr = "";
 
-				FILE* fp = fopen(refName, "rb");
+				FILE* fp = fopen(oldPath, "rb");
 				while (fgets(tmpStr, 1024, fp) != NULL)
 					scriptStr += tmpStr;
 				fclose(fp);
 
 				SetDlgItemText(editDlg, EDITDLG_CODE_TXT, scriptStr.c_str());
 			}
-			SetCurrentDirectory(oldPath);
 			return true;
 		}
 		}

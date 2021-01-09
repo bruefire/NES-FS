@@ -70,7 +70,8 @@ float atan2(float x, float y){///ok
 
 
 
-void main(){
+void main()
+{
 
 	vec4 pts1 = vec4(	// Žn“_ XYZW
 		0,
