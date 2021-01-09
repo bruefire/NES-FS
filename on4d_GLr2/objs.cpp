@@ -345,7 +345,7 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	// 有効範囲チェック
 	double rstDst = pyth3(reObj.loc);
 	if (rstDst > owner->H3_MAX_RADIUS || isnan(rstDst))
-		return false;
+		return true;
 
 	// 結果を反映
 	this->used = true;

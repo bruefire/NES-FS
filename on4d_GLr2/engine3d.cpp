@@ -497,7 +497,16 @@ void engine3d::UpdFloatObjsH3()
 			if (pyth3(drc) < H3_MAX_RADIUS)
 				curObj->ParallelMove(drc, true);
 			else
-				curObj->DealH3OohObj(h3objLoop);
+			{
+				// プレイヤーの場合範囲内に留める
+				if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
+				{
+					if(h3objLoop)
+						curObj->DealH3OohObj(h3objLoop);
+				}
+				else
+					curObj->DealH3OohObj(h3objLoop);
+			}
 		}
 
 		// 元の位置に戻す
@@ -846,9 +855,14 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 			// プレイヤーの場合範囲内に留める
 			if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
 			{
-				pt3 adjLoc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
-				curObj->ParallelMove(curObj->loc, false);
-				curObj->ParallelMove(adjLoc, true);
+				if (h3objLoop)
+					curObj->DealH3OohObj(h3objLoop);
+				else
+				{
+					pt3 adjLoc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
+					curObj->ParallelMove(curObj->loc, false);
+					curObj->ParallelMove(adjLoc, true);
+				}
 			}
 			else
 				curObj->DealH3OohObj(h3objLoop);
