@@ -76,6 +76,7 @@ public:
 	void ParallelMove(pt3, bool);
 	void DealH3OohObj(bool);
 	void TrackObjDirection(object3d*);
+	double GetDistance(object3d*);
 
 	bool copyFlg;	// éŒ¾Aˆø”A–ß‚è’l‚©‚ç‚Ìì¬
 	object3d();

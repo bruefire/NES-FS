@@ -284,6 +284,33 @@ void object3d::TrackObjDirection(object3d* trgObj)
 	}
 }
 
+double object3d::GetDistance(object3d* trgObj)
+{
+	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
+	{
+		pt4 pLoc = object3d::tudeToEuc(this->loc);
+		pt4 eLoc = object3d::tudeToEuc(trgObj->loc);
+		double val = asin((pyth4(pLoc.mns(eLoc)) * 0.5)) * 2 * owner->radius;
+
+		return val;
+	}
+	else if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+	{
+		pt3 preLoc = this->loc;
+		// 原点に移動
+		this->ParallelMove(preLoc, false);
+		object3d trgCpy(*trgObj);
+		trgCpy.ParallelMove(preLoc, false);
+
+		double dst = object3d::ClcHypbFromEuc(pyth3(trgCpy.loc)) * owner->radius;
+
+		// 元の位置に戻す
+		this->ParallelMove(preLoc, true);
+
+		return dst;
+	}
+}
+
 // 相対的に位置再設定
 bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 {

@@ -359,6 +359,22 @@ PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
         ReleaseObjObj(trgIdx);
         break;
     }
+    case FuncObject::GetDistance:
+    {
+        PyObject* src, * trg, * selfIdx, * trgIdx;
+        if (!PyArg_ParseTuple(args, "OO", &src, &trg) || !GetObjObj(&src, &selfIdx) || !GetObjObj(&trg, &trgIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        object3d* trgObj = &engine->objs[PyLong_AsLong(trgIdx)];
+
+        result = PyFloat_FromDouble(selfObj->GetDistance(trgObj));
+
+        ReleaseObjObj(selfIdx);
+        ReleaseObjObj(trgIdx);
+
+        break;
+    }
     }
     CppPythonIF::funcID = FuncObject::None;
 
