@@ -944,8 +944,10 @@ INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 // Pythonエディタプロシージャ
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) 
 {
-	char myPath[256];
 	char oldPath[256];
+	GetCurrentDirectory(256, oldPath);
+
+	char myPath[256];
 	static char refName[1024];
 	GetModuleFileName(NULL, myPath, 256);
 	string sampleDir = myPath;
@@ -985,20 +987,22 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		{
 			if (GetOpenFileName(&ofName))
 			{
-				strcpy(oldPath, refName);
+				char _refName[256];
+				strcpy(_refName, refName);
 				SetDlgItemText(editDlg, EDITDLG_PATH_TXT, refName);
 
 				// upd file
 				char tmpStr[1024];
 				string scriptStr = "";
 
-				FILE* fp = fopen(oldPath, "rb");
+				FILE* fp = fopen(_refName, "rb");
 				while (fgets(tmpStr, 1024, fp) != NULL)
 					scriptStr += tmpStr;
 				fclose(fp);
 
 				SetDlgItemText(editDlg, EDITDLG_CODE_TXT, scriptStr.c_str());
 			}
+			SetCurrentDirectory(oldPath);
 			return true;
 		}
 		}

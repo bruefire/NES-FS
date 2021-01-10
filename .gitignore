@@ -5,6 +5,7 @@
 *.db
 *.exe
 .vs
+*.sdf
 Debug/
 Release/
 on4d_GLr2/Debug/

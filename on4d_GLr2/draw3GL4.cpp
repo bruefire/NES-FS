@@ -873,23 +873,12 @@ int engine3dGL::DrawMapH3()
 				tmpPt.z = tmpY;
 			}
 
-			// farther than 2/π or not 
-			if (curObj->locr.z < 0.5 * PIE)
-			{
-				// front or back
-				if (curObj->locr.y > 0.5 * PIE)
-					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[17].texNo]);
-				else
-					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[19].texNo]);
-			}
+			// front or back
+			if (curObj->locr.z < 0)
+				glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[17].texNo]);
 			else
-			{
-				// front or back
-				if (curObj->locr.y > 0.5 * PIE)
-					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[18].texNo]);
-				else
-					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[20].texNo]);
-			}
+				glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[19].texNo]);
+
 
 			// 最初の属性バッファ : 頂点
 			glEnableVertexAttribArray(0);
