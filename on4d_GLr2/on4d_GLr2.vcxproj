@@ -57,6 +57,9 @@
     <ClCompile Include="engine3dWin.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="GL_Func.cpp" />
+    <None Include="vtxLowPt.c">
+      <FileType>CppCode</FileType>
+    </None>
     <None Include="pixel_low.c">
       <FileType>CppCode</FileType>
     </None>
@@ -70,6 +73,9 @@
     </None>
     <ClCompile Include="operation.cpp" />
     <ClCompile Include="player.cpp" />
+    <None Include="pxlLowPt.c">
+      <FileType>CppCode</FileType>
+    </None>
     <ClCompile Include="rcFunc.cpp" />
     <ClCompile Include="objs.cpp" />
     <ClCompile Include="shader.cpp" />

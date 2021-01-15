@@ -162,6 +162,12 @@
     <ClCompile Include="CppPythonIF.cpp">
       <Filter>c++ source\core演算部</Filter>
     </ClCompile>
+    <ClCompile Include="vtxLowPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
+    </ClCompile>
+    <ClCompile Include="pxlLowPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">

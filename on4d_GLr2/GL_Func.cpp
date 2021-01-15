@@ -61,12 +61,13 @@ int engine3dGL::GL_Init()
 			cout << "the geometry shader will not be used." << endl;
 
 			shader[0] = LoadShaders("vartex_low.c", "pixel_low.c");
+			shader[3] = LoadShaders("vtxLowPt.c", "pxlLowPt.c");
 		}
 		else
 		{
 			shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
+			shader[3] = LoadShaders2("vartex.c", "lineG.c", "lineF.c", 1);
 		}
-		shader[3] = LoadShaders2("vartex.c", "lineG.c", "lineF.c", 1);
 	}
 	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );
 	shader[2] = LoadShaders( "vtx3D.c", "pxl3D.c" );

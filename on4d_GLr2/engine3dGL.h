@@ -77,7 +77,7 @@ public:
 	void simulateS3GL();
 	void SimulateH3GL();
 	int DrawEachObjsS3(int);
-	int DrawEachObjsS3_LQY();
+	int DrawEachObjsS3_LQY(int);
 	int DrawEachObjsH3(int);
 	double GetAsp();
 	

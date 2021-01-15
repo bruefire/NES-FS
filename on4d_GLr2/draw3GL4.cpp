@@ -72,6 +72,9 @@ void engine3dGL::simulateS3GL()
 	glUseProgram(shader[4]);
 	 MatrixID = glGetUniformLocation(shader[0], "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	glUseProgram(shader[3]);
+	MatrixID = glGetUniformLocation(shader[3], "MVP");
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 	//===========================
 
@@ -89,15 +92,15 @@ void engine3dGL::simulateS3GL()
 	{
 	case QY_MODE::HIGH:
 		DrawEachObjsS3(0);
-
-		// クリック処理
-		ClickProc();
 		break;
 
 	case QY_MODE::LOW:
-		DrawEachObjsS3_LQY();
+		DrawEachObjsS3_LQY(0);
 		break;
 	}
+
+	// クリック処理
+	ClickProc();
 
 
 }
@@ -253,7 +256,7 @@ int engine3dGL::DrawEachObjsS3(int loop)
 	return 1;
 }
 
-int engine3dGL::DrawEachObjsS3_LQY()
+int engine3dGL::DrawEachObjsS3_LQY(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = -2; h < objCnt; h++)
@@ -266,7 +269,7 @@ int engine3dGL::DrawEachObjsS3_LQY()
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
 		if (h == PLR_No) continue;
 		///...++++++++++++ 一括GL描画 +++++++++++++...///
-		char SDR = (0 < curObj->mesh->faceLen) ? 0 : (curObj->draw == 0) ? 3 : 4;
+		char SDR = (0 < curObj->mesh->faceLen) ? 0 : 3;
 
 
 		///===================///
@@ -295,14 +298,15 @@ int engine3dGL::DrawEachObjsS3_LQY()
 		glBindTexture(GL_TEXTURE_2D, texNames[curObj->mesh->texNo]);
 
 
+		if (loop == 0)
+			glStencilFunc(GL_ALWAYS, (h + 1) % 256, -1);
+		else
+			glStencilFunc(GL_ALWAYS, (h + 1) % (256 * 256) / 256, -1);
 
 		glEnable(GL_TEXTURE_2D);
 
 
-		int fltLen = 21;
 
-		// (low環境用)
-		if (SDR != 0) continue;
 		GLuint vPosition = glGetAttribLocation(shader[SDR], "vPosition");
 		GLuint vColor = glGetAttribLocation(shader[SDR], "vColor");
 		GLuint vPos1 = glGetAttribLocation(shader[SDR], "vPos1");
@@ -314,77 +318,125 @@ int engine3dGL::DrawEachObjsS3_LQY()
 
 
 		// 最初の属性バッファ : 頂点
-		glEnableVertexAttribArray(vPosition);
-		glEnableVertexAttribArray(vColor);
-		glEnableVertexAttribArray(vPos1);
-		glEnableVertexAttribArray(vPos2);
-		glEnableVertexAttribArray(vPos3);
-		glEnableVertexAttribArray(tPos1);
-		glEnableVertexAttribArray(tPos2);
-		glEnableVertexAttribArray(tPos3);
+		if (curObj->mesh->faceLen)
+		{
+			int fltLen = 21;
+			glEnableVertexAttribArray(vPosition);
+			glEnableVertexAttribArray(vColor);
+			glEnableVertexAttribArray(vPos1);
+			glEnableVertexAttribArray(vPos2);
+			glEnableVertexAttribArray(vPos3);
+			glEnableVertexAttribArray(tPos1);
+			glEnableVertexAttribArray(tPos2);
+			glEnableVertexAttribArray(tPos3);
 
-		glVertexAttribPointer(  //---- Loc
-			vPosition, 3, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)0
-		);
-		glVertexAttribPointer(    //---- 色
-			vColor, 3, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
-		);
+			glVertexAttribPointer(  //---- Loc
+				vPosition, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)0
+				);
+			glVertexAttribPointer(    //---- 色
+				vColor, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
+				);
 
-		//---- 位置算出用Loc1, 2, 3
-		glVertexAttribPointer(    
-			vPos1, 3, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
-		);
-		glVertexAttribPointer(    
-			vPos2, 3, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(9 * sizeof(GLfloat))
-		);
-		glVertexAttribPointer(    
-			vPos3, 3, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(12 * sizeof(GLfloat))
-		);
+			//---- 位置算出用Loc1, 2, 3
+			glVertexAttribPointer(
+				vPos1, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
+				);
+			glVertexAttribPointer(
+				vPos2, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(9 * sizeof(GLfloat))
+				);
+			glVertexAttribPointer(
+				vPos3, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(12 * sizeof(GLfloat))
+				);
 
-		//---- 位置算出用tex1, 2, 3
-		glVertexAttribPointer(    
-			tPos1, 2, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(15 * sizeof(GLfloat))
-		);
-		glVertexAttribPointer(    
-			tPos2, 2, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(17 * sizeof(GLfloat))
-		);
-		glVertexAttribPointer(    
-			tPos3, 2, GL_FLOAT, GL_FALSE,
-			fltLen * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat))
-		);
+			//---- 位置算出用tex1, 2, 3
+			glVertexAttribPointer(
+				tPos1, 2, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(15 * sizeof(GLfloat))
+				);
+			glVertexAttribPointer(
+				tPos2, 2, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(17 * sizeof(GLfloat))
+				);
+			glVertexAttribPointer(
+				tPos3, 2, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat))
+				);
 
 
-		if (curObj->draw == 2) {
-			glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
+			if (curObj->draw == 2) {
+				glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// 三角形を描く
 
-			xID = glGetUniformLocation(shader[SDR], "revMd");
-			glUniform1f(xID, -1);
+				xID = glGetUniformLocation(shader[SDR], "revMd");
+				glUniform1f(xID, -1);
 
-			glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// 三角形 半周以上
+				glDrawArrays(GL_TRIANGLES, 0, curObj->mesh->faceLen * 3);	// 三角形 半周以上
+			}
+			else if (curObj->draw == 1 || curObj->draw == 0) {
+				glPointSize(2.0);
+				glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
+				glPointSize(1.0);
+			}
+			else {
+				glPointSize(2.0);
+				glDrawArrays(GL_LINE_LOOP, 0, 24);	// 点を描く
+				glPointSize(1.0);
+			}
+
+			glDisableVertexAttribArray(vPosition);
+			glDisableVertexAttribArray(vColor);
+			glDisableVertexAttribArray(vPos1);
+			glDisableVertexAttribArray(vPos2);
+			glDisableVertexAttribArray(vPos3);
 		}
-		else if (curObj->draw == 1 || curObj->draw == 0) {
-			glPointSize(2.0);
-			glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
-			glPointSize(1.0);
-		}
-		else {
-			glPointSize(2.0);
-			glDrawArrays(GL_LINE_LOOP, 0, 24);	// 点を描く
-			glPointSize(1.0);
-		}
+		else
+		{
+			int fltLen = 12;
+			glEnableVertexAttribArray(vPosition);
+			glEnableVertexAttribArray(vColor);
+			glEnableVertexAttribArray(vPos1);
+			glEnableVertexAttribArray(vPos2);
 
-		glDisableVertexAttribArray(vPosition);
-		glDisableVertexAttribArray(vColor);
-		glDisableVertexAttribArray(vPos1);
-		glDisableVertexAttribArray(vPos2);
-		glDisableVertexAttribArray(vPos3);
+			glVertexAttribPointer(  //---- Loc
+				vPosition, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)0
+				);
+			glVertexAttribPointer(    //---- 色
+				vColor, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))
+				);
+
+			//---- 位置算出用Loc1, 2
+			glVertexAttribPointer(
+				vPos1, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat))
+				);
+			glVertexAttribPointer(
+				vPos2, 3, GL_FLOAT, GL_FALSE,
+				fltLen * sizeof(GLfloat), (void*)(9 * sizeof(GLfloat))
+				);
+
+
+			if (curObj->draw == 0) {
+				glPointSize(2.0);
+				glDrawArrays(GL_POINTS, 0, curObj->mesh->lLen * 2);	// 点を描く
+				glPointSize(1.0);
+			}
+			else if(curObj->draw == 1){
+				glLineWidth(2.0);
+				glDrawArrays(GL_LINES, 0, curObj->mesh->lLen * 2);	// 線を描く
+				glLineWidth(1.0);
+			}
+
+			glDisableVertexAttribArray(vPosition);
+			glDisableVertexAttribArray(vColor);
+			glDisableVertexAttribArray(vPos1);
+			glDisableVertexAttribArray(vPos2);
+		}
 
 	}
 

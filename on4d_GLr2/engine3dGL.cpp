@@ -899,8 +899,10 @@ void engine3dGL::ClickProc()
 		glScissor(ope.clickCoord.x, ope.clickCoord.y, 1, 1);
 		if(worldGeo == WorldGeo::HYPERBOLIC)
 			DrawEachObjsH3(1);
-		else
+		else if(qyMode == QY_MODE::HIGH)
 			DrawEachObjsS3(1);
+		else
+			DrawEachObjsS3_LQY(1);
 
 		glScissor(0, 0, WIDTH, HEIGHT);
 
