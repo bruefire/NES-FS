@@ -3,12 +3,11 @@
 *.tlog
 *.ipch
 *.db
-*.exe
 .vs
 *.sdf
 Debug/
 Release/
+x64/
 on4d_GLr2/Debug/
 on4d_GLr2/Release/
-on4d_GLr2/x64/Debug/
-on4d_GLr2/x64/Release/
+on4d_GLr2/x64/
