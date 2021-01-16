@@ -14,7 +14,13 @@ using namespace std;
 
 #include "engine3dGL.h"
 
-uint32_t engine3dGL::LoadShaders(const char * vPath,const char * fPath){
+uint32_t engine3dGL::LoadShaders(const char * vName,const char * fName)
+{
+	string shDir = "shader\\";
+	string _vPath = shDir + vName;
+	string _fPath = shDir + fName;
+	const char* vPath = _vPath.c_str();
+	const char* fPath = _fPath.c_str();
 
 	// Create the shaders
 	GLuint vtxID = glCreateShader(GL_VERTEX_SHADER);
@@ -108,7 +114,15 @@ uint32_t engine3dGL::LoadShaders(const char * vPath,const char * fPath){
 	return ProgramID;
 }
 
-uint32_t engine3dGL::LoadShaders2(const char * vPath, const char * gPath, const char * fPath, char mode){
+uint32_t engine3dGL::LoadShaders2(const char * vName, const char * gName, const char * fName, char mode)
+{
+	string shDir = "shader\\";
+	string _vPath = shDir + vName;
+	string _gPath = shDir + gName;
+	string _fPath = shDir + fName;
+	const char* vPath = _vPath.c_str();
+	const char* gPath = _gPath.c_str();
+	const char* fPath = _fPath.c_str();
 
 	// シェーダを作る
 	GLuint vtxID = glCreateShader(GL_VERTEX_SHADER);
