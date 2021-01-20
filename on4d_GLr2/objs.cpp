@@ -986,13 +986,13 @@ void object3d::markInitS3(double radius)
 // ‹OÕ‰Šú‰» H3
 void object3d::markInitH3(double radius)
 {
-	double dst = ClcHypbFromEuc(pyth3(loc));
-	pt3 tmpt;
-	tmpt.x = atan2(loc.x, loc.z);		//--•ûŒü1
-	tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--•ûŒü2
-	tmpt.z = dst * radius;	//--‹——£(’·‚³)
+	//double dst = ClcHypbFromEuc(pyth3(loc));
+	//pt3 tmpt;
+	//tmpt.x = atan2(loc.x, loc.z);		//--•ûŒü1
+	//tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--•ûŒü2
+	//tmpt.z = dst * radius;	//--‹——£(’·‚³)
 
-	for (int i = 0; i < PAST_QTY; i++) past[i] = tmpt;
+	//for (int i = 0; i < PAST_QTY; i++) past[i] = tmpt;
 }
 
 

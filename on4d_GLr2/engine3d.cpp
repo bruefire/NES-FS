@@ -1135,12 +1135,17 @@ int engine3d::InitS3()	// 球面世界用初期化
 }
 
 // 全射撃オブジェクトをクリア
-void engine3d::DisableShootObjs()
+void engine3d::ClearFloatObjs()
 {
 	player.ep = ENR_QTY;
-	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++) {
+	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++) 
+	{
 		objs[i].used = false;
-		objs[i].markInitS3(radius);
+
+		if(worldGeo == WorldGeo::HYPERBOLIC)
+			objs[i].markInitH3(radius);
+		else
+			objs[i].markInitS3(radius);
 	}
 }
 
@@ -1290,11 +1295,6 @@ pt3 engine3d::randLocUniH3(double maxRad)
 	return rstPt;
 }
 
-void engine3d::ClearFloatObjs()
-{
-	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++)
-		objs[i].used = false;
-}
 
 // ランダムベクトル (長さ一定)
 pt3 engine3d::randVec3(double r)

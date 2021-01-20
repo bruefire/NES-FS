@@ -406,7 +406,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 
 				case UI_THROW_CLEAR:
-					newEngine.DisableShootObjs();
+					newEngine.ClearFloatObjs();
 					break;
 
 				case UI_THROW_RANDOM:

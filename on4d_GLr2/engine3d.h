@@ -141,7 +141,6 @@ public:
 	void RandLocH3(RandMode, ObjType, int qty=100);
 	pt3 randLocUniS3(int);
 	pt3 randLocUniH3(double);
-	void ClearFloatObjs();
 	pt3 randVec3(double);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
@@ -168,7 +167,7 @@ public:
 	worldGeo;
 	void UpdateS3();		// S3更新
 	void UpdateH3();		// H3更新
-	void DisableShootObjs();
+	void ClearFloatObjs();
 
 	// 操作関係
 	int inPutMouseMv(double x, double y, int opt); // 受け取る値は正規化済のもの
