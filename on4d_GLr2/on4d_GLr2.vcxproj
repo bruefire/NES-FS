@@ -100,6 +100,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="CppPythonIF.h" />
+    <ClInclude Include="randomUI.h" />
     <ClInclude Include="rcFunc.h" />
     <ClInclude Include="rcFunc2.h" />
     <ClInclude Include="modlgRc.h" />
@@ -126,6 +127,7 @@
     <Text Include="objSetting.h" />
     <Text Include="pyUpd.py" />
     <ResourceCompile Include="UIH3EN.rc" />
+    <ResourceCompile Include="randomUI.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BA463831-02FC-46CE-B106-7B2FDB7C0B43}</ProjectGuid>

@@ -1,0 +1,19 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include <Windows.h>
+#include "randomUI.h"
+#define IDC_STATIC	-1
+
+
+RDM_OBJ_DLG DIALOGEX 0, 0, 255, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ランダム配置"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+DEFPUSHBUTTON   "OK", IDOK, 137, 175, 50, 14
+PUSHBUTTON      "キャンセル", IDCANCEL, 198, 175, 50, 14
+EDITTEXT        MODLG_RDM_TXT, 187, 25, 41, 14, ES_AUTOHSCROLL
+LTEXT           "数量", IDC_STATIC, 26, 28, 43, 8
+CONTROL         "", MODLG_RDM_SLIDER, "msctls_trackbar32", TBS_BOTH | TBS_NOTICKS | WS_TABSTOP, 57, 25, 100, 15
+END
+

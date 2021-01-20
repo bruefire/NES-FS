@@ -18,7 +18,7 @@ using namespace std::chrono;
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
 	, PLR_QTY(10)	// プレイヤー
-	, ENR_QTY(500)	// 隕石()
+	, ENR_QTY(550)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
 	, ATK_QTY(1)	// ﾌﾟﾚｲﾔと敵の攻撃
@@ -1145,10 +1145,14 @@ void engine3d::DisableShootObjs()
 }
 
 // objのランダム配置 (S3)
-int engine3d::RandLocS3(engine3d::RandMode mode) {	
+int engine3d::RandLocS3(engine3d::RandMode mode, int qty) {	
 
-	///-- 放出オブジェクト ------
-	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++) {
+	//-- 放出オブジェクト ------
+	int bgn = BWH_QTY + PLR_QTY;
+	int end = (qty <= OBJ_QTY) ? qty : OBJ_QTY;
+	ClearFloatObjs();
+
+	for (int h = bgn; h < end; h++) {
 
 		if (mode == RandMode::Cluster) {//-- 乱数 (極座標)
 			objs[h].loc = pt3(	//-- 位置
@@ -1180,7 +1184,7 @@ int engine3d::RandLocS3(engine3d::RandMode mode) {
 }
 
 // objのランダム配置 (H3)
-void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
+void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType, int qty)
 {
 	int bgn;
 	int end;
@@ -1192,7 +1196,8 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 	else
 	{
 		bgn = BWH_QTY + PLR_QTY;
-		end = OBJ_QTY;
+		end = (qty <= OBJ_QTY) ? qty : OBJ_QTY;
+		ClearFloatObjs();
 	}
 
 	double maxRad = object3d::ClcHypbFromEuc(H3_MAX_RADIUS);
@@ -1220,7 +1225,7 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 			objs[h].lspX = spdDrc;
 
 		}
-		else // todo★ 一様乱数
+		else 
 		{
 			eucPt = randLocUniH3(maxRad);
 			objs[h].lspX.asgPt3(randVec3(H3_STD_LEN));
@@ -1229,6 +1234,7 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType)
 
 		// 結果を反映
 		objs[h].ParallelMove(eucPt, true);
+		objs[h].used = true;
 	}
 }
 
@@ -1282,6 +1288,12 @@ pt3 engine3d::randLocUniH3(double maxRad)
 	rstPt = randVec3(eucDst);
 
 	return rstPt;
+}
+
+void engine3d::ClearFloatObjs()
+{
+	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++)
+		objs[i].used = false;
 }
 
 // ランダムベクトル (長さ一定)

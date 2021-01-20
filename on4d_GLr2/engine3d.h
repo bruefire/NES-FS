@@ -137,10 +137,11 @@ public:
 		Player,
 		Energy
 	};
-	int RandLocS3(RandMode);
-	void RandLocH3(RandMode, ObjType);
+	int RandLocS3(RandMode, int qty=100);
+	void RandLocH3(RandMode, ObjType, int qty=100);
 	pt3 randLocUniS3(int);
 	pt3 randLocUniH3(double);
+	void ClearFloatObjs();
 	pt3 randVec3(double);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更

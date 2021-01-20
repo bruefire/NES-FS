@@ -11,15 +11,9 @@
     <Filter Include="c++ header\OS依存部%28Windows%29">
       <UniqueIdentifier>{99f3ddce-7745-4081-aca5-60d09562a2f1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="c++ header\OS依存部%28Windows%29\フォーム系">
-      <UniqueIdentifier>{1d777d3a-076e-4f26-bb8c-ddf3724e49f1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="c++ source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="c++ source\フォーム系">
-      <UniqueIdentifier>{0986643d-8083-4b2f-8525-7e3d2d3c9fd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="c++ source\GL部">
       <UniqueIdentifier>{361fa09f-0f34-4bf5-99f2-122377e16975}</UniqueIdentifier>
@@ -60,6 +54,12 @@
     </Filter>
     <Filter Include="c++ source\core演算部">
       <UniqueIdentifier>{1b9fabec-2501-4487-a358-3dd357866c4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="c++ header\OS依存部%28Windows%29\UI系">
+      <UniqueIdentifier>{1d777d3a-076e-4f26-bb8c-ddf3724e49f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="c++ source\UI系">
+      <UniqueIdentifier>{0986643d-8083-4b2f-8525-7e3d2d3c9fd6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -118,10 +118,16 @@
     <None Include="h3pxlPt.c">
       <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
     </None>
+    <None Include="vtxLowPt.c">
+      <Filter>c++ source</Filter>
+    </None>
+    <None Include="pxlLowPt.c">
+      <Filter>c++ source</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rcFunc.cpp">
-      <Filter>c++ source\フォーム系</Filter>
+      <Filter>c++ source\UI系</Filter>
     </ClCompile>
     <ClCompile Include="engine3d.cpp">
       <Filter>c++ source\core演算部</Filter>
@@ -162,25 +168,19 @@
     <ClCompile Include="CppPythonIF.cpp">
       <Filter>c++ source\core演算部</Filter>
     </ClCompile>
-    <ClCompile Include="vtxLowPt.c">
-      <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
-    </ClCompile>
-    <ClCompile Include="pxlLowPt.c">
-      <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </ClInclude>
     <ClInclude Include="rcFunc.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </ClInclude>
     <ClInclude Include="rcFunc2.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </ClInclude>
     <ClInclude Include="constants.h">
       <Filter>c++ header\core演算部</Filter>
@@ -234,7 +234,10 @@
       <Filter>c++ header\core演算部</Filter>
     </ClInclude>
     <ClInclude Include="editor.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
+    </ClInclude>
+    <ClInclude Include="randomUI.h">
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +271,9 @@
     <ResourceCompile Include="UIH3EN.rc">
       <Filter>resource files\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="randomUI.rc">
+      <Filter>resource files\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico">
@@ -279,7 +285,7 @@
       <Filter>resource files</Filter>
     </Text>
     <Text Include="objSetting.h">
-      <Filter>c++ header\OS依存部%28Windows%29\フォーム系</Filter>
+      <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
     </Text>
     <Text Include="pyUpd.py">
       <Filter>resource files</Filter>

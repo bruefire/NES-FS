@@ -1,17 +1,19 @@
 #include <Windows.h>
 #define IDC_STATIC -1
 
-INFO_DLG DIALOGEX 25, 25, 155, 80
+INFO_DLG DIALOGEX 25, 25, 175, 80
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "バージョン情報"
 FONT 9, "MS Shell Dlg", 400, 0, 0x1
 
 BEGIN
-	LTEXT "非ユークリッド空間遊泳シミュレータ\
-			\nNES-FS v.3.0.0\n\nリリース: 2021.01\n作成者: bruefire\
-			\nライセンス: オープンソースソフトウェア",
+	LTEXT "NES-FS \
+			(Non Euclidean Space Flight Simulator) v.3.0.0\
+			\n\nRelease: 2021.01\
+			\nMade by: bruefire\
+			\nLicense: Open Source Software",
 			-1, 8, 15, 105, 55
-	ICON "IDI_ICON1", IDC_STATIC, 122, 18, 18, 21
+	ICON "IDI_ICON1", IDC_STATIC, 132, 18, 18, 21
 END
 
 

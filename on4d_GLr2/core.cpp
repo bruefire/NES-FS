@@ -15,6 +15,7 @@
 #include "UI_DEF.h"
 #include "rcFunc.h"
 #include "modlgRc.h"
+#include "randomUI.h"
 #include "editor.h"
 #include "objSetting.h"
 #include <glew.h>
@@ -24,6 +25,7 @@ using namespace std;
 // プロシージャ
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK RandomRelocProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
@@ -50,6 +52,7 @@ char cmJD = 0;
 POINTS cm_rot[2] = {{}, {}};
 HMENU hpMenu;
 HMENU subMenu;
+engine3d::RandMode rdmRandMode;
 
 
 
@@ -405,28 +408,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case UI_THROW_CLEAR:
 					newEngine.DisableShootObjs();
 					break;
+
 				case UI_THROW_RANDOM:
 					newEngine.player.ep = 0;
-					newEngine.RandLocS3(engine3d::RandMode::Cluster);
+					rdmRandMode = engine3d::RandMode::Cluster;
+					DialogBox(curInst, "RDM_OBJ_DLG", preWnd, RandomRelocProc); 
 					break;
+
 				case UI_THROW_RANDOM2:
 					newEngine.player.ep = 0;
-					if (newEngine.worldGeo == engine3d::WorldGeo::HYPERBOLIC)
-					{
-						object3d* plrObj = &newEngine.objs[newEngine.PLR_No];
-						for (int h = newEngine.BWH_QTY + newEngine.PLR_QTY; h < newEngine.OBJ_QTY; h++)
-						{
-							newEngine.objs[h].loc = plrObj->loc;
-							newEngine.objs[h].std[0] = plrObj->std[0];
-							newEngine.objs[h].std[1] = plrObj->std[1];
-							newEngine.objs[h].lspX = plrObj->lspX;
-							newEngine.objs[h].used = true;
-						}
-						newEngine.RandLocH3(engine3d::RandMode::Uniform, engine3d::ObjType::Energy);
-					}
-					else 
-						newEngine.RandLocS3(engine3d::RandMode::Uniform);
-					
+					rdmRandMode = engine3d::RandMode::Uniform;
+					DialogBox(curInst, "RDM_OBJ_DLG", preWnd, RandomRelocProc);
 					break;
 
 				case UI_CR_S:
@@ -905,7 +897,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
  }
 }
 
-// プロシージャ
+// infoプロシージャ
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 
 	switch(msg){
@@ -919,6 +911,83 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp){
 			EndDialog(hDlg, IDOK);
 			return true;
 		
+	}
+	return false;
+
+};
+// random relocation procedure
+INT_PTR CALLBACK RandomRelocProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	// スライダー変数
+	LONG_PTR sVal;
+	static int sRst = 100;
+	LONG_PTR sMin = 1;
+	LONG_PTR sMax = 500;
+	const double qtyMax = sMax;
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		SendDlgItemMessage(hDlg, MODLG_RDM_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
+		SendDlgItemMessage(
+			hDlg,
+			MODLG_RDM_SLIDER,
+			TBM_SETPOS,
+			true,
+			sRst
+		);
+		SetDlgItemText(hDlg, MODLG_RDM_TXT, to_string(sRst).c_str());
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wp)) {
+		case IDOK:
+			if (newEngine.worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+			{
+				object3d* plrObj = &newEngine.objs[newEngine.PLR_No];
+				int end = (sRst <= newEngine.OBJ_QTY) ? sRst : newEngine.OBJ_QTY;
+				for (int h = newEngine.BWH_QTY + newEngine.PLR_QTY; h < end; h++)
+				{
+					newEngine.objs[h].loc = plrObj->loc;
+					newEngine.objs[h].std[0] = plrObj->std[0];
+					newEngine.objs[h].std[1] = plrObj->std[1];
+					newEngine.objs[h].lspX = plrObj->lspX;
+					newEngine.objs[h].used = true;
+				}
+				newEngine.RandLocH3(rdmRandMode, engine3d::ObjType::Energy, sRst);
+			}
+			else
+				newEngine.RandLocS3(rdmRandMode, sRst);
+
+			EndDialog(hDlg, IDOK);
+			return true;
+
+		case IDCANCEL:
+			EndDialog(hDlg, IDOK);
+			return true;
+		}
+		return true;
+	case WM_DESTROY:
+		EndDialog(hDlg, IDOK);
+		return true;
+
+	case WM_HSCROLL:
+
+		if (lp != 0)
+		{
+			sVal = SendMessage((HWND)lp, (UINT)TBM_GETPOS, NULL, NULL);
+			// スライダー特定
+			int sliderID = GetDlgCtrlID((HWND)lp);
+
+			// スライダーに応じた処理
+			switch (sliderID)
+			{
+			case MODLG_RDM_SLIDER:
+				sRst = sVal;
+				SetDlgItemText(hDlg, MODLG_RDM_TXT, to_string(sRst).c_str());
+				break;
+			}
+		}
+		return true;
 	}
 	return false;
 
