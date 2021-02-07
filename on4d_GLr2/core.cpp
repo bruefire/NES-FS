@@ -35,6 +35,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 ATOM InitApp(HINSTANCE);
 HWND InitInstance(HINSTANCE, int);
 HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow);
+bool StdWndMsgLoop(MSG*);
 
 
 TCHAR szClassName[] = TEXT("3d_engine");	//ウィンドウクラス
@@ -64,7 +65,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	//InitCommonControls();
 	//
 	curInst = hCurInst;
-	MSG msg;
 	GetCurrentDirectory(MAX_PATH, curDir);
 
 	//-- コンソール作成 --//
@@ -118,7 +118,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 
 	// S3シミュレータクラス 初期化
-	if (!newEngine.init(hCurInst, nCmdShow, InitStdWndFunc))
+	if (!newEngine.init(hCurInst, nCmdShow, InitStdWndFunc, StdWndMsgLoop))
 		PostQuitMessage(0);
 	
 
@@ -132,26 +132,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		cout << "joypad1 is avaliable." << endl;
 	}
 
-	///--------------メッセージを取得--------------///
-	while(true){
-		if((PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) != 0){
-			if(msg.message == WM_QUIT) break;
-			else{
-				// まず子ダイアログにメッセージ処理を試す
-				if (editDlg && IsDialogMessage(editDlg, &msg))
-					continue;
-				else if (modObjDlg && IsDialogMessage(modObjDlg, &msg))
-					continue;
 
-				TranslateMessage(&msg);	//メッセージを変換
-				DispatchMessage(&msg);	//メッセージを送出
-			}
-		}else
-		{
-			// S3更新
-			newEngine.update();
-		}
-	}
+	//**** 本処理 ****//
+	int result = newEngine.start();
+
 
 	///-- 後処理 --//
 	newEngine.dispose();
@@ -160,9 +144,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	///--
 	
 
-	return (int)msg.wParam;
+	return result;
 }
 
+
+// 標準ウィンドウ初期化処理
 HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow)
 {
 	hpMenu = LoadMenu(hCurInst, "POPUP");
@@ -180,6 +166,27 @@ HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow)
 	menuCheckDef(hMenu, &menuItemInfo);
 
 	return hWnd;
+}
+
+// 標準ウィンドウ用メッセージ処理
+bool StdWndMsgLoop(MSG* msg)
+{
+	if ((PeekMessage(msg, NULL, 0, 0, PM_REMOVE)) != 0) 
+	{
+		if (msg->message == WM_QUIT)
+			return false;
+
+		// まず子ダイアログにメッセージ処理を試す
+		if (editDlg && IsDialogMessage(editDlg, msg))
+			return true;
+		else if (modObjDlg && IsDialogMessage(modObjDlg, msg))
+			return true;
+
+		TranslateMessage(msg);	//メッセージを変換
+		DispatchMessage(msg);	//メッセージを送出
+	}
+
+	return true;
 }
 
 //ウィンドウクラスの登録

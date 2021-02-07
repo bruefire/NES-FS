@@ -72,13 +72,18 @@ int engine3dWin::disposeDIBS()
 
 
 // 初期化
-int engine3dWin::init(HINSTANCE hInst, int nCmdShow, HWND (*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow))
+int engine3dWin::init(
+			HINSTANCE hInst, 
+			int nCmdShow, 
+			HWND (*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow), 
+			bool (*loopFunc)(MSG*))
 {
 	CR_RANGE_Y = engine3dWin::clcRangeY(CR_RANGE_X);	//カメラ設定
 
 	this->hInst = hInst;
 	this->nCmdShow = nCmdShow;
 	this->initWndFunc = initStdWndFunc;
+	this->wndProcFunc = loopFunc;
 
 	// ウィンドウ初期化
 	if(!InitWindow())
@@ -100,6 +105,23 @@ int engine3dWin::init(HINSTANCE hInst, int nCmdShow, HWND (*initStdWndFunc)(HINS
 	}
 
 	return 1;
+}
+
+// 開始
+int engine3dWin::start()
+{
+	MSG msg;
+	// message loop
+	while (true)
+	{
+		if (!wndProcFunc(&msg))
+			break;
+
+		// 更新
+		update();
+	}
+
+	return msg.wParam;
 }
 
 

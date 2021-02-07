@@ -28,12 +28,15 @@ public:
 
 	JOYCAPS joyCaps;	// ゲームパッド情報
 	PyInteract pyInter;
-	HWND (*initWndFunc)(HINSTANCE hCurInst, int nCmdShow);
 
+	// 関数ポインタ
+	HWND (*initWndFunc)(HINSTANCE hCurInst, int nCmdShow);
+	bool (*wndProcFunc)(MSG*);
 
 	engine3dWin();
 
-	int init(HINSTANCE hInst, int nCmdShow, HWND (HINSTANCE hCurInst, int nCmdShow));
+	int init(HINSTANCE hInst, int nCmdShow, HWND (HINSTANCE hCurInst, int nCmdShow), bool(MSG*));
+	int start();
 	int update();
 	int dispose();
 
