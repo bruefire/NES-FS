@@ -72,14 +72,17 @@ int engine3dWin::disposeDIBS()
 
 
 // 初期化
-int engine3dWin::init(HWND preWnd)
+int engine3dWin::init(HINSTANCE hInst, int nCmdShow, HWND (*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow))
 {
 	CR_RANGE_Y = engine3dWin::clcRangeY(CR_RANGE_X);	//カメラ設定
 
-	this->preWnd = preWnd;
-	hdc = GetDC(preWnd);
-	createDIBS();
+	this->hInst = hInst;
+	this->nCmdShow = nCmdShow;
+	this->initWndFunc = initStdWndFunc;
 
+	// ウィンドウ初期化
+	if(!InitWindow())
+		return false;
 	
 	// 基底クラスinit()
 	try
@@ -103,10 +106,10 @@ int engine3dWin::init(HWND preWnd)
 // 更新
 int engine3dWin::update()
 {
+	pyInter.Update();
 
 	// 基底クラス
 	engine3dGL::update();
-	pyInter.Update();
 
 	return 1;
 }
@@ -124,7 +127,6 @@ int engine3dWin::dispose()
 	engine3dGL::dispose();
 	
 	//開放
-	disposeDIBS();
 	ReleaseDC(preWnd, hdc);
 
 	// python
@@ -134,6 +136,19 @@ int engine3dWin::dispose()
 	disposeFlg = true;
 
 	return 1;
+}
+
+bool engine3dWin::InitWindow()
+{
+	HWND hWnd = initWndFunc(hInst, nCmdShow);
+
+	if(!hWnd)
+		return false;
+
+	this->preWnd = hWnd;
+	hdc = GetDC(preWnd);
+
+	return true;
 }
 
 

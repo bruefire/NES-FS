@@ -82,7 +82,6 @@
     <ClCompile Include="rcFunc.cpp" />
     <ClCompile Include="objs.cpp" />
     <ClCompile Include="shader.cpp" />
-    <ClCompile Include="to3d.cpp" />
     <None Include="vartex_low.c">
       <FileType>CppCode</FileType>
     </None>

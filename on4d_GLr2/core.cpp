@@ -33,7 +33,8 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 
 //
 ATOM InitApp(HINSTANCE);
-BOOL InitInstance(HINSTANCE, int);
+HWND InitInstance(HINSTANCE, int);
+HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow);
 
 
 TCHAR szClassName[] = TEXT("3d_engine");	//ウィンドウクラス
@@ -115,22 +116,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		cout << awakeCmd.substr(awIdx) << endl;
 	}
 
-	// ポップアップメニュー初期化
-	hpMenu = LoadMenu(hCurInst, "POPUP");
-	subMenu = GetSubMenu(hpMenu, 0);
-	//------------
-
-	if(!InitApp(hCurInst)) return FALSE;
-	if(!InitInstance(hCurInst, nCmdShow)) return FALSE;
-
-	MENUITEMINFO menuItemInfo = { sizeof(MENUITEMINFO), MIIM_STATE };
-	menuCheckDef(hMenu, &menuItemInfo);
-	//
 
 	// S3シミュレータクラス 初期化
-	if (!newEngine.init(preWnd))
+	if (!newEngine.init(hCurInst, nCmdShow, InitStdWndFunc))
 		PostQuitMessage(0);
-
 	
 
 	///-- ゲームパッド
@@ -174,6 +163,25 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	return (int)msg.wParam;
 }
 
+HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow)
+{
+	hpMenu = LoadMenu(hCurInst, "POPUP");
+	subMenu = GetSubMenu(hpMenu, 0);
+	//------------
+
+	if (!InitApp(hCurInst)) 
+		return nullptr;
+
+	HWND hWnd = InitInstance(hCurInst, nCmdShow);
+	if (!hWnd) 
+		return nullptr;
+
+	MENUITEMINFO menuItemInfo = { sizeof(MENUITEMINFO), MIIM_STATE };
+	menuCheckDef(hMenu, &menuItemInfo);
+
+	return hWnd;
+}
+
 //ウィンドウクラスの登録
 ATOM InitApp(HINSTANCE hInst)
 {
@@ -199,10 +207,9 @@ ATOM InitApp(HINSTANCE hInst)
 }
 
 //=========メインウィンドウの生成
-BOOL InitInstance(HINSTANCE hInst, int nCmdShow)
+HWND InitInstance(HINSTANCE hInst, int nCmdShow)
 {
-	HWND hWnd;
-	hWnd = CreateWindow(szClassName,	//クラス名
+	HWND hWnd = CreateWindow(szClassName,	//クラス名
 				titleName,	//ウィンドウ名
 				WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル
 				CW_USEDEFAULT,	//x位置
@@ -217,13 +224,14 @@ BOOL InitInstance(HINSTANCE hInst, int nCmdShow)
 				NULL	//ウィンドウ作成データ
 			);
 
-	if(!hWnd) return FALSE; else preWnd = hWnd;
+	if(!hWnd) return nullptr; 
+	else preWnd = hWnd;
 	hMenu = GetMenu( hWnd );
 
 	ShowWindow(hWnd, nCmdShow);	//ウィンドウの表示状態を設定
 	UpdateWindow(hWnd);	//ウィンドウを更新
 	
-	return TRUE;
+	return hWnd;
 }
 
 

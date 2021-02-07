@@ -12,6 +12,8 @@
 class engine3dWin : public engine3dGL
 {
 public:
+	HINSTANCE hInst;
+	int nCmdShow;
 	HWND preWnd;
 	HDC hdc;
 	HGLRC hGLRC;
@@ -26,21 +28,21 @@ public:
 
 	JOYCAPS joyCaps;	// ゲームパッド情報
 	PyInteract pyInter;
+	HWND (*initWndFunc)(HINSTANCE hCurInst, int nCmdShow);
 
 
 	engine3dWin();
 
-	int init(HWND preWnd);
+	int init(HINSTANCE hInst, int nCmdShow, HWND (HINSTANCE hCurInst, int nCmdShow));
 	int update();
 	int dispose();
 
-	// openGL
+	// openGL overrides
 	int GL_CreateContextPls();
 	int GL_DeleteContextPls();
 	int GL_SwapBuffer();
 
-	int to3d();
-	int getOn4loc(short*, double*, UINT*);	//-- on4dオブジェクトの座標取得
+	bool InitWindow();
 	int createDIBS();
 	int disposeDIBS();
 	double clcRangeY(double rangeX);
