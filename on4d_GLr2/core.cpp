@@ -222,8 +222,6 @@ BOOL InitInstance(HINSTANCE hInst, int nCmdShow)
 
 	ShowWindow(hWnd, nCmdShow);	//ウィンドウの表示状態を設定
 	UpdateWindow(hWnd);	//ウィンドウを更新
-
-	newEngine.CR_RANGE_Y = newEngine.clcRangeY(newEngine.CR_RANGE_X);	//カメラ設定
 	
 	return TRUE;
 }

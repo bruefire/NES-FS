@@ -1,4 +1,7 @@
 #pragma once
+#define PY_SSIZE_T_CLEAN
+#include <Windows.h>
+#include <Python.h>
 
 
 class engine3d;

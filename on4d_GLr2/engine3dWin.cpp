@@ -74,6 +74,8 @@ int engine3dWin::disposeDIBS()
 // ‰Šú‰»
 int engine3dWin::init(HWND preWnd)
 {
+	CR_RANGE_Y = engine3dWin::clcRangeY(CR_RANGE_X);	//ƒJƒƒ‰Ý’è
+
 	this->preWnd = preWnd;
 	hdc = GetDC(preWnd);
 	createDIBS();

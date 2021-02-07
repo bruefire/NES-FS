@@ -58,6 +58,7 @@
     <ClCompile Include="engine3dWin.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="GL_Func.cpp" />
+    <ClCompile Include="PyInteract.cpp" />
     <ClCompile Include="VR_Manager.cpp" />
     <None Include="vtxLowPt.c">
       <FileType>CppCode</FileType>
@@ -104,6 +105,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="CppPythonIF.h" />
+    <ClInclude Include="PyInteract.h" />
     <ClInclude Include="randomUI.h" />
     <ClInclude Include="rcFunc.h" />
     <ClInclude Include="rcFunc2.h" />
