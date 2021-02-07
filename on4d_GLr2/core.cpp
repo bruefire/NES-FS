@@ -77,7 +77,14 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	int awIdx = awakeCmd.find_last_of(" ") +1;
 	 
 	if(awIdx <= awakeCmd.length()){
-		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
+		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA;view:VR")
+		{
+			//menuName = "KITTY_H3";
+			//titleName = "NES-FS -双曲空間-";
+			//newEngine.lang = UI_LANG_JA;
+			//newEngine.worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+		}
+		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{
 			menuName = "KITTY_H3";
 			titleName = "NES-FS -双曲空間-";
@@ -124,42 +131,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if (!newEngine.init(preWnd))
 		PostQuitMessage(0);
 
-
-	// Python初期化
-	bool initPyFlg;
-	PyObject* catcher;
-	string updPyFile = "pyUpd.py";
-	string updPyStr = "";
-	if (PyImport_AppendInittab("h3sim", PyInit_CppModule) == -1)
-		initPyFlg = false;
-	else
-	{
-		CppPythonIF::engine = &newEngine;
-		// python初期化ファイル
-		string pyInitFle = "pyInit.py";
-		FILE* pyInitFp = fopen(pyInitFle.c_str(), "rb");
-
-		Py_InitializeEx(0);	// todo★ python実行環境ごとこっちで用意する
-		CppPythonIF::pModule = PyImport_AddModule("__main__");
-		CppPythonIF::pDict = PyModule_GetDict(CppPythonIF::pModule);
-		char tmpStr[1024];
-		string initPyStr = "";
-		while (fgets(tmpStr, 1024, pyInitFp) != NULL)
-			initPyStr += tmpStr;
-		
-		PyRun_SimpleString(initPyStr.c_str());
-		catcher = PyObject_GetAttrString(CppPythonIF::pModule, "catchOutErr");
-		initPyFlg = true;
-
-		fclose(pyInitFp);
-
-		// upd file
-		FILE* pyUpdFp = fopen(updPyFile.c_str(), "rb");
-		while (fgets(tmpStr, 1024, pyUpdFp) != NULL)
-			updPyStr += tmpStr;
-		
-		fclose(pyUpdFp);
-	}
 	
 
 	///-- ゲームパッド
@@ -186,27 +157,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 				TranslateMessage(&msg);	//メッセージを変換
 				DispatchMessage(&msg);	//メッセージを送出
 			}
-		}else{
-			// Pythonスクリプト処理
-			if (initPyFlg)
-			{
-				// exec constant script
-				PyRun_SimpleString(updPyStr.c_str());
-			}
-			if (initPyFlg && CppPythonIF::rawCode[0] != 0)
-			{
-				// exec instant script
-				PyRun_SimpleString(CppPythonIF::rawCode);
-				
-				PyObject* output = PyObject_GetAttrString(catcher, "value");
-				const char* cnvStr = PyUnicode_AsUTF8AndSize(output, nullptr);
-				if(cnvStr != nullptr)
-					cout << cnvStr << endl;
-
-				ZeroMemory(CppPythonIF::rawCode, 8186);
-				Py_XDECREF(output);
-				PyRun_SimpleString("sys.stdout.value = ''");
-			}
+		}else
+		{
 			// S3更新
 			newEngine.update();
 		}
@@ -215,10 +167,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	///-- 後処理 --//
 	newEngine.dispose();
 
-	if (initPyFlg) {
-		Py_XDECREF(catcher);
-		Py_FinalizeEx();
-	}
 	FreeConsole();
 	///--
 	

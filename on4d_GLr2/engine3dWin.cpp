@@ -83,6 +83,8 @@ int engine3dWin::init(HWND preWnd)
 	try
 	{
 		engine3dGL::init();
+		pyInter.Init(this);
+
 		timeBeginPeriod(1);
 	}
 	catch(S3ErrorManager ex)
@@ -102,7 +104,7 @@ int engine3dWin::update()
 
 	// Šî’êƒNƒ‰ƒX
 	engine3dGL::update();
-
+	pyInter.Update();
 
 	return 1;
 }
@@ -122,6 +124,9 @@ int engine3dWin::dispose()
 	//ŠJ•ú
 	disposeDIBS();
 	ReleaseDC(preWnd, hdc);
+
+	// python
+	pyInter.Dispose();
 
 
 	disposeFlg = true;
@@ -285,3 +290,5 @@ void engine3dWin::Write32(HANDLE fh,const BYTE *lpPixel,int w,int h)
     WriteFile(fh,tmbm,(w*3+extra)*h,&dwWriteSize,NULL);
 	HeapFree(GetProcessHeap(), 0, tmbm);
 }
+
+

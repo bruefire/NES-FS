@@ -61,6 +61,12 @@
     <Filter Include="c++ source\UI系">
       <UniqueIdentifier>{0986643d-8083-4b2f-8525-7e3d2d3c9fd6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="c++ source\OVR">
+      <UniqueIdentifier>{481d39fe-e77f-41a9-8328-5e899acd5f20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="c++ header\OVR">
+      <UniqueIdentifier>{1bb33876-0ac0-45f1-bb9e-80a8963380a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="geo.c">
@@ -168,6 +174,12 @@
     <ClCompile Include="CppPythonIF.cpp">
       <Filter>c++ source\core演算部</Filter>
     </ClCompile>
+    <ClCompile Include="VR_Manager.cpp">
+      <Filter>c++ source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp">
+      <Filter>c++ source\OVR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -238,6 +250,15 @@
     </ClInclude>
     <ClInclude Include="randomUI.h">
       <Filter>c++ header\OS依存部%28Windows%29\UI系</Filter>
+    </ClInclude>
+    <ClInclude Include="VR_Manager.h">
+      <Filter>c++ source\OS依存%28Windows%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.h">
+      <Filter>c++ header\OVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE_GL.h">
+      <Filter>c++ header\OVR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

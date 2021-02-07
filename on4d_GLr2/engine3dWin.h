@@ -6,7 +6,7 @@
 #include <GL/gl.h>
 #include "constants.h"
 #include "engine3dGL.h"
-
+#include "PyInteract.h"
 
 
 class engine3dWin : public engine3dGL
@@ -25,6 +25,7 @@ public:
 	double MOUSE_FIX;
 
 	JOYCAPS joyCaps;	// ゲームパッド情報
+	PyInteract pyInter;
 
 
 	engine3dWin();

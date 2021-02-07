@@ -6,6 +6,9 @@
 #include "engine3d.h"
 
 
+/// <summary>
+/// ÀÛ‚ÉPython/C++ŠÔ‚Ås‚¤‚â‚èæ‚è‚ği‚éƒNƒ‰ƒX
+/// </summary>
 class CppPythonIF
 {
 public:
