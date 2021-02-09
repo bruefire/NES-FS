@@ -73,13 +73,14 @@ int engine3dWin::disposeDIBS()
 
 // ‰Šú‰»
 int engine3dWin::init(
-			HINSTANCE hInst, 
-			int nCmdShow, 
+			void** params, 
 			HWND (*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow), 
 			bool (*loopFunc)(MSG*))
 {
 	CR_RANGE_Y = engine3dWin::clcRangeY(CR_RANGE_X);	//ƒJƒƒ‰Ý’è
 
+	HINSTANCE hInst = *((HINSTANCE*)params[0]);
+	int nCmdShow = *((int*)params[1]);
 	this->hInst = hInst;
 	this->nCmdShow = nCmdShow;
 	this->initWndFunc = initStdWndFunc;

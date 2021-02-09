@@ -117,11 +117,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 
-	// S3シミュレータクラス 初期化
-	if (!newEngine.init(hCurInst, nCmdShow, InitStdWndFunc, StdWndMsgLoop))
-		PostQuitMessage(0);
-	
-
 	///-- ゲームパッド
 	JoyInfoEx.dwSize = sizeof(JOYINFOEX);
 	JoyInfoEx.dwFlags = JOY_RETURNALL;
@@ -131,6 +126,12 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		newEngine.useJoyPad = true;
 		cout << "joypad1 is avaliable." << endl;
 	}
+
+
+	// S3シミュレータクラス 初期化
+	void* iparam[2] = {&hCurInst, &nCmdShow};
+	if (!newEngine.init(iparam, InitStdWndFunc, StdWndMsgLoop))
+		PostQuitMessage(0);
 
 
 	//**** 本処理 ****//

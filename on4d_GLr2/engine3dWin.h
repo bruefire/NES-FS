@@ -7,9 +7,10 @@
 #include "constants.h"
 #include "engine3dGL.h"
 #include "PyInteract.h"
+#include "engine3dOS.h"
 
 
-class engine3dWin : public engine3dGL
+class engine3dWin : public engine3dOS
 {
 public:
 	HINSTANCE hInst;
@@ -29,13 +30,10 @@ public:
 	JOYCAPS joyCaps;	// ゲームパッド情報
 	PyInteract pyInter;
 
-	// 関数ポインタ
-	HWND (*initWndFunc)(HINSTANCE hCurInst, int nCmdShow);
-	bool (*wndProcFunc)(MSG*);
 
 	engine3dWin();
 
-	int init(HINSTANCE hInst, int nCmdShow, HWND (HINSTANCE hCurInst, int nCmdShow), bool(MSG*));
+	int init(void** params, HWND (*a)(HINSTANCE hCurInst, int nCmdShow), bool (*b)(MSG*));
 	int start();
 	int update();
 	int dispose();
