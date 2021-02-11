@@ -180,6 +180,9 @@
     <ClCompile Include="PyInteract.cpp">
       <Filter>c++ source</Filter>
     </ClCompile>
+    <ClCompile Include="engine3dWinOVR.cpp">
+      <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -264,6 +267,9 @@
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
     <ClInclude Include="engine3dOS.h">
+      <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
+    </ClInclude>
+    <ClInclude Include="engine3dWinOVR.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
   </ItemGroup>

@@ -80,6 +80,7 @@ public:
 	int DrawEachObjsS3_LQY(int);
 	int DrawEachObjsH3(int);
 	double GetAsp();
+	double clcRangeY(double rangeX);
 	
 	void MakeCharVBO();
 	void DisposeCharVBO();

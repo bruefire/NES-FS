@@ -448,11 +448,11 @@ engine3dGL::engine3dGL()
 	tObj.rsp.asg(0, 0, 0);
 	tObj.polObj = true;
 	tObj.alfa = 0.4;
-	//pt3 cPt = pt3(0,0,0);
-	//pt4 cPt4 = pt4(0,0,0,0);
+
 	shader[0] = shader[1] = shader[2] =
 		shader[3] = shader[4] = -1;
 
+	CR_RANGE_Y = clcRangeY(CR_RANGE_X);	//ƒJƒƒ‰İ’è
 }
 engine3dGL::~engine3dGL()
 {
@@ -921,6 +921,11 @@ void engine3dGL::ClickProc()
 	}
 
 	ope.clickState = Operation::ClickState::None;
+}
+
+double engine3dGL::clcRangeY(double rangeX)
+{
+	return atan(tan((LDBL)(rangeX) / 2 * PIE / 180) * HEIGHT / WIDTH) * 2 / PIE * 180;	//ƒJƒƒ‰İ’è
 }
 
 

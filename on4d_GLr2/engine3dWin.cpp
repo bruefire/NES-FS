@@ -77,7 +77,6 @@ int engine3dWin::init(
 			HWND (*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow), 
 			bool (*loopFunc)(MSG*))
 {
-	CR_RANGE_Y = engine3dWin::clcRangeY(CR_RANGE_X);	//ÉJÉÅÉâê›íË
 
 	HINSTANCE hInst = *((HINSTANCE*)params[0]);
 	int nCmdShow = *((int*)params[1]);
@@ -227,11 +226,6 @@ int engine3dWin::GL_SwapBuffer()
 
 
 ////////////////
-
-double engine3dWin::clcRangeY(double rangeX)
-{
-	return atan( tan((LDBL)( rangeX )/2*PIE/180)*HEIGHT/WIDTH ) *2/PIE*180;	//ÉJÉÅÉâê›íË
-}
 
 
 int engine3dWin::SaveDIB32(char *lpFileName,const BYTE *lpPixel,const BITMAPINFO *lpBmpInfo, int loop)

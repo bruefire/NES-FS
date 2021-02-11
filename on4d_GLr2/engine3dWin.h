@@ -7,10 +7,9 @@
 #include "constants.h"
 #include "engine3dGL.h"
 #include "PyInteract.h"
-#include "engine3dOS.h"
 
 
-class engine3dWin : public engine3dOS
+class engine3dWin : public engine3dGL
 {
 public:
 	HINSTANCE hInst;
@@ -30,6 +29,9 @@ public:
 	JOYCAPS joyCaps;	// ゲームパッド情報
 	PyInteract pyInter;
 
+	HWND(*initWndFunc)(HINSTANCE hCurInst, int nCmdShow);
+	bool (*wndProcFunc)(MSG*);
+
 
 	engine3dWin();
 
@@ -46,7 +48,6 @@ public:
 	bool InitWindow();
 	int createDIBS();
 	int disposeDIBS();
-	double clcRangeY(double rangeX);
 
 	int SaveDIB32(char *lpFileName,const BYTE *lpPixel,const BITMAPINFO *lpBmpInfo, int loop);
 	char* nextInt(char* nowInt, char len, char rank);
