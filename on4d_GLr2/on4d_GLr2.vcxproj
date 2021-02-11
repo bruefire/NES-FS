@@ -94,7 +94,6 @@
     <ClInclude Include="editor.h" />
     <ClInclude Include="engine3d.h" />
     <ClInclude Include="engine3dGL.h" />
-    <ClInclude Include="engine3dOS.h" />
     <ClInclude Include="engine3dWin.h" />
     <ClInclude Include="engine3dWinOVR.h" />
     <ClInclude Include="functions.h" />
@@ -103,6 +102,7 @@
     <ClInclude Include="global_var2.h" />
     <ClInclude Include="guiItem.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="OculusTextureBuffer.h" />
     <ClInclude Include="operation.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="point.h" />

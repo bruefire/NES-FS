@@ -10,6 +10,7 @@
 #include <commctrl.h>
 #include "constants.h"
 #include "global_var.h"
+#include "VR_Manager.h"
 #include "engine3dWin.h"
 #include "engine3dWinOVR.h"
 #include "functions.h"
@@ -19,8 +20,6 @@
 #include "randomUI.h"
 #include "editor.h"
 #include "objSetting.h"
-#include <glew.h>
-#include <GL/gl.h>
 using namespace std;
 
 // プロシージャ
@@ -81,9 +80,9 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if(awIdx <= awakeCmd.length()){
 		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA;view:VR")
 		{
-			newEngine = new engine3dWinOVR();
-			newEngine->lang = UI_LANG_JA;
-			newEngine->worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+			//newEngine = new engine3dWinOVR();
+			//newEngine->lang = UI_LANG_JA;
+			//newEngine->worldGeo = engine3d::WorldGeo::HYPERBOLIC;
 		}
 		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{
@@ -121,6 +120,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 
+	// S3シミュレータクラス 初期化
+	void* iparam[2] = {&hCurInst, &nCmdShow};
+	if (!newEngine->init(iparam, InitStdWndFunc, StdWndMsgLoop))
+		PostQuitMessage(0);
+
 	///-- ゲームパッド
 	JoyInfoEx.dwSize = sizeof(JOYINFOEX);
 	JoyInfoEx.dwFlags = JOY_RETURNALL;
@@ -130,12 +134,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		newEngine->useJoyPad = true;
 		cout << "joypad1 is avaliable." << endl;
 	}
-
-
-	// S3シミュレータクラス 初期化
-	void* iparam[2] = {&hCurInst, &nCmdShow};
-	if (!newEngine->init(iparam, InitStdWndFunc, StdWndMsgLoop))
-		PostQuitMessage(0);
 
 
 	//**** 本処理 ****//
@@ -177,22 +175,25 @@ HWND InitStdWndFunc(HINSTANCE hCurInst, int nCmdShow)
 // 標準ウィンドウ用メッセージ処理
 bool StdWndMsgLoop(MSG* msg)
 {
-	if ((PeekMessage(msg, NULL, 0, 0, PM_REMOVE)) != 0) 
+	while (true)
 	{
+		if (!(PeekMessage(msg, NULL, 0, 0, PM_REMOVE)) != 0)
+			return true;
+
 		if (msg->message == WM_QUIT)
 			return false;
 
 		// まず子ダイアログにメッセージ処理を試す
 		if (editDlg && IsDialogMessage(editDlg, msg))
-			return true;
+			continue;
 		else if (modObjDlg && IsDialogMessage(modObjDlg, msg))
-			return true;
+			continue;
 
 		TranslateMessage(msg);	//メッセージを変換
 		DispatchMessage(msg);	//メッセージを送出
 	}
 
-	return true;
+	return false;
 }
 
 //ウィンドウクラスの登録

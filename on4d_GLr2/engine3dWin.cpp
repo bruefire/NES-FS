@@ -112,11 +112,8 @@ int engine3dWin::start()
 {
 	MSG msg;
 	// message loop
-	while (true)
+	while (wndProcFunc(&msg))
 	{
-		if (!wndProcFunc(&msg))
-			break;
-
 		// çXêV
 		update();
 	}

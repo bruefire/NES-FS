@@ -7,7 +7,7 @@
 
 
 // ƒƒjƒ…[ŠÖŒW
-class GlRect : public Rect
+class GlRect : public RectAngle
 {
 public:
 	enum STD

@@ -8,7 +8,7 @@
 
 struct col3 { uint8_t R, G, B; };
 
-class Rect
+class RectAngle
 {
 public:
 	pt2 sz;

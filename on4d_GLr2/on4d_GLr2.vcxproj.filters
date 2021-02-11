@@ -266,10 +266,10 @@
     <ClInclude Include="VR_Manager.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
-    <ClInclude Include="engine3dOS.h">
+    <ClInclude Include="engine3dWinOVR.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
-    <ClInclude Include="engine3dWinOVR.h">
+    <ClInclude Include="OculusTextureBuffer.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
   </ItemGroup>

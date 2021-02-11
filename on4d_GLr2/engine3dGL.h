@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <glew.h>
-#include <GL/gl.h>
 #include <vector>
 #include "constants.h"
 #include "guiItem.h"
@@ -34,7 +32,7 @@ public:
 	{
 	public:
 		std::string chrImgNm;	// フォントimgName
-		GLuint chrTex;			// フォントテクスチャ
+		uint32_t chrTex;			// フォントテクスチャ
 		int guiChrQty;
 		uint32_t* chrBuf;
 		int charShader;

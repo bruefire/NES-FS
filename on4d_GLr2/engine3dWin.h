@@ -2,7 +2,6 @@
 
 #include <Windows.h>
 #include <string>
-#include <glew.h>
 #include <GL/gl.h>
 #include "constants.h"
 #include "engine3dGL.h"
@@ -35,10 +34,10 @@ public:
 
 	engine3dWin();
 
-	int init(void** params, HWND (*a)(HINSTANCE hCurInst, int nCmdShow), bool (*b)(MSG*));
-	int start();
-	int update();
-	int dispose();
+	virtual int init(void** params, HWND (*a)(HINSTANCE hCurInst, int nCmdShow), bool (*b)(MSG*));
+	virtual int start();
+	virtual int update();
+	virtual int dispose();
 
 	// openGL overrides
 	int GL_CreateContextPls();
