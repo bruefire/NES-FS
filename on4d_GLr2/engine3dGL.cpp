@@ -449,8 +449,10 @@ engine3dGL::engine3dGL()
 	tObj.polObj = true;
 	tObj.alfa = 0.4;
 
-	shader[0] = shader[1] = shader[2] =
-		shader[3] = shader[4] = -1;
+	shader.resize(6);
+	for (int i = 0; i < shader.size(); i++)
+		shader[i] = -1;
+
 
 	CR_RANGE_Y = clcRangeY(CR_RANGE_X);	//ƒJƒƒ‰Ý’è
 }

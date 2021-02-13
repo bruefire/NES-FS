@@ -110,7 +110,7 @@ public:
 	//private:
 	uint32_t* buffers;
 	uint32_t* texNames;
-	int shader[6];
+	std::vector<uint32_t> shader;
 	int outMax;
 
 	// コンストラクタ, デストラクタ

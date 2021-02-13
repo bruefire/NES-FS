@@ -96,6 +96,11 @@ int engine3dGL::GL_End()
 	glDeleteBuffers(texs, buffers+0);
 	glDeleteTextures(texs, texNames+0);
 
+	// シェ―ダー後処理
+	int shLen = shader.size();
+	for (int i = 0; i < shLen; i++)
+		glDeleteProgram(shader[i]);
+
 	// OS依存 純粋仮想関数
 	GL_DeleteContextPls();
 

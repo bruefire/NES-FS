@@ -36,3 +36,22 @@ int engine3dWinOVR::dispose()
 {
 	return 0;
 }
+
+int engine3dWinOVR::GL_CreateContextPls()
+{
+	// transfer initialization to VR_Manager.
+
+	return 1;
+}
+
+int engine3dWinOVR::GL_DeleteContextPls()
+{
+	// transfer initialization to VR_Manager.
+
+	return 1;
+}
+
+int engine3dWinOVR::GL_SwapBuffer()
+{
+	return 1;
+}
