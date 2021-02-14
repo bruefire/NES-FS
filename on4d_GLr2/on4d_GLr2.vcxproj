@@ -58,7 +58,9 @@
     <ClCompile Include="engine3dWin.cpp" />
     <ClCompile Include="engine3dWinOVR.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="GlScene.cpp" />
     <ClCompile Include="GL_Func.cpp" />
+    <ClCompile Include="NesEsVR.cpp" />
     <ClCompile Include="PyInteract.cpp" />
     <ClCompile Include="VR_Manager.cpp" />
     <None Include="vtxLowPt.c">
@@ -100,6 +102,7 @@
     <ClInclude Include="geometry.h" />
     <ClInclude Include="global_var.h" />
     <ClInclude Include="global_var2.h" />
+    <ClInclude Include="GlScene.h" />
     <ClInclude Include="guiItem.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="OculusTextureBuffer.h" />
@@ -117,6 +120,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="UI_DEF.h" />
     <ClInclude Include="VR_Manager.h" />
+    <ClInclude Include="NesEsVR.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico" />

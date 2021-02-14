@@ -171,9 +171,6 @@
     <ClCompile Include="CppPythonIF.cpp">
       <Filter>c++ source\core演算部</Filter>
     </ClCompile>
-    <ClCompile Include="VR_Manager.cpp">
-      <Filter>c++ source</Filter>
-    </ClCompile>
     <ClCompile Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp">
       <Filter>c++ source\OVR</Filter>
     </ClCompile>
@@ -182,6 +179,15 @@
     </ClCompile>
     <ClCompile Include="engine3dWinOVR.cpp">
       <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
+    </ClCompile>
+    <ClCompile Include="VR_Manager.cpp">
+      <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
+    </ClCompile>
+    <ClCompile Include="NesEsVR.cpp">
+      <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
+    </ClCompile>
+    <ClCompile Include="GlScene.cpp">
+      <Filter>c++ source\GL部</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +277,12 @@
     </ClInclude>
     <ClInclude Include="OculusTextureBuffer.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
+    </ClInclude>
+    <ClInclude Include="NesEsVR.h">
+      <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
+    </ClInclude>
+    <ClInclude Include="GlScene.h">
+      <Filter>c++ header\GL部</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

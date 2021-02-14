@@ -26,7 +26,7 @@ public:
 	{
 		LOW,
 		HIGH
-	};
+	} qyMode;
 
 	class GuiFont
 	{
@@ -56,7 +56,6 @@ public:
 	bool LOC_MODE;
 	bool VIEW_DST;
 	bool VIEW_LocRot;
-	QY_MODE qyMode;
 
 	GuiFont guiFont;
 
@@ -97,6 +96,8 @@ public:
 	virtual int GL_CreateContextPls() = 0;
 	virtual int GL_DeleteContextPls() = 0;
 	virtual int GL_SwapBuffer() = 0;
+	void GL_InitScene();
+	void GL_DisposeScene();
 
 	uint32_t LoadShaders(const char* vPath, const char* fPath);
 	uint32_t LoadShaders2(const char* vPath, const char* gPath, const char* fPath, char mode);

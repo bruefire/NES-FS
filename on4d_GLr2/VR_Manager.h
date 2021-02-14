@@ -1,12 +1,11 @@
 #pragma once
 #include <Windows.h>
 
+#include "OVR_CAPI_GL.h"
 #if defined(_WIN32)
 #include <dxgi.h> // for GetDefaultAdapterLuid
 #pragma comment(lib, "dxgi.lib")
 #endif
-#include "../OVR/Common/Win32_GLAppUtil.h"
-#include "OculusTextureBuffer.h"
 
 
 class VR_Manager
@@ -15,6 +14,10 @@ private:
 	HINSTANCE hInst;
 
 public:
+	virtual void initGlScnene() = 0;
+	virtual void updateGlScene() = 0;
+	virtual void disposeGlScene() = 0;
+
 	VR_Manager();
 	~VR_Manager();
 

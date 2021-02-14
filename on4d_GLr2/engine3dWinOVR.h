@@ -1,12 +1,12 @@
 #pragma once
-#include "VR_Manager.h"
+#include "NesEsVR.h"
 #include "engine3dWin.h"
 
 
 class engine3dWinOVR : public engine3dWin
 {
 private:
-	VR_Manager vrm;
+	NesEsVR vrm;
 
 public:
 	int init(

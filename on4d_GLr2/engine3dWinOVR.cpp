@@ -11,10 +11,14 @@ int engine3dWinOVR::init(void** params, HWND(*initStdWndFunc)(HINSTANCE hCurInst
 	this->initWndFunc = initStdWndFunc;
 	this->wndProcFunc = loopFunc;
 
+	// 基底クラスのinit
+	engine3d::init();
+
 	// VR, ウィンドウ初期化
 	vrm.Init(hInst);
-
+	// pythonインタラクティブ初期化
 	pyInter.Init(this);
+	
 	timeBeginPeriod(1);
 
 	return 1;
@@ -29,11 +33,25 @@ int engine3dWinOVR::start()
 
 int engine3dWinOVR::update()
 {
+	engine3d::update();
+
+	GL_SwapBuffer();
+	if (worldGeo == WorldGeo::SPHERICAL)
+	{
+		simulateS3GL();
+	}
+	else if (worldGeo == WorldGeo::HYPERBOLIC)
+	{
+		SimulateH3GL();
+	}
+
 	return 0;
 }
 
 int engine3dWinOVR::dispose()
 {
+	vrm.Dispose();
+
 	return 0;
 }
 

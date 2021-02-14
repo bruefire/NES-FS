@@ -12,11 +12,6 @@ using namespace std;
 
 int engine3dGL::GL_Init()
 {
-	int texs = meshLen+2;
-
-	texNames = new uint32_t[ texs ];	// 画面1 + mesh数 + 軌跡1
-	buffers = new uint32_t[ texs ];
-
 
 	// OS依存 純粋仮想関数
 	try
@@ -28,6 +23,18 @@ int engine3dGL::GL_Init()
 		throw ex;
 	}
 
+	// init the scene.
+	GL_InitScene();
+
+	return 1;
+};
+
+
+void engine3dGL::GL_InitScene()
+{
+	int texs = meshLen + 2;
+	texNames = new uint32_t[texs];	// 画面1 + mesh数 + 軌跡1
+	buffers = new uint32_t[texs];
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -39,7 +46,7 @@ int engine3dGL::GL_Init()
 	glGenBuffers(texs, buffers);	//③頂点バッファを作成する
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);	//バインド
 	//
-	
+
 
 	int varing;
 	glGetIntegerv(GL_MAX_VARYING_VECTORS, &varing);
@@ -69,44 +76,48 @@ int engine3dGL::GL_Init()
 			shader[3] = LoadShaders2("vartex.c", "lineG.c", "lineF.c", 1);
 		}
 	}
-	shader[1] = LoadShaders( "vtx0.c", "pxl.c" );
-	shader[2] = LoadShaders( "vtx3D.c", "pxl3D.c" );
-	shader[4] = LoadShaders2( "vartex.c", "lineG2.c", "lineF2.c" , 2);
+	shader[1] = LoadShaders("vtx0.c", "pxl.c");
+	shader[2] = LoadShaders("vtx3D.c", "pxl3D.c");
+	shader[4] = LoadShaders2("vartex.c", "lineG2.c", "lineF2.c", 2);
 
 	///-- テクスチャ --///
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures( texs, texNames );
-	for(int i=0;i<texs;i++){
+	glGenTextures(texs, texNames);
+	for (int i = 0; i < texs; i++) {
 		glBindTexture(GL_TEXTURE_2D, texNames[i]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
+}
 
 
-	return 1;
-};
-
-
-
-int engine3dGL::GL_End()
+void engine3dGL::GL_DisposeScene()
 {
-	int texs = meshLen+2;
-	
+	int texs = meshLen + 2;
+
 	// メインVBO解放
-	glDeleteBuffers(texs, buffers+0);
-	glDeleteTextures(texs, texNames+0);
+	glDeleteBuffers(texs, buffers + 0);
+	glDeleteTextures(texs, texNames + 0);
 
 	// シェ―ダー後処理
 	int shLen = shader.size();
 	for (int i = 0; i < shLen; i++)
 		glDeleteProgram(shader[i]);
 
+	delete[] texNames;
+	delete[] buffers;
+}
+
+
+
+int engine3dGL::GL_End()
+{
+	// シーン後処理
+	GL_DisposeScene();
+
 	// OS依存 純粋仮想関数
 	GL_DeleteContextPls();
 
-	
-	delete[] texNames;
-	delete[] buffers;
 
 	return 0;
 };
