@@ -120,6 +120,8 @@ public:
 	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
+	void ClcVRPlayerPosS3(double* cmrStd);
+	void ReflectVRPoseS3();
 	void ClcCoordinate();
 	int physics();
 	bool CheckSelectedEnable(int idx = -1);
@@ -147,6 +149,7 @@ public:
 	virtual int allocMesh();
 	void shoot();
 	void InitInputParams();	// 入力値初期化
+	void PrepareInParamForNext();
 
 	// 不要？
 	void adjW(pt4* pt2, pt4* pt1);

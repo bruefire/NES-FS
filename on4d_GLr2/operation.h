@@ -12,6 +12,9 @@ public:
 	pt3 cmRot;
 	bool cmBack;
 	int speed;
+	pt3 VRLoc;	// loc‚©‚ç‚Ì‘Š‘ÎˆÊ’u (VR)
+	pt3 VRStd[2];	// std‚É‘Î‚·‚é‘Š‘Îstd (VR)
+	double VREysDst;
 
 	int chgMapStateOld;
 	int chgMapState;

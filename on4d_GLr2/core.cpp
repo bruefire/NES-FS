@@ -78,11 +78,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	int awIdx = awakeCmd.find_last_of(" ") +1;
 	 
 	if(awIdx <= awakeCmd.length()){
-		if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA;view:VR")
+		if (awakeCmd.substr(awIdx) == "sim:S3;lang:JA;view:VR")
 		{
 			newEngine = new engine3dWinOVR();
 			newEngine->lang = UI_LANG_JA;
-			newEngine->worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+			newEngine->worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}
 		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{

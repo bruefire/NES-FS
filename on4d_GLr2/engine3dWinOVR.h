@@ -9,6 +9,8 @@ private:
 	NesEsVR vrm;
 
 public:
+	engine3dWinOVR();
+
 	int init(
 		void** params,
 		HWND(*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow),

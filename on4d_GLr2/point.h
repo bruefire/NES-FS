@@ -28,6 +28,8 @@ public:
 	pt3 mtp(double pts);
 	pt3 mtp(pt3 pts);
 	pt3 norm(pt3 def=pt3(0, 0, 1), double lim= 0.000000000001);
+	double length();
+	bool isZero();
 
 	static double dot(pt3, pt3);	// 内積
 	static pt3 cross(pt3, pt3);		// 外積(クロス積)
@@ -51,7 +53,11 @@ public:
 	pt3 xyz();
 	pt4 norm(pt4 errPt= pt4(1, 0, 0, 0), double lim=0.000000000001);
 	void asgPt3(pt3);
+	double length();
+	bool isZero();
 
+	pt4 qtrMtp(pt4);
+	pt3 qtrMtp(pt3);
 	static double dot(pt4, pt4);		// 内積
 	static pt4 cross(pt4, pt4, pt4);	// 外積(クロス積)
 

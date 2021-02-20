@@ -185,8 +185,14 @@ int engine3d::update()
 	else if (worldGeo == WorldGeo::HYPERBOLIC)
 		UpdateH3();
 
-
 	// 入力状態 次回待機処理
+	PrepareInParamForNext();
+
+	return 1;
+};
+
+void engine3d::PrepareInParamForNext()
+{
 	if (!useJoyPad)
 		ope.ClearLocRotParam();
 
@@ -194,9 +200,7 @@ int engine3d::update()
 	//----
 
 	ope.inputByKey = false;
-
-	return 1;
-};
+}
 
 /// <summary>
 /// S3世界更新
@@ -780,6 +784,156 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	//cmData.rot.asg(curObj->rot.x * rtCoe, curObj->rot.y * rtCoe, curObj->rot.z * rtCoe);
 }
 
+// プレイヤーオブジェクト更新
+void engine3d::ClcVRPlayerPosS3(double* cmrStd)
+{
+	object3d* curObj = &objs[PLR_No];
+
+	//----
+	pt4 locE = curObj->tudeToEuc(curObj->loc);
+	pt4 std1 = curObj->tudeToEuc(curObj->std[0]);		// 基準位置1
+	pt4 std2 = curObj->tudeToEuc(curObj->std[1]);		// 基準位置2
+	///-------- 傾きの更新 ----------
+	//-- まず4つの基本軸を算出 (正規化済)
+	pt4 normN = locE;
+	pt4 normO = normN.mtp(COS_1);
+	pt4 std1N = std1.mns(normO).mtp(SIN_1R);
+	pt4 std2N = std2.mns(normO).mtp(SIN_1R);
+	pt4 sideN = pt4::cross(normN, std1N, std2N);	// (長さは1.0)
+
+
+	double rotOn[3];
+	ope.VRStd[0].x *= -1;
+	ope.VRStd[0].y *= -1;
+	ope.VRStd[1].x *= -1;
+	ope.VRStd[1].y *= -1;
+	ope.VRStd[1] = ope.VRStd[1].mtp(-1);
+	curObj->clcStd(ope.VRStd[0], ope.VRStd[1], rotOn);
+	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
+	{
+		pt4 tmp;
+		pt4 s1x, s1y, s1z;
+		pt4 s2x, s2y, s2z;
+		// 視線固定回転
+		pt4 tmpN[2];
+		pt2 tmpRt = pt2(0, 1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
+		//
+		s2y = std2N.mtp(tmpRt.y); 
+		s2x = sideN.mtp(tmpRt.x);
+
+		// 視線移動回転1
+		tmpRt = pt2(0, 1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
+		//
+		s1z = std1N.mtp(tmpRt.y);
+		s1y = std2N.mtp(tmpRt.x);
+		tmp = s2y.mtp(tmpRt.y);
+		s2z = std1N.mtp(-1 * pt4::dot(std2N, s2y)).mtp(tmpRt.x);
+		s2y = tmp;
+
+		// 視線移動回転2
+		tmpRt = pt2(0, 1);
+		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
+		//
+		tmp = s1y.mtp(tmpRt.y);
+		s1x = sideN.mtp(pt4::dot(std2N, s1y)).mtp(tmpRt.x);
+		s1y = tmp;
+		pt4 s2xy = s2x.pls(s2y);
+		pt4 s2xy1 = s2xy.mtp(tmpRt.y);
+		double s2xy_yL = pt4::dot(std2N, s2xy);
+		double s2xy_xL = pt4::dot(sideN, s2xy);
+		pt4 s2xy_y = std2N.mtp(s2xy_yL);
+		pt4 s2xy_x = s2xy.mns(s2xy_y);
+		pt4 s2xyS = pt4()
+			.pls(sideN.mtp(s2xy_yL))
+			.pls(std2N.mtp(-1 * s2xy_xL));
+		pt4 s2xy2 = s2xyS.mtp(tmpRt.x);
+
+		std1N = s1x.pls(s1y).pls(s1z).norm();
+		std2N = s2xy1.pls(s2xy2).pls(s2z).norm();
+	}
+
+
+	///-------- 位置,基準位置の更新 ----------
+	pt4 cmLc = pt4(0, ope.VRLoc.y, ope.VRLoc.z, ope.VRLoc.x);
+	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
+
+	std1 = std1N.mtp(SIN_1).pls(normO);
+	std2 = std2N.mtp(SIN_1).pls(normO);
+
+	if (cmLc.w > 0.0000000001)
+	{
+		// 移動方向ベクトル(正規化)
+		pt4 lspXN = std1N.mtp(cmLc.z)
+			.pls(std2N.mtp(cmLc.y))
+			.pls(sideN.mtp(cmLc.x))
+			.mtp(1 / cmLc.w);
+
+		//o-正規化標準1,2ベクトルの分解 (normN成分は無し)
+		double std1xL = pt4::dot(lspXN, std1);
+		pt4 std1x = lspXN.mtp(std1xL);
+		pt4 std1e = std1.mns(normO).mns(std1x);
+
+		double std2xL = pt4::dot(lspXN, std2);
+		pt4 std2x = lspXN.mtp(std2xL);
+		pt4 std2e = std2.mns(normO).mns(std2x);
+
+		// 更新
+		pt2 tmpRt = pt2(0, 1);
+		tudeRst(&tmpRt.x, &tmpRt.y, cmLc.w / radius, 1);
+		locE = normN.mtp(tmpRt.y).pls(lspXN.mtp(tmpRt.x));
+
+		tmpRt = pt2(std1xL, COS_1);
+		tudeRst(&tmpRt.x, &tmpRt.y, cmLc.w / radius, 1);
+		std1 = std1e
+			.pls(normN.mtp(tmpRt.y))
+			.pls(lspXN.mtp(tmpRt.x));
+
+		tmpRt = pt2(std2xL, COS_1);
+		tudeRst(&tmpRt.x, &tmpRt.y, cmLc.w / radius, 1);
+		std2 = std2e
+			.pls(normN.mtp(tmpRt.y))
+			.pls(lspXN.mtp(tmpRt.x));
+	}
+
+	///-- 位置,基準位置を上書き (end
+	curObj->loc = curObj->eucToTude(locE);
+	curObj->std[0] = curObj->eucToTude(std1);
+	curObj->std[1] = curObj->eucToTude(std2);
+
+	///----------- 更新後のカメラ基準の測定 -------------
+	///-- 緯度,経度,深度を0に
+	all_tudeRst(&std1, curObj->loc, 0);// 基準1
+	all_tudeRst(&std2, curObj->loc, 0);// 基準2
+	///-- 基準方向1,2,3の特定
+	curObj->clcStd(std1, std2, cmrStd);
+
+	// std修正
+	if (curObj->stdRefCnt == stdRefSpan)
+	{
+		pt4 ntd1 = pt4(COS_1, 0, 0, SIN_1);
+		pt4 ntd2 = pt4(COS_1, 0, SIN_1, 0);
+
+		///-- 方向1,2を0に (基準1,2のみ)
+		tudeRst(&ntd1.x, &ntd1.y, cmrStd[2], 1);//-- X-Y 回転
+		tudeRst(&ntd2.x, &ntd2.y, cmrStd[2], 1);
+		tudeRst(&ntd1.y, &ntd1.z, cmrStd[1], 1);//-- Y-Z 回転
+		tudeRst(&ntd2.y, &ntd2.z, cmrStd[1], 1);
+		tudeRst(&ntd1.x, &ntd1.y, cmrStd[0], 1);//-- X-Y 回転
+		tudeRst(&ntd2.x, &ntd2.y, cmrStd[0], 1);
+
+		all_tudeRst(&ntd1, curObj->loc, 1);
+		all_tudeRst(&ntd2, curObj->loc, 1);
+
+		curObj->std[0] = object3d::eucToTude(ntd1);
+		curObj->std[1] = object3d::eucToTude(ntd2);
+		curObj->stdRefCnt = 0;
+	}
+	// std再計算カウンタ
+	++curObj->stdRefCnt;
+}
+
 
 // 相対位置計算
 void engine3d::ClcRelaivePosS3(double* cmrStd)
@@ -921,6 +1075,11 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		// 元の位置に戻す
 		curObj->ParallelMove(locOld, true);	
 	}
+}
+
+void engine3d::ReflectVRPoseS3()
+{
+
 }
 
 // 現プレイヤー座標計算

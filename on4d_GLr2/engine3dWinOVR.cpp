@@ -2,6 +2,11 @@
 
 
 
+engine3dWinOVR::engine3dWinOVR()
+	: vrm(this)
+{
+}
+
 int engine3dWinOVR::init(void** params, HWND(*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow), bool(*loopFunc)(MSG*))
 {
 	HINSTANCE hInst = *((HINSTANCE*)params[0]);
@@ -35,7 +40,6 @@ int engine3dWinOVR::update()
 {
 	engine3d::update();
 
-	GL_SwapBuffer();
 	if (worldGeo == WorldGeo::SPHERICAL)
 	{
 		simulateS3GL();

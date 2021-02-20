@@ -8,6 +8,8 @@
 
 #include "../OVR/Common/Win32_GLAppUtil.h"
 #include "OculusTextureBuffer.h"
+#include "geometry.h"
+#include "functions.h"
 
 
 VR_Manager::VR_Manager()
@@ -18,8 +20,10 @@ VR_Manager::~VR_Manager()
 }
 
 
+VR_Manager* vrInst;
 void VR_Manager::Init(HINSTANCE hInst)
 {
+    vrInst = this;
 	this->hInst = hInst;
 
 	// Initializes LibOVR, and the Rift
@@ -32,9 +36,14 @@ void VR_Manager::Init(HINSTANCE hInst)
 }
 
 
+bool NesEsVRmainLoop(bool val)
+{
+    return vrInst->MainLoop(val);
+}
+
 void VR_Manager::Start()
 {
-	Platform.Run(MainLoop);
+	Platform.Run(NesEsVRmainLoop);
 }
 
 
@@ -49,7 +58,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
     OculusTextureBuffer* eyeRenderTexture[2] = { nullptr, nullptr };
     ovrMirrorTexture mirrorTexture = nullptr;
     GLuint          mirrorFBO = 0;
-    Scene* roomScene = nullptr;
+    //Scene* roomScene = nullptr;
     long long frameIndex = 0;
 
     ovrSession session;
@@ -112,12 +121,17 @@ bool VR_Manager::MainLoop(bool retryCreate)
     wglSwapIntervalEXT(0);
 
     // Make scene - can simplify further if needed
-    roomScene = new Scene(false);
+    //roomScene = new Scene(false);
+    initGlScnene();
 
     // FloorLevel will give tracking poses where the floor height is 0
     ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
 
     // Main loop
+    pt3 preVrLoc = pt3(0, 0, 0);
+    pt3 preVrStd[2] = { pt3(0, 0, 0), pt3(0, 0, 0) };
+    pt3 vrLoc;
+    pt3 vrStd[2];
     while (Platform.HandleMessages())
     {
         ovrSessionStatus sessionStatus;
@@ -147,13 +161,18 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
             // Animate the cube
             static float cubeClock = 0;
-            if (sessionStatus.HasInputFocus) // Pause the application if we are not supposed to have input.
-                roomScene->Models[0]->Pos = Vector3f(9 * (float)sin(cubeClock), 3, 9 * (float)cos(cubeClock += 0.015f));
+            //if (sessionStatus.HasInputFocus) // Pause the application if we are not supposed to have input.
+            //    roomScene->Models[0]->Pos = Vector3f(9 * (float)sin(cubeClock), 3, 9 * (float)cos(cubeClock += 0.015f));
 
             // Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyePose) may change at runtime.
             ovrEyeRenderDesc eyeRenderDesc[2];
             eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
             eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+            double eyeDstHf = pt3(
+                eyeRenderDesc[1].HmdToEyePose.Orientation.x - eyeRenderDesc[0].HmdToEyePose.Orientation.x,
+                eyeRenderDesc[1].HmdToEyePose.Orientation.y - eyeRenderDesc[0].HmdToEyePose.Orientation.y,
+                eyeRenderDesc[1].HmdToEyePose.Orientation.z - eyeRenderDesc[0].HmdToEyePose.Orientation.z)
+                .length() * 0.5;
 
             // Get eye poses, feeding in correct IPD offset
             ovrPosef EyeRenderPose[2];
@@ -164,6 +183,49 @@ bool VR_Manager::MainLoop(bool retryCreate)
             ovr_GetEyePoses(session, frameIndex, ovrTrue, HmdToEyePose, EyeRenderPose, &sensorSampleTime);
 
             ovrTimewarpProjectionDesc posTimewarpProjectionDesc = {};
+
+            // Render world
+            int repnEye = 0;
+            ovrVector3f eyeLoc = EyeRenderPose[repnEye].Position;
+            vrLoc = pt3(eyeLoc.z, eyeLoc.x, -eyeLoc.y);
+
+            ovrQuatf eyeRot = EyeRenderPose[repnEye].Orientation;
+            pt4 eyeQ = pt4(eyeRot.w, eyeRot.x, eyeRot.y, eyeRot.z);
+            vrStd[0] = pt3(0, 0, 1);
+            vrStd[1] = pt3(0, 1, 0);
+            for (int s = 0; s < 2; s++)
+                vrStd[s] = eyeQ.qtrMtp(vrStd[s]);
+            
+
+            pt3 vrLocDf;
+            pt3 vrStdDf[2];
+            if (!preVrStd[0].isZero())
+            {
+                vrLocDf = vrLoc.mns(preVrLoc);
+                pt3 preCross = pt3::cross(preVrStd[1], preVrStd[0]);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    vrStdDf[i] = pt3(
+                        pt3::dot(preCross, vrStd[i]),
+                        pt3::dot(preVrStd[1], vrStd[i]),
+                        pt3::dot(preVrStd[0], vrStd[i]));
+                }
+            }
+            else
+            {
+                vrLocDf = pt3();
+                vrStdDf[0] = pt3();
+                vrStdDf[1] = pt3();
+            }
+            // test
+            vrLocDf = vrLocDf.mtp(14);
+            eyeDstHf *= 14;
+            // test
+
+            // do main logical proccessing.
+            SendPose(vrLocDf, vrStdDf, 0);
+            updateSceneLgc();
 
             // Render Scene to Eye Buffers
             for (int eye = 0; eye < 2; ++eye)
@@ -183,7 +245,11 @@ bool VR_Manager::MainLoop(bool retryCreate)
                 posTimewarpProjectionDesc = ovrTimewarpProjectionDesc_FromProjection(proj, ovrProjection_None);
 
                 // Render world
-                roomScene->Render(view, proj);
+                // Rendering Scene
+                SendPose(vrLocDf, vrStdDf, eyeDstHf * powi(-1, eye + 1));
+                updateGlScene();
+
+                //roomScene->Render(view, proj);
 
                 // Avoids an error when calling SetAndClearRenderSurface during next iteration.
                 // Without this, during the next while loop iteration SetAndClearRenderSurface
@@ -232,10 +298,15 @@ bool VR_Manager::MainLoop(bool retryCreate)
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
         SwapBuffers(Platform.hDC);
+
+        preVrLoc = vrLoc;
+        preVrStd[0] = vrStd[0];
+        preVrStd[1] = vrStd[1];
     }
 
 Done:
-    delete roomScene;
+    //delete roomScene;
+    disposeGlScene();
     if (mirrorFBO) glDeleteFramebuffers(1, &mirrorFBO);
     if (mirrorTexture) ovr_DestroyMirrorTexture(session, mirrorTexture);
     for (int eye = 0; eye < 2; ++eye)

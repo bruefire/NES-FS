@@ -1309,6 +1309,10 @@ pt3 pt3::norm(pt3 errPt, double lim)
 	double len = pyth3(*this);
 	return (len <= lim) ? errPt : this->mtp(1 / len);
 }
+// 長さ
+double pt3::length() { return pyth3(*this); }
+// ゼロベクトル
+bool pt3::isZero() { return x == 0.0 && y == 0.0 && z == 0.0; }
 // 内積
 double pt3::dot(pt3 a, pt3 b)
 {
@@ -1341,6 +1345,10 @@ void poly::pSet(uint32_t num, double tx, double ty, double tz, double tw){		//オ
 	pt4 pt = pt4(tw, tx, ty, tz);
 	pts[num] = pt;
 }
+// 長さ
+double pt4::length() { return pyth4(*this); }
+// ゼロベクトル
+bool pt4::isZero() { return w == 0.0 && x == 0.0 && y == 0.0 && z == 0.0; }
 
 void object4d::cSet(uint8_t r, uint8_t g, uint8_t b){//一括色設定
 	col3 tCol = { r, g, b };
@@ -1381,6 +1389,28 @@ pt4 pt4::norm(pt4 errOpt, double lim)
 {
 	double len = pyth4(*this);
 	return (len <= lim) ? errOpt : this->mtp(1 / len);
+}
+/// <summary>
+/// 四元数同士の掛け算
+/// </summary>
+/// <param name="q">掛けられる対象の四元数</param>
+/// <returns>結果四元数</returns>
+pt4 pt4::qtrMtp(pt4 p)
+{
+	pt4 q = *this;
+	return pt4(
+			- q.x * p.x - q.y * p.y - q.z * p.z + q.w * p.w,
+			+ q.w * p.x - q.z * p.y + q.y * p.z + q.x * p.w,
+			+ q.z * p.x + q.w * p.y - q.x * p.z + q.y * p.w,
+			- q.y * p.x + q.x * p.y + q.w * p.z + q.z * p.w);
+}
+pt3 pt4::qtrMtp(pt3 _v)
+{
+	pt4 q = *this;
+	pt4 r = pt4(q.w, -q.x, -q.y, -q.z);
+	pt4 v = pt4(0.0, _v.x, _v.y, _v.z);
+
+	return q.qtrMtp(v).qtrMtp(r).xyz();
 }
 void pt4::asgPt3(pt3 pts3){ x = pts3.x, y = pts3.y, z = pts3.z; }
 pt4::pt4()
