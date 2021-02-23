@@ -856,7 +856,7 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 
 
 	///-------- 位置,基準位置の更新 ----------
-	pt4 cmLc = pt4(0, ope.VRLoc.y, ope.VRLoc.z, ope.VRLoc.x);
+	pt4 cmLc = pt4(0, ope.VRLoc.x, ope.VRLoc.y, ope.VRLoc.z);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
 
 	std1 = std1N.mtp(SIN_1).pls(normO);
@@ -970,6 +970,13 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 			tudeRst(&locT.x, &locT.z, PIE, 1);//-- X-Y 回転 (-方向3
 			tudeRst(&std1.x, &std1.z, PIE, 1);
 			tudeRst(&std2.x, &std2.z, PIE, 1);
+		}
+		// VR
+		if (!ope.VRStd[0].isZero())
+		{
+			tudeRst(&locT.x, &locT.w, ope.VREysDst / radius, 0);
+			tudeRst(&std1.x, &std1.w, ope.VREysDst / radius, 0);
+			tudeRst(&std2.x, &std2.w, ope.VREysDst / radius, 0);
 		}
 
 		///------ オブジェクトの見かけの座標を計算 ------
@@ -1283,6 +1290,8 @@ int engine3d::InitS3()	// 球面世界用初期化
 		objs[h].used = false;	//-- 有効化
 		objs[h].draw = 2;
 	}
+	// ランダムな位置
+	RandLocS3(RandMode::Uniform);
 
 	///-- 共通
 	for (h = 0; h < OBJ_QTY; h++) {

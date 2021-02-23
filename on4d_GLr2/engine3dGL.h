@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "constants.h"
 #include "guiItem.h"
 #include "engine3d.h"
@@ -51,6 +53,8 @@ public:
 	int bgCol;
 	double CR_RANGE_X;
 	double CR_RANGE_Y;
+	double CR_RANGE_R;
+	double CR_RANGE_D;
 	bool VIEW_PLR;
 	bool VIEW_XYZ;
 	bool LOC_MODE;
@@ -89,6 +93,8 @@ public:
 	int DrawMapS3();
 	int DrawMapH3();
 	void ClickProc();
+	glm::mat4 GetPerspective(double, double);
+	glm::mat4 GetPerspective(double, double, double, double);
 
 	// OpenGL
 	int GL_Init();

@@ -9,9 +9,14 @@ NesEsVR::NesEsVR(engine3dWinOVR* owner)
 	this->owner = owner;
 }
 
-void NesEsVR::initGlScnene()
+void NesEsVR::initGlScnene(double w, double h, double fovX)
 {
 	owner->GL_InitScene();
+	glCullFace(GL_FRONT);
+	owner->WIDTH = w;
+	owner->HEIGHT = h;
+	owner->CR_RANGE_X = atan(fovX) * 2 / PIE * 180;
+	owner->CR_RANGE_Y = owner->clcRangeY(owner->CR_RANGE_X);
 
 	//-- ƒƒbƒVƒ…“]‘—
 	for (int i = 0; i < owner->meshLen; i++)

@@ -122,7 +122,10 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
     // Make scene - can simplify further if needed
     //roomScene = new Scene(false);
-    initGlScnene();
+    initGlScnene(
+        eyeRenderTexture[0]->texSize.w,
+        eyeRenderTexture[0]->texSize.h, 
+        (hmdDesc.DefaultEyeFov[0].LeftTan + hmdDesc.DefaultEyeFov[0].RightTan) * 0.5);
 
     // FloorLevel will give tracking poses where the floor height is 0
     ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
@@ -169,9 +172,9 @@ bool VR_Manager::MainLoop(bool retryCreate)
             eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
             eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
             double eyeDstHf = pt3(
-                eyeRenderDesc[1].HmdToEyePose.Orientation.x - eyeRenderDesc[0].HmdToEyePose.Orientation.x,
-                eyeRenderDesc[1].HmdToEyePose.Orientation.y - eyeRenderDesc[0].HmdToEyePose.Orientation.y,
-                eyeRenderDesc[1].HmdToEyePose.Orientation.z - eyeRenderDesc[0].HmdToEyePose.Orientation.z)
+                eyeRenderDesc[1].HmdToEyePose.Position.x - eyeRenderDesc[0].HmdToEyePose.Position.x,
+                eyeRenderDesc[1].HmdToEyePose.Position.y - eyeRenderDesc[0].HmdToEyePose.Position.y,
+                eyeRenderDesc[1].HmdToEyePose.Position.z - eyeRenderDesc[0].HmdToEyePose.Position.z)
                 .length() * 0.5;
 
             // Get eye poses, feeding in correct IPD offset
@@ -187,7 +190,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
             // Render world
             int repnEye = 0;
             ovrVector3f eyeLoc = EyeRenderPose[repnEye].Position;
-            vrLoc = pt3(eyeLoc.z, eyeLoc.x, -eyeLoc.y);
+            vrLoc = pt3(eyeLoc.x, eyeLoc.y, -eyeLoc.z);
 
             ovrQuatf eyeRot = EyeRenderPose[repnEye].Orientation;
             pt4 eyeQ = pt4(eyeRot.w, eyeRot.x, eyeRot.y, eyeRot.z);
@@ -196,12 +199,24 @@ bool VR_Manager::MainLoop(bool retryCreate)
             for (int s = 0; s < 2; s++)
                 vrStd[s] = eyeQ.qtrMtp(vrStd[s]);
             
-
             pt3 vrLocDf;
             pt3 vrStdDf[2];
             if (!preVrStd[0].isZero())
             {
                 vrLocDf = vrLoc.mns(preVrLoc);
+                //test
+                pt3 tvrStd[2] = { vrStd[0], vrStd[1] };
+                tvrStd[0].x *= -1;
+                tvrStd[0].y *= -1;
+                tvrStd[1].x *= -1;
+                tvrStd[1].y *= -1;
+                tvrStd[1] = tvrStd[1].mtp(-1);
+                pt3 tvrCross = pt3::cross(tvrStd[1], tvrStd[0]);
+                vrLocDf = pt3(
+                    pt3::dot(tvrCross, vrLocDf),
+                    pt3::dot(tvrStd[1], vrLocDf),
+                    pt3::dot(tvrStd[0], vrLocDf));
+                //test
                 pt3 preCross = pt3::cross(preVrStd[1], preVrStd[0]);
 
                 for (int i = 0; i < 2; i++)
@@ -219,8 +234,8 @@ bool VR_Manager::MainLoop(bool retryCreate)
                 vrStdDf[1] = pt3();
             }
             // test
-            vrLocDf = vrLocDf.mtp(14);
-            eyeDstHf *= 14;
+            vrLocDf = vrLocDf.mtp(55);
+            eyeDstHf *= 1;
             // test
 
             // do main logical proccessing.

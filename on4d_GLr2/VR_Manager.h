@@ -16,7 +16,7 @@ private:
 	void* owner;
 
 public:
-	virtual void initGlScnene() = 0;
+	virtual void initGlScnene(double w, double h, double fov) = 0;
 	virtual void updateSceneLgc() = 0;
 	virtual void updateGlScene() = 0;
 	virtual void disposeGlScene() = 0;

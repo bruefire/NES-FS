@@ -440,6 +440,9 @@ engine3dGL::engine3dGL()
 	, ptDel4d(0)
 	, qyMode(QY_MODE::HIGH)
 {
+	CR_RANGE_R = -1.0;
+	CR_RANGE_D = -1.0;
+
 	///Å• 3DÉXÉNÉäÅ[Éì
 	tObj.ctr.asg(0, 0, 0);
 	tObj.loc.asg(0, 5, 0);

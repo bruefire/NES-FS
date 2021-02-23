@@ -13,7 +13,7 @@ private:
 	engine3dWinOVR* owner;
 	double cmrStd[3];
 
-	void initGlScnene() override;
+	void initGlScnene(double w, double h, double fov) override;
 	void updateSceneLgc() override;
 	void updateGlScene() override;
 	void disposeGlScene() override;
