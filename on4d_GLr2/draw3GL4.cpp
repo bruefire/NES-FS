@@ -54,17 +54,17 @@ void engine3dGL::simulateS3GL()
 	glClear(GL_DEPTH_BUFFER_BIT); 
 	//glFlush(); 
 	//------------
-	glUseProgram(shader[3]);
-	GLint xID = glGetUniformLocation(shader[3], "WH_CR");
-	glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
 
-	//--
-	glUseProgram(shader[0]);
-	xID = glGetUniformLocation(shader[0], "WH_CR");
-	glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
-	glUseProgram(shader[4]);
-	xID = glGetUniformLocation(shader[0], "WH_CR");
-	glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
+	GLint xID;
+	int shIdx[3] = {0, 3, 4};
+	for (int i = 0; i < 3; i++)
+	{
+		glUseProgram(shader[shIdx[i]]);
+		xID = glGetUniformLocation(shader[shIdx[i]], "WH_CR");
+		glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
+		xID = glGetUniformLocation(shader[shIdx[i]], "cRange");
+		glUniform4f(xID, cRangeX, cRangeR, cRangeY, cRangeD);
+	}
 
 	//------------	
 
