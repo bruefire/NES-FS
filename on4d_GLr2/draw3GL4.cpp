@@ -23,6 +23,18 @@ void engine3dGL::simulateS3GL()
 	//=====カメラの範囲
 	double cRangeX = tan((LDBL)CR_RANGE_X/2 *PIE/180);	
 	double cRangeY = tan((LDBL)CR_RANGE_Y/2 *PIE/180);
+	double cRangeR;
+	double cRangeD;
+	if (CR_RANGE_R < 0)
+	{
+		cRangeR = cRangeX;
+		cRangeD = cRangeY;
+	}
+	else
+	{
+		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PIE / 180);
+		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PIE / 180);
+	}
 
 	
 	//-- 軌跡データ転送
@@ -57,7 +69,7 @@ void engine3dGL::simulateS3GL()
 	//------------	
 
 	/// Projection matrix : 45ｰ Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	glm::mat4 Projection = glm::perspective((float)CR_RANGE_Y, (float)(cRangeX / cRangeY), 0.00001f, 2.0f);
+	glm::mat4 Projection = GetPerspective(-cRangeX, cRangeR, cRangeY, -cRangeD);
 	glm::mat4 View       = glm::lookAt(
 								glm::vec3(0,0,0), // Camera location in World Space
 								glm::vec3(0,1,0), // direction of view
@@ -164,6 +176,22 @@ void engine3dGL::SimulateH3GL()
 	// クリック処理
 	ClickProc();
 
+}
+
+// 対称FOV
+glm::mat4 engine3dGL::GetPerspective(double cRangeX, double cRangeY)
+{
+	return glm::perspective((float)CR_RANGE_Y, (float)(cRangeX / cRangeY), 0.00001f, 2.0f);
+}
+
+// 非対称FOV
+glm::mat4 engine3dGL::GetPerspective(double leftTan, double rightTan, double topTan, double downTan)
+{
+	float zNear = 0.00001f;
+	float zFar = 2.0;
+
+	return glm::frustum((float)leftTan * zNear, (float)rightTan * zNear, 
+		(float)downTan * zNear, (float)topTan * zNear, zNear, zFar);
 }
 
 

@@ -13,9 +13,9 @@ private:
 	engine3dWinOVR* owner;
 	double cmrStd[3];
 
-	void initGlScnene(double w, double h, double fov) override;
+	void initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD) override;
 	void updateSceneLgc() override;
-	void updateGlScene() override;
+	void updateGlScene(Eye) override;
 	void disposeGlScene() override;
 	void SendPose(pt3 loc, pt3 std[2], double eyeDst) override;
 };

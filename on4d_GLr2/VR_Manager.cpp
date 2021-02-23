@@ -125,7 +125,10 @@ bool VR_Manager::MainLoop(bool retryCreate)
     initGlScnene(
         eyeRenderTexture[0]->texSize.w,
         eyeRenderTexture[0]->texSize.h, 
-        (hmdDesc.DefaultEyeFov[0].LeftTan + hmdDesc.DefaultEyeFov[0].RightTan) * 0.5);
+        hmdDesc.DefaultEyeFov[0].LeftTan,
+        hmdDesc.DefaultEyeFov[0].RightTan,
+        hmdDesc.DefaultEyeFov[0].UpTan,
+        hmdDesc.DefaultEyeFov[0].DownTan);
 
     // FloorLevel will give tracking poses where the floor height is 0
     ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
@@ -235,7 +238,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
             }
             // test
             vrLocDf = vrLocDf.mtp(55);
-            eyeDstHf *= 1;
+            eyeDstHf *= 14;
             // test
 
             // do main logical proccessing.
@@ -262,7 +265,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
                 // Render world
                 // Rendering Scene
                 SendPose(vrLocDf, vrStdDf, eyeDstHf * powi(-1, eye + 1));
-                updateGlScene();
+                updateGlScene(eye == 0 ? Eye::Left : Eye::Right);
 
                 //roomScene->Render(view, proj);
 

@@ -69,66 +69,66 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="geo.c">
-      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
-    </None>
-    <None Include="pixel.c">
-      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
-    </None>
-    <None Include="vartex.c">
-      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
-    </None>
-    <None Include="lineF.c">
-      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
-    </None>
-    <None Include="lineG.c">
-      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
-    </None>
-    <None Include="pxl.c">
-      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
-    </None>
-    <None Include="vtx3D.c">
-      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
-    </None>
-    <None Include="pxl3D.c">
-      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
-    </None>
-    <None Include="vtx0.c">
-      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
-    </None>
-    <None Include="lineG2.c">
-      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
-    </None>
-    <None Include="lineF2.c">
-      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
-    </None>
     <None Include="メモ.txt">
       <Filter>resource files</Filter>
     </None>
     <None Include="ClassDiagram1.cd" />
-    <None Include="pixel_low.c">
+    <None Include="shader/geo.c">
+      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
+    </None>
+    <None Include="shader/pixel.c">
+      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
+    </None>
+    <None Include="shader/vartex.c">
+      <Filter>resource files\GL部\GLSLシェーダ\S3</Filter>
+    </None>
+    <None Include="shader/h3pxl.c">
+      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="shader/h3pxlPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="shader/h3vtx.c">
+      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="shader/h3vtxPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    </None>
+    <None Include="shader/lineF.c">
+      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
+    </None>
+    <None Include="shader/lineF2.c">
+      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
+    </None>
+    <None Include="shader/lineG.c">
+      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
+    </None>
+    <None Include="shader/lineG2.c">
+      <Filter>resource files\GL部\GLSLシェーダ\line4</Filter>
+    </None>
+    <None Include="shader/pixel_low.c">
       <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
     </None>
-    <None Include="vartex_low.c">
+    <None Include="shader/vartex_low.c">
       <Filter>resource files\GL部\GLSLシェーダ\S3_low</Filter>
     </None>
-    <None Include="h3pxl.c">
-      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    <None Include="shader/vtx0.c">
+      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
     </None>
-    <None Include="h3vtx.c">
-      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    <None Include="shader/vtx3D.c">
+      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
     </None>
-    <None Include="h3vtxPt.c">
-      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    <None Include="shader/pxl.c">
+      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
     </None>
-    <None Include="h3pxlPt.c">
-      <Filter>resource files\GL部\GLSLシェーダ\H3</Filter>
+    <None Include="shader/pxl3D.c">
+      <Filter>resource files\GL部\GLSLシェーダ\pxl</Filter>
     </None>
-    <None Include="vtxLowPt.c">
-      <Filter>c++ source</Filter>
+    <None Include="shader/vtxLowPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ</Filter>
     </None>
-    <None Include="pxlLowPt.c">
-      <Filter>c++ source</Filter>
+    <None Include="shader/pxlLowPt.c">
+      <Filter>resource files\GL部\GLSLシェーダ</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -326,14 +326,12 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="pyInit.py">
-      <Filter>resource files</Filter>
-    </Text>
     <Text Include="objSetting.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
     </Text>
     <Text Include="pyUpd.py">
       <Filter>resource files</Filter>
     </Text>
+    <Text Include="shader/pyInit.py" />
   </ItemGroup>
 </Project>

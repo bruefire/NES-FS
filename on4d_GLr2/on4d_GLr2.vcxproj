@@ -24,19 +24,19 @@
     <ResourceCompile Include="chgPlayerLoc.rc">
       <FileType>Text</FileType>
     </ResourceCompile>
-    <None Include="geo.c" />
+    <None Include="shader/geo.c" />
     <ResourceCompile Include="editor.rc" />
     <ResourceCompile Include="howTo.rc" />
     <ResourceCompile Include="info.rc">
       <FileType>Text</FileType>
     </ResourceCompile>
-    <None Include="lineF.c" />
-    <None Include="lineF2.c" />
-    <None Include="lineG.c" />
-    <None Include="lineG2.c" />
-    <None Include="pixel.c" />
-    <None Include="pxl.c" />
-    <None Include="pxl3D.c" />
+    <None Include="shader/lineF.c" />
+    <None Include="shader/lineF2.c" />
+    <None Include="shader/lineG.c" />
+    <None Include="shader/lineG2.c" />
+    <None Include="shader/pixel.c" />
+    <None Include="shader/pxl.c" />
+    <None Include="shader/pxl3D.c" />
     <ResourceCompile Include="UI.rc">
       <FileType>Text</FileType>
     </ResourceCompile>
@@ -44,9 +44,9 @@
     <ResourceCompile Include="UI_EN.rc">
       <FileType>Text</FileType>
     </ResourceCompile>
-    <None Include="vartex.c" />
-    <None Include="vtx0.c" />
-    <None Include="vtx3D.c" />
+    <None Include="shader/vartex.c" />
+    <None Include="shader/vtx0.c" />
+    <None Include="shader/vtx3D.c" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp" />
@@ -63,29 +63,29 @@
     <ClCompile Include="NesEsVR.cpp" />
     <ClCompile Include="PyInteract.cpp" />
     <ClCompile Include="VR_Manager.cpp" />
-    <None Include="vtxLowPt.c">
+    <None Include="shader/vtxLowPt.c">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="pixel_low.c">
+    <None Include="shader/pixel_low.c">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="h3vtx.c">
+    <None Include="shader/h3vtx.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>CppCode</FileType>
     </None>
-    <None Include="h3pxl.c">
+    <None Include="shader/h3pxl.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>CppCode</FileType>
     </None>
     <ClCompile Include="operation.cpp" />
     <ClCompile Include="player.cpp" />
-    <None Include="pxlLowPt.c">
+    <None Include="shader/pxlLowPt.c">
       <FileType>CppCode</FileType>
     </None>
     <ClCompile Include="rcFunc.cpp" />
     <ClCompile Include="objs.cpp" />
     <ClCompile Include="shader.cpp" />
-    <None Include="vartex_low.c">
+    <None Include="shader/vartex_low.c">
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>
@@ -128,13 +128,13 @@
   <ItemGroup>
     <ResourceCompile Include="Popup.rc" />
     <ResourceCompile Include="objSetting.rc" />
-    <None Include="h3pxlPt.c">
+    <None Include="shader/h3pxlPt.c">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="h3vtxPt.c">
+    <None Include="shader/h3vtxPt.c">
       <FileType>CppCode</FileType>
     </None>
-    <Text Include="pyInit.py">
+    <Text Include="shader/pyInit.py">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Text>
     <Text Include="objSetting.h" />

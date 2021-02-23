@@ -16,9 +16,14 @@ private:
 	void* owner;
 
 public:
-	virtual void initGlScnene(double w, double h, double fov) = 0;
+	enum class Eye
+	{
+		Left,
+		Right
+	};
+	virtual void initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD) = 0;
 	virtual void updateSceneLgc() = 0;
-	virtual void updateGlScene() = 0;
+	virtual void updateGlScene(Eye) = 0;
 	virtual void disposeGlScene() = 0;
 	virtual void SendPose(pt3 loc, pt3 std[2], double eyeDst) = 0;
 

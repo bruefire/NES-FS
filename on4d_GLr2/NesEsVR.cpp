@@ -1,3 +1,4 @@
+#include <math.h>
 #include "NesEsVR.h"
 #include "engine3dWinOVR.h"
 using WorldGeo = engine3d::WorldGeo;
@@ -9,14 +10,16 @@ NesEsVR::NesEsVR(engine3dWinOVR* owner)
 	this->owner = owner;
 }
 
-void NesEsVR::initGlScnene(double w, double h, double fovX)
+void NesEsVR::initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD)
 {
 	owner->GL_InitScene();
 	glCullFace(GL_FRONT);
 	owner->WIDTH = w;
 	owner->HEIGHT = h;
-	owner->CR_RANGE_X = atan(fovX) * 2 / PIE * 180;
-	owner->CR_RANGE_Y = owner->clcRangeY(owner->CR_RANGE_X);
+	owner->CR_RANGE_X = atan(fovL) * 2 / PIE * 180;
+	owner->CR_RANGE_R = atan(fovR) * 2 / PIE * 180;
+	owner->CR_RANGE_Y = atan(fovT) * 2 / PIE * 180;
+	owner->CR_RANGE_D = atan(fovD) * 2 / PIE * 180;
 
 	//-- メッシュ転送
 	for (int i = 0; i < owner->meshLen; i++)
@@ -38,8 +41,22 @@ void NesEsVR::updateSceneLgc()
 
 }
 
-void NesEsVR::updateGlScene()
+void NesEsVR::updateGlScene(Eye eye)
 {
+	double rMax = fmax(owner->CR_RANGE_X, owner->CR_RANGE_R);
+	double rMin = fmin(owner->CR_RANGE_X, owner->CR_RANGE_R);
+
+	if (eye == Eye::Left)
+	{
+		owner->CR_RANGE_X = rMax;
+		owner->CR_RANGE_R = rMin;
+	}
+	else
+	{
+		owner->CR_RANGE_X = rMin;
+		owner->CR_RANGE_R = rMax;
+	}
+
 	if (owner->worldGeo == WorldGeo::SPHERICAL)
 	{
 		// 相対位置計算
