@@ -197,10 +197,13 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
             ovrQuatf eyeRot = EyeRenderPose[repnEye].Orientation;
             pt4 eyeQ = pt4(eyeRot.w, eyeRot.x, eyeRot.y, eyeRot.z);
-            vrStd[0] = pt3(0, 0, 1);
+            vrStd[0] = pt3(0, 0, -1);
             vrStd[1] = pt3(0, 1, 0);
             for (int s = 0; s < 2; s++)
+            {
                 vrStd[s] = eyeQ.qtrMtp(vrStd[s]);
+                vrStd[s].z *= -1;
+            }
             
             pt3 vrLocDf;
             pt3 vrStdDf[2];
@@ -208,17 +211,46 @@ bool VR_Manager::MainLoop(bool retryCreate)
             {
                 vrLocDf = vrLoc.mns(preVrLoc);
                 //test
-                pt3 tvrStd[2] = { vrStd[0], vrStd[1] };
-                tvrStd[0].x *= -1;
-                tvrStd[0].y *= -1;
-                tvrStd[1].x *= -1;
-                tvrStd[1].y *= -1;
-                tvrStd[1] = tvrStd[1].mtp(-1);
-                pt3 tvrCross = pt3::cross(tvrStd[1], tvrStd[0]);
+                pt3 tvrCross = pt3::cross(vrStd[1], vrStd[0]);
                 vrLocDf = pt3(
                     pt3::dot(tvrCross, vrLocDf),
-                    pt3::dot(tvrStd[1], vrLocDf),
-                    pt3::dot(tvrStd[0], vrLocDf));
+                    pt3::dot(vrStd[1], vrLocDf),
+                    pt3::dot(vrStd[0], vrLocDf));
+                //
+                auto GetRelativeVec = [](pt3* baseVec, pt3 trgVec)
+                {
+                    pt3 baseCross = pt3::cross(baseVec[1], baseVec[0]);
+                    return pt3(
+                        pt3::dot(baseCross, trgVec),
+                        pt3::dot(baseVec[1], trgVec),
+                        pt3::dot(baseVec[0], trgVec));
+                };
+                auto GetStdFromQuat = [](pt4 quatPt, pt3* vrStd)
+                {
+                    vrStd[0] = pt3(0, 0, -1);
+                    vrStd[1] = pt3(0, 1, 0);
+
+                    for (int s = 0; s < 2; s++)
+                    {
+                        vrStd[s] = quatPt.qtrMtp(vrStd[s]);
+                        vrStd[s].z *= -1;
+                    }
+                };
+                ovrPoseStatef devPoseEx[2];
+                ovrTrackedDeviceType devType[2] = {
+                    ovrTrackedDeviceType::ovrTrackedDevice_LTouch,
+                    ovrTrackedDeviceType::ovrTrackedDevice_RTouch };
+                ovr_GetDevicePoses(session, devType, 2, 0, devPoseEx);
+                ovrVector3f eyeLoc = devPoseEx[0].ThePose.Position;
+                pt3 devLoc = pt3(eyeLoc.x, eyeLoc.y, -eyeLoc.z);
+                pt3 devLocDf = devLoc.mns(vrLoc);
+                devLocDf = GetRelativeVec(vrStd, devLocDf);
+                ovrQuatf devRot = devPoseEx[0].ThePose.Orientation;
+                pt4 devQ = pt4(devRot.w, devRot.x, devRot.y, devRot.z);
+                pt3 devStd[2];
+                GetStdFromQuat(devQ, devStd);
+                for(int i = 0; i < 2; i++)
+                    devStd[i] = GetRelativeVec(vrStd, devStd[i]);
                 //test
                 pt3 preCross = pt3::cross(preVrStd[1], preVrStd[0]);
 

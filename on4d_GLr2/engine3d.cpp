@@ -803,11 +803,6 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 
 
 	double rotOn[3];
-	ope.VRStd[0].x *= -1;
-	ope.VRStd[0].y *= -1;
-	ope.VRStd[1].x *= -1;
-	ope.VRStd[1].y *= -1;
-	ope.VRStd[1] = ope.VRStd[1].mtp(-1);
 	curObj->clcStd(ope.VRStd[0], ope.VRStd[1], rotOn);
 	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
 	{

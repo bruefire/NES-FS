@@ -72,6 +72,7 @@ void engine3dGL::GL_InitScene()
 		}
 		else
 		{
+			// VR未対応シェーダー
 			shader[0] = LoadShaders2("vartex.c", "geo.c", "pixel.c", 0);
 			shader[3] = LoadShaders2("vartex.c", "lineG.c", "lineF.c", 1);
 		}
