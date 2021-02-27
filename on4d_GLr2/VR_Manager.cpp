@@ -161,10 +161,10 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
             // Keyboard inputs to adjust player position
             static Vector3f Pos2(0.0f, 0.0f, -5.0f);
-            if (Platform.Key['W'] || Platform.Key[VK_UP])     Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(0, 0, -0.05f));
-            if (Platform.Key['S'] || Platform.Key[VK_DOWN])   Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(0, 0, +0.05f));
-            if (Platform.Key['D'])                            Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(+0.05f, 0, 0));
-            if (Platform.Key['A'])                            Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(-0.05f, 0, 0));
+            //if (Platform.Key['W'] || Platform.Key[VK_UP])     Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(0, 0, -0.05f));
+            ovrInputState inputState;
+            ovr_GetInputState(session, ovrControllerType::ovrControllerType_RTouch, &inputState);
+            //inputState.HandTriggerRaw[2];
 
             // Animate the cube
             static float cubeClock = 0;
@@ -198,13 +198,18 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
             ovrQuatf eyeRot = EyeRenderPose[repnEye].Orientation;
             pt4 eyeQ = pt4(eyeRot.w, eyeRot.x, eyeRot.y, eyeRot.z);
-            vrStd[0] = pt3(0, 0, -1);
-            vrStd[1] = pt3(0, 1, 0);
-            for (int s = 0; s < 2; s++)
+            auto GetStdFromQuat = [](pt4 quatPt, pt3* vrStd)
             {
-                vrStd[s] = eyeQ.qtrMtp(vrStd[s]);
-                vrStd[s].z *= -1;
-            }
+                vrStd[0] = pt3(0, 0, -1);
+                vrStd[1] = pt3(0, 1, 0);
+
+                for (int s = 0; s < 2; s++)
+                {
+                    vrStd[s] = quatPt.qtrMtp(vrStd[s]);
+                    vrStd[s].z *= -1;
+                }
+            };
+            GetStdFromQuat(eyeQ, vrStd);
             
             pt3 vrLocDf;
             pt3 vrStdDf[2];
@@ -225,17 +230,6 @@ bool VR_Manager::MainLoop(bool retryCreate)
                         pt3::dot(baseCross, trgVec),
                         pt3::dot(baseVec[1], trgVec),
                         pt3::dot(baseVec[0], trgVec));
-                };
-                auto GetStdFromQuat = [](pt4 quatPt, pt3* vrStd)
-                {
-                    vrStd[0] = pt3(0, 0, -1);
-                    vrStd[1] = pt3(0, 1, 0);
-
-                    for (int s = 0; s < 2; s++)
-                    {
-                        vrStd[s] = quatPt.qtrMtp(vrStd[s]);
-                        vrStd[s].z *= -1;
-                    }
                 };
                 ovrPoseStatef devPoseEx[2];
                 ovrTrackedDeviceType devType[2] = {

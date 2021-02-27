@@ -198,7 +198,7 @@ glm::mat4 engine3dGL::GetPerspective(double leftTan, double rightTan, double top
 int engine3dGL::DrawEachObjsS3(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
-	for (int h = -3; h < objCnt; h++)
+	for (int h = -4; h < objCnt; h++)
 	{
 		object3d* curObj = GetObject(h);
 

@@ -806,6 +806,8 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 	pt4 std2N = std2.mns(normO).mtp(SIN_1R);
 	pt4 sideN = pt4::cross(normN, std1N, std2N);	// (長さは1.0)
 
+	// for objects except the head.
+	pt3 std1NDf, std2NDf;
 
 	double rotOn[3];
 	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
@@ -850,11 +852,32 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 			.pls(std2N.mtp(-1 * s2xy_xL));
 		pt4 s2xy2 = s2xyS.mtp(tmpRt.x);
 
-		std1N = s1x.pls(s1y).pls(s1z).norm();
-		std2N = s2xy1.pls(s2xy2).pls(s2z).norm();
-		sideN = pt4::cross(normN, std1N, std2N);
-	}
 
+		// set result
+		pt4 newStd1N = s1x.pls(s1y).pls(s1z).norm();
+		pt4 newStd2N = s2xy1.pls(s2xy2).pls(s2z).norm();
+		pt4 newSideN = pt4::cross(normN, std1N, std2N);
+		if (cmrStd == nullptr)
+		{
+			std1NDf = pt3(
+				pt4::dot(sideN, newStd1N),
+				pt4::dot(std2N, newStd1N), 
+				pt4::dot(std1N, newStd1N));
+			std2NDf = pt3(
+				pt4::dot(sideN, newStd2N),
+				pt4::dot(std2N, newStd2N),
+				pt4::dot(std1N, newStd2N));
+		}
+		else
+		{
+			std1N = newStd1N;
+			std2N = newStd2N;
+			sideN = newSideN;
+			std1NDf = pt3(0, 0, 1);
+			std2NDf = pt3(0, 1, 0);
+		}
+	}
+	curObj->rot = pt3();
 
 	///-------- 位置,基準位置の更新 ----------
 	pt4 cmLc = pt4(0, devOpe.loc.x, devOpe.loc.y, devOpe.loc.z);
@@ -896,6 +919,25 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 		std2 = std2e
 			.pls(normN.mtp(tmpRt.y))
 			.pls(lspXN.mtp(tmpRt.x));
+
+		//
+		normN = locE;
+		normO = normN.mtp(COS_1);
+		std1N = std1.mns(normO).mtp(SIN_1R);
+		std2N = std2.mns(normO).mtp(SIN_1R);
+		sideN = pt4::cross(normN, std1N, std2N);
+		std1 = pt4()
+			.pls(std1N.mtp(std1NDf.z))
+			.pls(std2N.mtp(std1NDf.y))
+			.pls(sideN.mtp(std1NDf.x))
+			.mtp(SIN_1)
+			.pls(normO);
+		std2 = pt4()
+			.pls(std1N.mtp(std2NDf.z))
+			.pls(std2N.mtp(std2NDf.y))
+			.pls(sideN.mtp(std2NDf.x))
+			.mtp(SIN_1)
+			.pls(normO);
 	}
 
 	///-- 位置,基準位置を上書き (end
@@ -943,14 +985,15 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 void engine3d::UpdVRObjectsS3(double* cmrStd)
 {
 	// HMD
-	ClcVRObjectPosS3(ope.vrDev[0], &objs[PLR_No], cmrStd);
+	object3d* plrObj = &objs[PLR_No];
+	ClcVRObjectPosS3(ope.vrDev[0], plrObj, cmrStd);
 
 	// hands
 	for (int i = 0; i < 2; i++)
 	{
-		vrHand[i].loc = objs[PLR_No].loc;
-		vrHand[i].std[0] = objs[PLR_No].std[0];
-		vrHand[i].std[1] = objs[PLR_No].std[1];
+		vrHand[i].loc = plrObj->loc;
+		vrHand[i].std[0] = plrObj->std[0];
+		vrHand[i].std[1] = plrObj->std[1];
 	}
 	ClcVRObjectPosS3(ope.vrDev[1], &vrHand[0], nullptr);
 	ClcVRObjectPosS3(ope.vrDev[2], &vrHand[1], nullptr);
@@ -961,7 +1004,7 @@ void engine3d::UpdVRObjectsS3(double* cmrStd)
 // 相対位置計算
 void engine3d::ClcRelaivePosS3(double* cmrStd)
 {
-	for (int h = -3; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
+	for (int h = -4; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
 
 		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;
@@ -1111,6 +1154,8 @@ object3d* engine3d::GetObject(int idx)
 {
 	switch (idx)
 	{
+	case -4:
+		return &vrHand[0];
 	case -3:
 		return &vrHand[1];
 	case -2:
