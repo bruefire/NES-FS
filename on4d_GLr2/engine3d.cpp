@@ -55,9 +55,12 @@ engine3d::engine3d()
 	, H3_REF_RADIUS(0.999999) // 双曲長で約??.?	//=0.999 約7.7
 	, h3objLoop(true)
 	, viewTrackIdx(-1)
+	, vrFlag(false)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
+	vrHand[0].owner = this;
+	vrHand[1].owner = this;
 
 	// 瞬間移動
 	mvObjFlg = false;
@@ -80,7 +83,7 @@ int engine3d::init()
 	PLR_No = BWH_QTY;	
 
 	// メッシュ定義
-	meshLen = 22;
+	meshLen = 23;
 	meshNames = new char*[meshLen];
 	meshNames[0] = "wLines", 
 	meshNames[1] = "player", 
@@ -105,6 +108,7 @@ int engine3d::init()
 	meshNames[19] = "mapElm3";
 	meshNames[20] = "mapElm4";
 	meshNames[21] = "plane";
+	meshNames[22] = "hand";
 
 	///-- 雛形メッシュ
 	allocMesh();
@@ -784,10 +788,11 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	//cmData.rot.asg(curObj->rot.x * rtCoe, curObj->rot.y * rtCoe, curObj->rot.z * rtCoe);
 }
 
-// プレイヤーオブジェクト更新
-void engine3d::ClcVRPlayerPosS3(double* cmrStd)
+// VRオブジェクト更新
+void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd)
 {
-	object3d* curObj = &objs[PLR_No];
+	if (devOpe.std[0].isZero())
+		return;
 
 	//----
 	pt4 locE = curObj->tudeToEuc(curObj->loc);
@@ -803,7 +808,7 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 
 
 	double rotOn[3];
-	curObj->clcStd(ope.VRStd[0], ope.VRStd[1], rotOn);
+	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
 	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
 	{
 		pt4 tmp;
@@ -847,11 +852,12 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 
 		std1N = s1x.pls(s1y).pls(s1z).norm();
 		std2N = s2xy1.pls(s2xy2).pls(s2z).norm();
+		sideN = pt4::cross(normN, std1N, std2N);
 	}
 
 
 	///-------- 位置,基準位置の更新 ----------
-	pt4 cmLc = pt4(0, ope.VRLoc.x, ope.VRLoc.y, ope.VRLoc.z);
+	pt4 cmLc = pt4(0, devOpe.loc.x, devOpe.loc.y, devOpe.loc.z);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
 
 	std1 = std1N.mtp(SIN_1).pls(normO);
@@ -897,6 +903,10 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 	curObj->std[0] = curObj->eucToTude(std1);
 	curObj->std[1] = curObj->eucToTude(std2);
 
+	// HMD以外の場合は終了
+	if (cmrStd == nullptr)
+		return;
+
 	///----------- 更新後のカメラ基準の測定 -------------
 	///-- 緯度,経度,深度を0に
 	all_tudeRst(&std1, curObj->loc, 0);// 基準1
@@ -930,13 +940,30 @@ void engine3d::ClcVRPlayerPosS3(double* cmrStd)
 }
 
 
+void engine3d::UpdVRObjectsS3(double* cmrStd)
+{
+	// HMD
+	ClcVRObjectPosS3(ope.vrDev[0], &objs[PLR_No], cmrStd);
+
+	// hands
+	for (int i = 0; i < 2; i++)
+	{
+		vrHand[i].loc = objs[PLR_No].loc;
+		vrHand[i].std[0] = objs[PLR_No].std[0];
+		vrHand[i].std[1] = objs[PLR_No].std[1];
+	}
+	ClcVRObjectPosS3(ope.vrDev[1], &vrHand[0], nullptr);
+	ClcVRObjectPosS3(ope.vrDev[2], &vrHand[1], nullptr);
+
+}
+
+
 // 相対位置計算
 void engine3d::ClcRelaivePosS3(double* cmrStd)
 {
-	for (int h = -2; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
+	for (int h = -3; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
 
-		object3d* curObj;
-		if (h == -2) curObj = &markObj; else if (h == -1) curObj = &sun; else curObj = objs + h;
+		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;
 		pt3 drawLoc;
 
@@ -967,7 +994,7 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 			tudeRst(&std2.x, &std2.z, PIE, 1);
 		}
 		// VR
-		if (!ope.VRStd[0].isZero())
+		if (!ope.vrDev[0].std[0].isZero())
 		{
 			tudeRst(&locT.x, &locT.w, ope.VREysDst / radius, 0);
 			tudeRst(&std1.x, &std1.w, ope.VREysDst / radius, 0);
@@ -1079,10 +1106,22 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 	}
 }
 
-void engine3d::ReflectVRPoseS3()
-{
 
+object3d* engine3d::GetObject(int idx)
+{
+	switch (idx)
+	{
+	case -3:
+		return &vrHand[1];
+	case -2:
+		return &markObj;
+	case -1:
+		return &sun;
+	default:
+		return objs + idx;
+	}
 }
+
 
 // 現プレイヤー座標計算
 void engine3d::ClcCoordinate()
@@ -1234,6 +1273,16 @@ int engine3d::InitS3()	// 球面世界用初期化
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
 
+	// VR hand
+	if (vrFlag)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			vrHand[i].draw = 2;
+			vrHand[i].objInitS3(meshs + 22);
+			vrHand[i].used = true;
+		}
+	}
 
 
 	//-- 最初に全オブジェクトを用意

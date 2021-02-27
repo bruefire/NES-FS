@@ -35,9 +35,8 @@ void NesEsVR::updateSceneLgc()
 	owner->engine3d::UpdFloatObjsS3();
 	owner->PrepareInParamForNext();
 
-	// VR HMD‚ÌˆÚ“®
-	if (!owner->ope.VRStd[0].isZero())
-		owner->ClcVRPlayerPosS3(cmrStd);
+	// VR HMD, hand‚ÌˆÚ“®
+	owner->UpdVRObjectsS3(cmrStd);
 
 }
 
@@ -71,10 +70,10 @@ void NesEsVR::disposeGlScene()
 	owner->GL_DisposeScene();
 }
 
-void NesEsVR::SendPose(pt3 loc, pt3 std[2], double eyeDst)
+void NesEsVR::SendPose(VRDeviceOperation ope[3], double eyeDst)
 {
-	owner->ope.VRLoc = loc;
-	owner->ope.VRStd[0] = std[0];
-	owner->ope.VRStd[1] = std[1];
+	for (int i = 0; i < 3; i++)
+		owner->ope.vrDev[i] = ope[i];
+
 	owner->ope.VREysDst = eyeDst;
 }

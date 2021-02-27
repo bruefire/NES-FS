@@ -5,6 +5,7 @@
 engine3dWinOVR::engine3dWinOVR()
 	: vrm(this)
 {
+	vrFlag = true;
 }
 
 int engine3dWinOVR::init(void** params, HWND(*initStdWndFunc)(HINSTANCE hCurInst, int nCmdShow), bool(*loopFunc)(MSG*))

@@ -89,6 +89,9 @@ public:
 	object3d markObj;	//軌跡s
 	mesh3d markMesh;	//軌跡s
 
+	bool vrFlag;
+	object3d vrHand[2];	// hand for VR
+
 	Player player;	//--プレイヤー
 
 	double SPEED_MAX;
@@ -120,9 +123,10 @@ public:
 	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
-	void ClcVRPlayerPosS3(double* cmrStd);
-	void ReflectVRPoseS3();
+	void ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd);
+	void UpdVRObjectsS3(double* cmrSts);
 	void ClcCoordinate();
+	object3d* GetObject(int idx);
 	int physics();
 	bool CheckSelectedEnable(int idx = -1);
 	bool CheckTrackedEnable();

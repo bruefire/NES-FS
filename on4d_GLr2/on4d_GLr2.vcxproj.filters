@@ -186,9 +186,6 @@
     <ClCompile Include="NesEsVR.cpp">
       <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
     </ClCompile>
-    <ClCompile Include="GlScene.cpp">
-      <Filter>c++ source\GL部</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -283,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="GlScene.h">
       <Filter>c++ header\GL部</Filter>
+    </ClInclude>
+    <ClInclude Include="VRDeviceOperation.h">
+      <Filter>c++ source\core演算部</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

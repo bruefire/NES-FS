@@ -7,6 +7,7 @@
 #pragma comment(lib, "dxgi.lib")
 #endif
 #include "point.h"
+#include "VRDeviceOperation.h"
 
 
 class VR_Manager
@@ -25,7 +26,7 @@ public:
 	virtual void updateSceneLgc() = 0;
 	virtual void updateGlScene(Eye) = 0;
 	virtual void disposeGlScene() = 0;
-	virtual void SendPose(pt3 loc, pt3 std[2], double eyeDst) = 0;
+	virtual void SendPose(VRDeviceOperation dev[3], double eyeDst) = 0;
 
 	VR_Manager();
 	~VR_Manager();

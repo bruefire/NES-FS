@@ -17,6 +17,6 @@ private:
 	void updateSceneLgc() override;
 	void updateGlScene(Eye) override;
 	void disposeGlScene() override;
-	void SendPose(pt3 loc, pt3 std[2], double eyeDst) override;
+	void SendPose(VRDeviceOperation dev[3], double eyeDst) override;
 };
 

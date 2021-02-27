@@ -2,6 +2,7 @@
 #pragma once
 
 #include "point.h"
+#include "VRDeviceOperation.h"
 
 
 class Operation
@@ -12,8 +13,8 @@ public:
 	pt3 cmRot;
 	bool cmBack;
 	int speed;
-	pt3 VRLoc;	// loc‚©‚ç‚Ì‘Š‘ÎˆÊ’u (VR)
-	pt3 VRStd[2];	// std‚É‘Î‚·‚é‘Š‘Îstd (VR)
+
+	VRDeviceOperation vrDev[3];		// 0: HMD, 1: left hand, 2: right hand
 	double VREysDst;
 
 	int chgMapStateOld;

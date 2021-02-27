@@ -138,6 +138,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
     pt3 preVrStd[2] = { pt3(0, 0, 0), pt3(0, 0, 0) };
     pt3 vrLoc;
     pt3 vrStd[2];
+    VRDeviceOperation opeResult[3];
     while (Platform.HandleMessages())
     {
         ovrSessionStatus sessionStatus;
@@ -241,16 +242,23 @@ bool VR_Manager::MainLoop(bool retryCreate)
                     ovrTrackedDeviceType::ovrTrackedDevice_LTouch,
                     ovrTrackedDeviceType::ovrTrackedDevice_RTouch };
                 ovr_GetDevicePoses(session, devType, 2, 0, devPoseEx);
-                ovrVector3f eyeLoc = devPoseEx[0].ThePose.Position;
-                pt3 devLoc = pt3(eyeLoc.x, eyeLoc.y, -eyeLoc.z);
-                pt3 devLocDf = devLoc.mns(vrLoc);
-                devLocDf = GetRelativeVec(vrStd, devLocDf);
-                ovrQuatf devRot = devPoseEx[0].ThePose.Orientation;
-                pt4 devQ = pt4(devRot.w, devRot.x, devRot.y, devRot.z);
-                pt3 devStd[2];
-                GetStdFromQuat(devQ, devStd);
-                for(int i = 0; i < 2; i++)
-                    devStd[i] = GetRelativeVec(vrStd, devStd[i]);
+                for (int h = 0; h < 2; h++)
+                {
+                    ovrVector3f eyeLoc = devPoseEx[h].ThePose.Position;
+                    pt3 devLoc = pt3(eyeLoc.x, eyeLoc.y, -eyeLoc.z);
+                    pt3 devLocDf = devLoc.mns(vrLoc);
+                    devLocDf = GetRelativeVec(vrStd, devLocDf);
+                    ovrQuatf devRot = devPoseEx[h].ThePose.Orientation;
+                    pt4 devQ = pt4(devRot.w, devRot.x, devRot.y, devRot.z);
+                    pt3 devStd[2];
+                    pt3 devStdDf[2];
+                    GetStdFromQuat(devQ, devStd);
+                    for (int i = 0; i < 2; i++)
+                        devStdDf[i] = GetRelativeVec(vrStd, devStd[i]);
+
+                    opeResult[h + 1] = VRDeviceOperation(devLocDf, devStdDf[0], devStdDf[1]);
+                }
+
                 //test
                 pt3 preCross = pt3::cross(preVrStd[1], preVrStd[0]);
 
@@ -269,12 +277,15 @@ bool VR_Manager::MainLoop(bool retryCreate)
                 vrStdDf[1] = pt3();
             }
             // test
-            vrLocDf = vrLocDf.mtp(55);
+            opeResult[0] = VRDeviceOperation(vrLocDf, vrStdDf[0], vrStdDf[1]);
+
+            for (int i = 0; i < 3; i++)
+                opeResult[i].loc = opeResult[i].loc.mtp(55);
             eyeDstHf *= 14;
             // test
 
             // do main logical proccessing.
-            SendPose(vrLocDf, vrStdDf, 0);
+            SendPose(opeResult, 0);
             updateSceneLgc();
 
             // Render Scene to Eye Buffers
@@ -296,7 +307,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
                 // Render world
                 // Rendering Scene
-                SendPose(vrLocDf, vrStdDf, eyeDstHf * powi(-1, eye + 1));
+                SendPose(opeResult, eyeDstHf * powi(-1, eye + 1));
                 updateGlScene(eye == 0 ? Eye::Left : Eye::Right);
 
                 //roomScene->Render(view, proj);

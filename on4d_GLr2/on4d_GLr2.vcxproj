@@ -58,7 +58,6 @@
     <ClCompile Include="engine3dWin.cpp" />
     <ClCompile Include="engine3dWinOVR.cpp" />
     <ClCompile Include="functions.cpp" />
-    <ClCompile Include="GlScene.cpp" />
     <ClCompile Include="GL_Func.cpp" />
     <ClCompile Include="NesEsVR.cpp" />
     <ClCompile Include="PyInteract.cpp" />
@@ -119,6 +118,7 @@
     <ClInclude Include="S3ErrorManager.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="UI_DEF.h" />
+    <ClInclude Include="VRDeviceOperation.h" />
     <ClInclude Include="VR_Manager.h" />
     <ClInclude Include="NesEsVR.h" />
   </ItemGroup>

@@ -13,9 +13,6 @@ Operation::Operation()
 {
 	cmLoc = pt3(0, 0, 0);
 	cmRot = pt3(0, 0, 0);
-	VRLoc = pt3(0, 0, 0);
-	VRStd[0] = pt3(0, 0, 0);
-	VRStd[1] = pt3(0, 0, 0);
 }
 
 int Operation::updRotationParam(double x, double y, int opt)
@@ -40,3 +37,4 @@ void Operation::ClearLocRotParam()
 	cmLoc = pt3(0, 0, 0);
 	cmRot = pt3(0, 0, 0);
 }
+

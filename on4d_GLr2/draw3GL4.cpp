@@ -198,11 +198,9 @@ glm::mat4 engine3dGL::GetPerspective(double leftTan, double rightTan, double top
 int engine3dGL::DrawEachObjsS3(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
-	for (int h = -2; h < objCnt; h++)
+	for (int h = -3; h < objCnt; h++)
 	{
-
-		object3d* curObj;
-		if (h == -2) curObj = &markObj; else if (h == -1) curObj = &sun; else curObj = objs + h;
+		object3d* curObj = GetObject(h);
 
 		if (!curObj->used) continue;
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
