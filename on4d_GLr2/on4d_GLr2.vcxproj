@@ -121,6 +121,7 @@
     <ClInclude Include="VRDeviceOperation.h" />
     <ClInclude Include="VR_Manager.h" />
     <ClInclude Include="NesEsVR.h" />
+    <ClInclude Include="MyWin32_GLAppUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico" />
@@ -203,6 +204,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

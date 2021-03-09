@@ -162,9 +162,17 @@ bool VR_Manager::MainLoop(bool retryCreate)
             // Keyboard inputs to adjust player position
             static Vector3f Pos2(0.0f, 0.0f, -5.0f);
             //if (Platform.Key['W'] || Platform.Key[VK_UP])     Pos2 += Matrix4f::RotationY(Yaw).Transform(Vector3f(0, 0, -0.05f));
+            
             ovrInputState inputState;
-            ovr_GetInputState(session, ovrControllerType::ovrControllerType_RTouch, &inputState);
-            //inputState.HandTriggerRaw[2];
+            ovrControllerType inputType[2] = {
+                ovrControllerType::ovrControllerType_LTouch,
+                ovrControllerType::ovrControllerType_RTouch
+            };
+            for (int i = 0; i < 2; i++)
+            {
+                ovr_GetInputState(session, inputType[i], &inputState);
+                DeviceInputProcedure(inputState, inputType[i]);
+            }
 
             // Animate the cube
             static float cubeClock = 0;
@@ -408,3 +416,4 @@ ovrGraphicsLuid VR_Manager::GetDefaultAdapterLuid()
 
     return luid;
 }
+

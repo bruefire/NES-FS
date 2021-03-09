@@ -17,6 +17,7 @@ private:
 	void updateSceneLgc() override;
 	void updateGlScene(Eye) override;
 	void disposeGlScene() override;
+	void DeviceInputProcedure(ovrInputState, ovrControllerType) override;
 	void SendPose(VRDeviceOperation dev[3], double eyeDst) override;
 };
 

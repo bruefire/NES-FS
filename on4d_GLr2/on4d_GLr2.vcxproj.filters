@@ -284,6 +284,9 @@
     <ClInclude Include="VRDeviceOperation.h">
       <Filter>c++ source\core演算部</Filter>
     </ClInclude>
+    <ClInclude Include="MyWin32_GLAppUtil.h">
+      <Filter>c++ header\OVR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UI_EN.rc">

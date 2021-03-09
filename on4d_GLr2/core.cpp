@@ -84,6 +84,12 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			newEngine->lang = UI_LANG_JA;
 			newEngine->worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}
+		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA;view:VR")
+		{
+			newEngine = new engine3dWinOVR();
+			newEngine->lang = UI_LANG_JA;
+			newEngine->worldGeo = engine3d::WorldGeo::HYPERBOLIC;
+		}
 		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA")
 		{
 			menuName = "KITTY_H3";

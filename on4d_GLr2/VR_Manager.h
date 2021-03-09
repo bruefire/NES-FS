@@ -35,6 +35,8 @@ public:
 	void Start();
 	void Dispose();
 	bool MainLoop(bool retryCreate);
+	virtual void DeviceInputProcedure(ovrInputState, ovrControllerType) = 0;
+
 	static ovrGraphicsLuid VR_Manager::GetDefaultAdapterLuid();
 	static int Compare(const ovrGraphicsLuid& lhs, const ovrGraphicsLuid& rhs);
 };
