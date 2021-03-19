@@ -60,6 +60,11 @@ GuiContainer::GuiContainer()
 	type = GuiType::CONTAINER;
 }
 
+GuiItem* GuiContainer::SelectedChild()
+{
+	return childs[selectedIdx];
+}
+
 GuiString::GuiString()
 {
 	type = GuiType::STRING;
@@ -259,6 +264,7 @@ int mesh3dGL::transBuffers(uint32_t* buffers, uint32_t* texNames)
 
 	// テクスチャ転送
 	if (!texJD) return 0;
+	if (texName.empty()) return 0;
 
 
 	glBindTexture(GL_TEXTURE_2D, texNames[texNo]);
@@ -286,25 +292,25 @@ int mesh3dGL::transBuffers(uint32_t* buffers, uint32_t* texNames)
 }
 
 
-void engine3dGL::MakeCommonVBO(int i)
+void engine3dGL::MakeCommonVBO(mesh3dGL* mesh)
 {
-	if (meshs[i].pts != nullptr)
+	if (mesh->pts != nullptr)
 	{
 		switch (qyMode)
 		{
 		case QY_MODE::HIGH:
-			((mesh3dGL*)&meshs[i])->makeDataForGL();
+			(mesh)->makeDataForGL();
 			break;
 
 		case QY_MODE::LOW:
-			if (meshs[i].coorType == mesh3d::COOR::Cartesian)
-				((mesh3dGL*)&meshs[i])->makeDataForGL();
+			if (mesh->coorType == mesh3d::COOR::Cartesian)
+				(mesh)->makeDataForGL();
 			else
-				((mesh3dGL*)&meshs[i])->makeDataForGL_LQY(this);
+				(mesh)->makeDataForGL_LQY(this);
 			break;
 		}
 
-		((mesh3dGL*)&meshs[i])->transBuffers(buffers, texNames);
+		(mesh)->transBuffers(buffers, texNames);
 	}
 
 }
@@ -327,8 +333,8 @@ int engine3dGL::init()
 	}
 
 
-	// フォント
-	MakeCharVBO();
+	// フォント GUI VBO
+	InitGUI();
 
 	// マップ
 	tObj.mesh = &tMesh;
@@ -336,11 +342,10 @@ int engine3dGL::init()
 	pols[0].polyInit(3);
 	pol_pLen = pols[0].pLen;
 
-
 	//-- メッシュ転送
 	for (int i = 0; i < meshLen; i++)
 	{
-		MakeCommonVBO(i);
+		MakeCommonVBO((mesh3dGL*)(meshs + i));
 	}
 
 
@@ -397,6 +402,7 @@ int engine3dGL::update()
 		if (VIEW_ON4) DrawMapH3();
 	}
 
+	drawGui();
 
 
 	return 1;
@@ -410,11 +416,10 @@ int engine3dGL::dispose()
 
 	
 	end4D();			// マップ後処理
-	DisposeCharVBO();	// ASCII VBO 解放
+	DisposeGUI();		// ASCII GUI VBO 解放
 	GL_End();
 	delete[] pols;
 
-	
 
 	// 基底クラス
 	engine3d::dispose();
@@ -422,6 +427,20 @@ int engine3dGL::dispose()
 	disposeFlg = true;
 
 	return 1;
+}
+
+void engine3dGL::InitGUI()
+{
+	MakeCharVBO();
+	glGenBuffers(1, &ctnrBuf);
+	makeGuiPlateVBO();
+}
+
+void engine3dGL::DisposeGUI()
+{
+	DisposeCharVBO();	// ASCII VBO 解放
+	glDeleteBuffers(1, &ctnrBuf);
+	glDeleteProgram(guiShader);
 }
 
 engine3dGL::engine3dGL()
@@ -442,6 +461,7 @@ engine3dGL::engine3dGL()
 {
 	CR_RANGE_R = -1.0;
 	CR_RANGE_D = -1.0;
+	menuLgc.owner = this;
 
 	///▼ 3Dスクリーン
 	tObj.ctr.asg(0, 0, 0);
@@ -932,5 +952,210 @@ double engine3dGL::clcRangeY(double rangeX)
 {
 	return atan(tan((LDBL)(rangeX) / 2 * PIE / 180) * HEIGHT / WIDTH) * 2 / PIE * 180;	//カメラ設定
 }
+
+void engine3dGL::makeGuiPlateVBO()
+{
+
+	// ポリゴン頂点設定 単なる四角形
+	pt2 vtx[6];
+
+	vtx[0].x = 1.0, vtx[0].y = 1.0;
+	vtx[1].x = 0, vtx[1].y = 1.0;
+	vtx[2].x = 0, vtx[2].y = 0;
+	vtx[3] = vtx[0];
+	vtx[4] = vtx[2];
+	vtx[5].x = 1.0;
+	vtx[5].y = 0;
+
+	// 転送用に再構成
+	float vtxs[12] =
+	{
+		(float)vtx[0].x, (float)vtx[0].y,
+		(float)vtx[1].x, (float)vtx[1].y,
+		(float)vtx[2].x, (float)vtx[2].y,
+		(float)vtx[3].x, (float)vtx[3].y,
+		(float)vtx[4].x, (float)vtx[4].y,
+		(float)vtx[5].x, (float)vtx[5].y
+	};
+
+
+	// 頂点転送
+	glBindBuffer(GL_ARRAY_BUFFER, ctnrBuf);
+	glBufferData(	//---- pts転送
+		GL_ARRAY_BUFFER,
+		24 * sizeof(float),
+		vtxs,
+		GL_STATIC_DRAW
+		);
+
+	// シェーダ作成
+	guiShader = LoadShaders("guiVtx.c", "guiPxl.c");
+}
+
+
+// GUI 描画
+void engine3dGL::drawGui()
+{
+	GuiContainer& menu = menuLgc.menu;
+
+	if (!menu.displayed)
+		return;
+
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	double asp = ((double)WIDTH / HEIGHT);
+
+	double x = menu.drawArea.sz.x;
+	double y = menu.drawArea.sz.y * asp;
+	double l = menu.drawArea.l;
+	double t = menu.drawArea.t * asp;
+	drawGuiPlate
+	(
+	(-1) + l,
+		1 + (-y) + (-t),
+		x,
+		y,
+		menu.bkColor
+		);
+	// 再帰
+	GuiContainer* active = (GuiContainer*)menu.childs[menu.selectedIdx];
+	drawGuiRecur(active);
+
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+}
+
+
+
+void engine3dGL::drawGuiRecur(GuiContainer* ct)
+{
+	int len = ct->childs.size();
+	double asp = ((double)WIDTH / HEIGHT);
+
+	for (int i = 0; i < len; i++)
+	{
+		double x = ct->childs[i]->drawArea.sz.x;
+		double y = ct->childs[i]->drawArea.sz.y * asp;
+		double l = ct->childs[i]->drawArea.l;
+		double t = ct->childs[i]->drawArea.t * asp;
+		pt3 col = (ct->selectedIdx == i) ? pt3(0.8, 0.8, 1.0) : ct->childs[i]->bkColor;
+		drawGuiPlate
+		(
+		(-1) + l,
+			1 + (-y) + (-t),
+			x,
+			y,
+			col
+			);
+
+		string tStr;
+		double fSz;
+		double fSp;
+		double fl;
+		double ft;
+
+		switch (ct->childs[i]->type)
+		{
+			// 文字列描画
+		case GuiItem::GuiType::STRING:
+			tStr = ((GuiString*)ct->childs[i])->content;
+			fSz = ((GuiString*)ct->childs[i])->fontSz;
+			fSp = ((GuiString*)ct->childs[i])->fontSpan;
+			fl = ct->childs[i]->padding.l;
+			ft = ct->childs[i]->padding.t;
+
+			for (int i = 0; i < tStr.length(); i++)
+			{
+				DrawChar
+				(
+					tStr[i],
+					(-1) + fl + l + fSz * i * fSp,
+					1 + (-fSz) * asp + (-ft) * asp + (-t),
+					fSz,
+					fSz * asp
+					);
+			}
+
+			break;
+
+			// コンテナ描画
+		case GuiItem::GuiType::CONTAINER:
+			drawGuiRecur((GuiContainer*)ct->childs[i]);
+			break;
+		}
+	}
+}
+
+
+// GUIコンテナ描画
+void engine3dGL::drawGuiPlate(double x, double y, double w, double h, pt3 col)
+{
+	int charShader = guiFont.charShader;
+
+	glUseProgram(guiShader);
+	glBindBuffer(GL_ARRAY_BUFFER, ctnrBuf);
+
+	// 表示位置, 表示幅
+	GLint xID = glGetUniformLocation(guiShader, "vMod");
+	glUniform4f(xID, (float)x, (float)y, (float)w, (float)h);
+	// 色
+	xID = glGetUniformLocation(guiShader, "bkColor");
+	glUniform4f(xID, col.x, col.y, col.z, (float)0.5);
+
+
+	GLuint vPosition = glGetAttribLocation(charShader, "vPos");
+
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(
+		vPosition, 2, GL_FLOAT, GL_FALSE,
+		2 * sizeof(GLfloat), 0
+		);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3 * 2);
+
+	glDisableVertexAttribArray(vPosition);
+
+}
+
+void engine3dGL::CreateBuffersForVRMenu()
+{
+	MakeCommonVBO((mesh3dGL*)&vrMenuMesh);
+	menuTex = texNames[vrMenuMesh.texNo];
+
+	glGenFramebuffers(1, &menuFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, menuFBO);
+	glBindTexture(GL_TEXTURE_2D, menuTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuTex, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void engine3dGL::DisposeBuffersForVRMenu()
+{
+	glDeleteFramebuffers(1, &menuFBO);
+}
+
+void engine3dGL::DrawGUIForVR()
+{
+	int oldFbo;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFbo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, menuFBO);
+	glBindTexture(GL_TEXTURE_2D, menuTex);
+
+	glClearColor(0.2, 0.2, 0.2, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	drawGui();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, oldFbo);
+
+}
+
 
 

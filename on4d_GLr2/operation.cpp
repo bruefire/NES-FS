@@ -10,6 +10,7 @@ Operation::Operation()
 	, clickState(Operation::ClickState::None)
 	, clickCoord(pt2i(-1, -1))
 	, VREysDst(0.0)
+	, menuAction(MenuLgc::INPUT::NONE)
 {
 	cmLoc = pt3(0, 0, 0);
 	cmRot = pt3(0, 0, 0);
@@ -32,9 +33,10 @@ int Operation::updLocationParam(double x, double y, int opt)
 	return 1;
 }
 
-void Operation::ClearLocRotParam()
+void Operation::ClearUnkeepedParam()
 {
 	cmLoc = pt3(0, 0, 0);
 	cmRot = pt3(0, 0, 0);
+	menuAction = MenuLgc::INPUT::NONE;
 }
 

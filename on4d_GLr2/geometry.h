@@ -76,8 +76,10 @@ public:
 
 	int meshInit(std::string, uint32_t, int);
 	int meshInitB(int, uint32_t);
+	void meshInitC(int);
 	int setNull();
 	void Init();
+	void CartesianToPolar();
 
 	mesh3d();
 	~mesh3d();

@@ -642,6 +642,47 @@ int mesh3d::meshInitB(int qty, uint32_t texNo)
 
 	return 0;
 }
+void mesh3d::meshInitC(int texNo)
+{
+	texJD = true;
+	faces = new face3[2];
+	faceLen = 2;
+
+	pLen = 4;
+	pts0 = new pt3[pLen];
+	pts = new pt3[pLen];
+	pts[0] = pt3(+1, +1, 0);
+	pts[1] = pt3(-1, +1, 0);
+	pts[2] = pt3(-1, -1, 0);
+	pts[3] = pt3(+1, -1, 0);
+
+	faces[0].pts = new pt3 *[3];
+	faces[0].pts[0] = pts + 0;
+	faces[0].pts[1] = pts + 1;
+	faces[0].pts[2] = pts + 2;
+	faces[1].pts = new pt3 *[3];
+	faces[1].pts[0] = pts + 2;
+	faces[1].pts[1] = pts + 3;
+	faces[1].pts[2] = pts + 0;
+
+	txLen = pLen;
+	txs = new pt2[pLen];
+	txs[0] = pt2(1, 1);
+	txs[1] = pt2(0, 1);
+	txs[2] = pt2(0, 0);
+	txs[3] = pt2(1, 0);
+	faces[0].txs = new pt2 *[3];
+	faces[0].txs[0] = txs + 0;
+	faces[0].txs[1] = txs + 1;
+	faces[0].txs[2] = txs + 2;
+	faces[1].txs = new pt2 *[3];
+	faces[1].txs[0] = txs + 2;
+	faces[1].txs[1] = txs + 3;
+	faces[1].txs[2] = txs + 0;
+	this->texNo = texNo;
+
+	CartesianToPolar();
+}
 int mesh3d::meshInit(std::string objName, uint32_t texNo, int md)
 {
 	texJD = false;
@@ -885,17 +926,7 @@ int mesh3d::meshInit(std::string objName, uint32_t texNo, int md)
 	}
 	else{
 		double tooLong = -1;
-		for(int i=0;i<pLen;i++){
-			pts0[i] = pts[i];
-			double oLen = pyth3(pts[i]);
-			pt3 tmpt;
-			tmpt.x = atan2(pts[i].x, pts[i].y);		//--方向1
-			tmpt.y = atan2(pyth2(pts[i].x,pts[i].y), pts[i].z);	//--方向2
-			tmpt.z = oLen;	//--距離(長さ)
-			pts[i] = tmpt;
-			//if(OBJ_LEN_MAX < oLen)
-			//	if(tooLong<oLen) tooLong = oLen;
-		}
+		CartesianToPolar();
 		//if(0<tooLong && md){	//-- 長さオーバーなら
 		//	double fixRate = OBJ_LEN_MAX / tooLong;
 		//	for(int i=0;i<pLen;i++) pts[i].z *= fixRate;
@@ -908,6 +939,22 @@ int mesh3d::meshInit(std::string objName, uint32_t texNo, int md)
  
 
   return 1;
+}
+
+void mesh3d::CartesianToPolar()
+{
+	for (int i = 0; i < pLen; i++) 
+	{
+		pts0[i] = pts[i];
+		double oLen = pyth3(pts[i]);
+		pt3 tmpt;
+		tmpt.x = atan2(pts[i].x, pts[i].y);		//--方向1
+		tmpt.y = atan2(pyth2(pts[i].x, pts[i].y), pts[i].z);	//--方向2
+		tmpt.z = oLen;	//--距離(長さ)
+		pts[i] = tmpt;
+		//if(OBJ_LEN_MAX < oLen)
+		//	if(tooLong<oLen) tooLong = oLen;
+	}
 }
 
 

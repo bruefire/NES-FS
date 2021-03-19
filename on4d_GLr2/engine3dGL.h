@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "guiItem.h"
 #include "engine3d.h"
+#include "MenuLgc.h"
 
 
 
@@ -60,6 +61,7 @@ public:
 	bool LOC_MODE;
 	bool VIEW_DST;
 	bool VIEW_LocRot;
+	int glTexLen;
 
 	GuiFont guiFont;
 
@@ -69,11 +71,22 @@ public:
 	bool VIEW_ON4;
 	uint32_t ptDel4d;
 
+	// メニュー
+	int guiShader;
+	uint32_t ctnrBuf;
+	void makeGuiPlateVBO();
+	void drawGui();
+	void drawGuiRecur(GuiContainer* ct);
+	void drawGuiPlate(double x, double y, double w, double h, pt3 col);
+	void InitGUI();
+	void DisposeGUI();
+
+
 	// メソッド //
 	int init();
 	int update();
 	int dispose();
-	void MakeCommonVBO(int);
+	void MakeCommonVBO(mesh3dGL*);
 	// 描画
 	void simulateS3GL();
 	void SimulateH3GL();
@@ -104,6 +117,11 @@ public:
 	virtual int GL_SwapBuffer() = 0;
 	void GL_InitScene();
 	void GL_DisposeScene();
+	uint32_t menuFBO;
+	uint32_t menuTex;
+	void CreateBuffersForVRMenu();
+	void DisposeBuffersForVRMenu();
+	void DrawGUIForVR();
 
 	uint32_t LoadShaders(const char* vPath, const char* fPath);
 	uint32_t LoadShaders2(const char* vPath, const char* gPath, const char* fPath, char mode);

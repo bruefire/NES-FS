@@ -46,6 +46,7 @@ engine3d::engine3d()
 	, SIN_1R(1.0 / SIN_1)
 	, sun(this)
 	, markObj(this)
+	, vrMenuObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.1)
 	, selectedIdx(-1)
@@ -160,6 +161,9 @@ int engine3d::init()
 	mapMesh[0] = meshs + 15;
 	mapMesh[1] = meshs + 16;
 
+	// menu
+	menuLgc.Init();
+
 
 	return rtnVal;
 }
@@ -198,7 +202,7 @@ int engine3d::update()
 void engine3d::PrepareInParamForNext()
 {
 	if (!useJoyPad)
-		ope.ClearLocRotParam();
+		ope.ClearUnkeepedParam();
 
 	ope.chgMapStateOld = ope.chgMapState;
 	//----
@@ -211,6 +215,8 @@ void engine3d::PrepareInParamForNext()
 /// </summary>
 void engine3d::UpdateS3()
 {
+	menuLgc.InputProc(ope.menuAction);
+
 	// S3演算処理
 	if (GRAVITY && obMove) physics();
 	simulateS3();
@@ -233,6 +239,7 @@ int engine3d::dispose()
 		return 0;
 
 	// 解放
+	menuLgc.Dispose();
 	delete[] objs;
 	delete[] meshs;
 	delete[] meshNames;
@@ -998,13 +1005,19 @@ void engine3d::UpdVRObjectsS3(double* cmrStd)
 	ClcVRObjectPosS3(ope.vrDev[1], &vrHand[0], nullptr);
 	ClcVRObjectPosS3(ope.vrDev[2], &vrHand[1], nullptr);
 
+	// menu
+	vrMenuObj.used = menuLgc.menu.displayed;
+	vrMenuObj.loc = vrHand[0].loc;
+	vrMenuObj.std[0] = vrHand[0].std[0];
+	vrMenuObj.std[1] = vrHand[0].std[1];
+
 }
 
 
 // 相対位置計算
 void engine3d::ClcRelaivePosS3(double* cmrStd)
 {
-	for (int h = -4; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
+	for (int h = -5; h < objCnt; h++) {	//==============オブジェクトごとの処理==============//
 
 		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;
@@ -1154,6 +1167,8 @@ object3d* engine3d::GetObject(int idx)
 {
 	switch (idx)
 	{
+	case -5:
+		return &vrMenuObj;
 	case -4:
 		return &vrHand[0];
 	case -3:
@@ -1327,6 +1342,13 @@ int engine3d::InitS3()	// 球面世界用初期化
 			vrHand[i].objInitS3(meshs + 22);
 			vrHand[i].used = true;
 		}
+
+		vrMenuObj.draw = 2;
+		vrMenuObj.objInitS3(nullptr);
+		vrMenuObj.used = true;
+		vrMenuMesh.meshInitC((meshLen - 1) + 3);
+		vrMenuObj.mesh = &vrMenuMesh;
+		vrMenuObj.scale = 4;
 	}
 
 
@@ -1404,6 +1426,14 @@ void engine3d::ClearFloatObjs()
 		else
 			objs[i].markInitS3(radius);
 	}
+}
+
+void engine3d::RandLoc(engine3d::RandMode mode, int qty)
+{
+	if (worldGeo == WorldGeo::HYPERBOLIC)
+		RandLocH3(mode, ObjType::Energy, qty);
+	else
+		RandLocS3(mode, qty);
 }
 
 // objのランダム配置 (S3)
@@ -1884,6 +1914,30 @@ void engine3d::InitInputParams()
 
 
 	ope.cmBack = false;
+}
+
+void engine3d::ChangeBasicObject(int bufIdx, int drawMode, bool sunFlg)
+{
+	if (bufIdx < 0)
+	{
+		objs[0].used = false;
+		sun.used = false;
+	}
+	else
+	{
+		objs[0].mesh = meshs + bufIdx;
+		objs[0].draw = drawMode;
+		objs[0].used = true;
+		sun.used = sunFlg;
+	}
+}
+
+void engine3d::ChangeThrowObject(int bufIdx)
+{
+	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++)
+	{
+		objs[i].mesh = meshs + bufIdx;
+	}
 }
 
 // 内積

@@ -3,6 +3,7 @@
 
 #include "point.h"
 #include "VRDeviceOperation.h"
+#include "MenuLgc.h"
 
 
 class Operation
@@ -13,6 +14,8 @@ public:
 	pt3 cmRot;
 	bool cmBack;
 	int speed;
+
+	MenuLgc::INPUT menuAction;
 
 	VRDeviceOperation vrDev[3];		// 0: HMD, 1: left hand, 2: right hand
 	double VREysDst;
@@ -31,7 +34,7 @@ public:
 
 	int updLocationParam(double x, double y, int opt);
 	int updRotationParam(double x, double y, int opt);
-	void ClearLocRotParam();
+	void ClearUnkeepedParam();
 
 	Operation();
 };

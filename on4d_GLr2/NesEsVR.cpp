@@ -22,10 +22,13 @@ void NesEsVR::initGlScnene(double w, double h, double fovL, double fovR, double 
 	owner->CR_RANGE_Y = atan(fovT) * 2 / PIE * 180;
 	owner->CR_RANGE_D = atan(fovD) * 2 / PIE * 180;
 
+	owner->InitGUI();
+	owner->CreateBuffersForVRMenu();
+
 	//-- メッシュ転送
 	for (int i = 0; i < owner->meshLen; i++)
 	{
-		owner->MakeCommonVBO(i);
+		owner->MakeCommonVBO((mesh3dGL*)(owner->meshs + i));
 	}
 }
 
@@ -33,6 +36,7 @@ void NesEsVR::updateSceneLgc()
 {
 	cmrStd[0] = cmrStd[1] = cmrStd[2] = 0;
 
+	owner->menuLgc.InputProc(owner->ope.menuAction);
 	owner->engine3d::UpdFloatObjsS3();
 
 	// VR HMD, handの移動
@@ -61,15 +65,20 @@ void NesEsVR::updateGlScene(Eye eye)
 
 	if (owner->worldGeo == WorldGeo::SPHERICAL)
 	{
+		owner->DrawGUIForVR();
+
 		// 相対位置計算
-		owner->ClcRelaivePosS3(cmrStd);	// 視差未対応
+		owner->ClcRelaivePosS3(cmrStd);	
 		owner->simulateS3GL();
+
 	}
 }
 
 
 void NesEsVR::disposeGlScene()
 {
+	owner->DisposeBuffersForVRMenu();
+	owner->DisposeGUI();
 	owner->GL_DisposeScene();
 }
 
@@ -94,53 +103,113 @@ void NesEsVR::DeviceInputProcedure(ovrInputState state, ovrControllerType type)
 	{
 	case ovrControllerType::ovrControllerType_LTouch:
 	{
-		pt3 gLoc = pt3(state.IndexTriggerRaw[0],	// 前後
-			state.ThumbstickRaw[0].x,	// 左右
-			state.ThumbstickRaw[0].y)	// 上下
-			.mtp(0.32767 * owner->adjSpd * powi(3.0, owner->ope.speed));	// 係数
+		// switch menu/
+		if (!ope.buttonX_raw && state.Buttons & 0b100000000)
+			owner->ope.menuAction = MenuLgc::INPUT::RETURN;
+		ope.buttonX_raw = state.Buttons & 0b100000000;
 
-		// 位置
-		double lLim = 0.05 * owner->adjSpd * powi(3.0, owner->ope.speed);
-		owner->ope.cmLoc.x = (lLim < abs(gLoc.x)) ? gLoc.x : 0.0;
-		owner->ope.cmLoc.y = (lLim < abs(gLoc.y)) ? gLoc.y : 0.0;
-		owner->ope.cmLoc.z = (lLim < abs(gLoc.z)) ? gLoc.z : 0.0;
+		if (owner->menuLgc.menu.displayed)
+		{
+			Ope::StickVState preStickVState = ope.lStickVState;
 
-		//// マップ
-		//owner->ope.chgMapState = JoyInfoEx.dwPOV;
-		//if (owner->ope.chgMapState != owner->ope.chgMapStateOld)
-		//{
-		//	if (owner->ope.chgMapState == JOY_POVFORWARD)
-		//	{
-		//		owner->inPutKey(owner->IK::No_4, NULL); break;
-		//	}
-		//	else if (owner->ope.chgMapState == JOY_POVLEFT)
-		//	{
-		//		owner->inPutKey(owner->IK::No_5, NULL); break;
-		//	}
-		//}
+			if (ope.lStickVState == Ope::StickVState::Neutral)
+			{
+				if (state.ThumbstickRaw[0].y < -ope.StickStateExTH)
+					ope.lStickVState = Ope::StickVState::Down;
+				else if(state.ThumbstickRaw[0].y > ope.StickStateExTH)
+					ope.lStickVState = Ope::StickVState::Up;
+			}
+			else if (ope.lStickVState == Ope::StickVState::Down)
+			{
+				if (state.ThumbstickRaw[0].y > -ope.StickStateNtTH)
+					ope.lStickVState = Ope::StickVState::Neutral;
+				else if (state.ThumbstickRaw[0].y > ope.StickStateExTH)
+					ope.lStickVState = Ope::StickVState::Up;
+			}
+			else if (ope.lStickVState == Ope::StickVState::Up)
+			{
+				if (state.ThumbstickRaw[0].y < ope.StickStateNtTH)
+					ope.lStickVState = Ope::StickVState::Neutral;
+				else if (state.ThumbstickRaw[0].y < -ope.StickStateExTH)
+					ope.lStickVState = Ope::StickVState::Down;
+			}
 
-		//// 後ろを見る
-		//owner->ope.cmBack = (JoyInfoEx.dwButtons & JOY_BUTTON10) ? true : false;
+			if (preStickVState != ope.lStickVState)
+			{
+				if (ope.lStickVState == Ope::StickVState::Down)
+					owner->ope.menuAction = MenuLgc::INPUT::DOWN;
+				else if (ope.lStickVState == Ope::StickVState::Neutral)
+					owner->ope.menuAction = MenuLgc::INPUT::NONE;
+				else if (ope.lStickVState == Ope::StickVState::Up)
+					owner->ope.menuAction = MenuLgc::INPUT::UP;
+			}
+		}
+		else
+		{
+			pt3 gLoc = pt3(state.IndexTriggerRaw[0] + (-state.HandTriggerRaw[0]),	// 前後
+				state.ThumbstickRaw[0].x,	// 左右
+				state.ThumbstickRaw[0].y)	// 上下
+				.mtp(0.32767 * owner->adjSpd * powi(3.0, owner->ope.speed));	// 係数
+
+			// 位置
+			double lLim = 0.05 * owner->adjSpd * powi(3.0, owner->ope.speed);
+			owner->ope.cmLoc.x = (lLim < abs(gLoc.x)) ? gLoc.x : 0.0;
+			owner->ope.cmLoc.y = (lLim < abs(gLoc.y)) ? gLoc.y : 0.0;
+			owner->ope.cmLoc.z = (lLim < abs(gLoc.z)) ? gLoc.z : 0.0;
+
+			//// マップ
+			//owner->ope.chgMapState = JoyInfoEx.dwPOV;
+			//if (owner->ope.chgMapState != owner->ope.chgMapStateOld)
+			//{
+			//	if (owner->ope.chgMapState == JOY_POVFORWARD)
+			//	{
+			//		owner->inPutKey(owner->IK::No_4, NULL); break;
+			//	}
+			//	else if (owner->ope.chgMapState == JOY_POVLEFT)
+			//	{
+			//		owner->inPutKey(owner->IK::No_5, NULL); break;
+			//	}
+			//}
+
+			//// 後ろを見る
+			//owner->ope.cmBack = (JoyInfoEx.dwButtons & JOY_BUTTON10) ? true : false;
+		}
 		break;
 	}
 
 	case ovrControllerType::ovrControllerType_RTouch:
 	{
-		pt2 gRot = pt2(
-			-state.ThumbstickRaw[1].x,	//左右
-			state.ThumbstickRaw[1].y)	//上下
-			.mtp(0.32767 * 0.3);
+		if (owner->menuLgc.menu.displayed)
+		{
+			if (!ope.buttonA_raw && state.Buttons & 0b01)
+				owner->ope.menuAction = MenuLgc::INPUT::OK;
+			ope.buttonA_raw = state.Buttons & 0b01;
+		}
+		else
+		{
+			if (!ope.buttonA_raw && state.Buttons & 0b01)
+				owner->inPutKey(owner->IK::No_2, NULL);
+			ope.buttonA_raw = state.Buttons & 0b01;
 
-		// 回転
-		owner->ope.cmRot.x = (0.02 < abs(gRot.x)) ? gRot.x * owner->adjSpd : 0.0;
-		owner->ope.cmRot.y = (0.02 < abs(gRot.y)) ? gRot.y * owner->adjSpd : 0.0;
-		//if (JoyInfoEx.dwButtons == 16)
-		//	owner->ope.cmRot.z = owner->adjSpd * -0.1;
-		//else if (JoyInfoEx.dwButtons == 32)
-		//	owner->ope.cmRot.z = owner->adjSpd * 0.1;
-		//else
-		//	owner->ope.cmRot.z = 0.0;
+			if (!ope.buttonB_raw && state.Buttons & 0b10)
+				owner->inPutKey(owner->IK::SPACE, NULL);
+			ope.buttonB_raw = state.Buttons & 0b10;
 
+			pt2 gRot = pt2(
+				-state.ThumbstickRaw[1].x,	//左右
+				state.ThumbstickRaw[1].y)	//上下
+				.mtp(0.32767 * 0.3);
+
+			// 回転
+			owner->ope.cmRot.x = (0.02 < abs(gRot.x)) ? gRot.x * owner->adjSpd : 0.0;
+			owner->ope.cmRot.y = (0.02 < abs(gRot.y)) ? gRot.y * owner->adjSpd : 0.0;
+			//if (JoyInfoEx.dwButtons == 16)
+			//	owner->ope.cmRot.z = owner->adjSpd * -0.1;
+			//else if (JoyInfoEx.dwButtons == 32)
+			//	owner->ope.cmRot.z = owner->adjSpd * 0.1;
+			//else
+			//	owner->ope.cmRot.z = 0.0;
+		}
 		break;
 	}
 	}

@@ -480,120 +480,76 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 
 				case UI_WL_NONE:
-					newEngine->objs[0].used = false;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(-1, 0);
 					menuCheck(hMenu, &menuItemInfo, UI_WL_NONE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_6_POINT:
-					newEngine->objs[0].mesh = newEngine->meshs+0; 
-					newEngine->objs[0].draw = 0; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(0, 0);
 					menuCheck(hMenu, &menuItemInfo, UI_6_POINT, unCk_mark, unCk_mark_len);
 					break;
 				case UI_6_LINE:
-					newEngine->objs[0].mesh = newEngine->meshs+0; 
-					newEngine->objs[0].draw = 1;
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(0, 1);
 					menuCheck(hMenu, &menuItemInfo, UI_6_LINE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_TUDE_POINT:
-					newEngine->objs[0].mesh = newEngine->meshs+3; 
-					newEngine->objs[0].draw = 0; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(3, 0);
 					menuCheck(hMenu, &menuItemInfo, UI_TUDE_POINT, unCk_mark, unCk_mark_len);
 					break;
 				case UI_TUDE_LINE:
-					newEngine->objs[0].mesh = newEngine->meshs+3; 
-					newEngine->objs[0].draw = 1;
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(3, 1);
 					menuCheck(hMenu, &menuItemInfo, UI_TUDE_LINE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_120C_POINT:
-					newEngine->objs[0].mesh = newEngine->meshs+10; 
-					newEngine->objs[0].draw = 0; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(10, 0);
 					menuCheck(hMenu, &menuItemInfo, UI_120C_POINT, unCk_mark, unCk_mark_len);
 					break;
 				case UI_120C_LINE:
-					newEngine->objs[0].mesh = newEngine->meshs+10; 
-					newEngine->objs[0].draw = 1; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(10, 1);
 					menuCheck(hMenu, &menuItemInfo, UI_120C_LINE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_120C_SURFACE:
-					newEngine->objs[0].mesh = newEngine->meshs+11; 
-					newEngine->objs[0].draw = 2; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(11, 2);
 					menuCheck(hMenu, &menuItemInfo, UI_120C_SURFACE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_TORUS_POINT:
-					newEngine->objs[0].mesh = newEngine->meshs+12; 
-					newEngine->objs[0].draw = 0; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(12, 0);
 					menuCheck(hMenu, &menuItemInfo, UI_TORUS_POINT, unCk_mark, unCk_mark_len);
 					break;
 				case UI_TORUS_LINE:
-					newEngine->objs[0].mesh = newEngine->meshs+12; 
-					newEngine->objs[0].draw = 1; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(12, 1);
 					menuCheck(hMenu, &menuItemInfo, UI_TORUS_LINE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_TORUS_SURFACE:
-					newEngine->objs[0].mesh = newEngine->meshs+13; 
-					newEngine->objs[0].draw = 2; 
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(13, 2);
 					menuCheck(hMenu, &menuItemInfo, UI_TORUS_SURFACE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_PLANE_SURFACE:
-					newEngine->objs[0].mesh = newEngine->meshs + 21;
-					newEngine->objs[0].draw = 2;
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(21, 2);
 					menuCheck(hMenu, &menuItemInfo, UI_PLANE_SURFACE, unCk_mark, unCk_mark_len);
 					break;
 				case UI_MK_EARTH:
-					newEngine->objs[0].mesh = newEngine->meshs+2; 
-					newEngine->objs[0].draw = 2;
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = false;
+					newEngine->ChangeBasicObject(2, 2);
 					menuCheck(hMenu, &menuItemInfo, UI_MK_EARTH, unCk_mark, unCk_mark_len);
 					break;
 				case UI_MK_TC:
-					newEngine->objs[0].mesh = newEngine->meshs+7; 
-					newEngine->objs[0].draw = 2;
-					newEngine->objs[0].used = true;
-					newEngine->sun.used = true;
+					newEngine->ChangeBasicObject(7, 2, true);
 					menuCheck(hMenu, &menuItemInfo, UI_MK_TC, unCk_mark, unCk_mark_len);
 					break;
 
 				case UI_THROW_SPHERE:
-					for(int i=newEngine->BWH_QTY+newEngine->PLR_QTY; i<newEngine->OBJ_QTY; i++)
-						newEngine->objs[i].mesh = newEngine->meshs+8; 
+					newEngine->ChangeThrowObject(8);
 					menuCheck(hMenu, &menuItemInfo, UI_THROW_SPHERE, unCk_thrw, unCk_thrw_len);
 					break;
 				case UI_THROW_CUBE:
-					for(int i=newEngine->BWH_QTY+newEngine->PLR_QTY; i<newEngine->OBJ_QTY; i++)
-						newEngine->objs[i].mesh = newEngine->meshs+4; 
+					newEngine->ChangeThrowObject(4);
 					menuCheck(hMenu, &menuItemInfo, UI_THROW_CUBE, unCk_thrw, unCk_thrw_len);
 					break;
 				case UI_THROW_HORSE:
-					for(int i=newEngine->BWH_QTY+newEngine->PLR_QTY; i<newEngine->OBJ_QTY; i++)
-						newEngine->objs[i].mesh = newEngine->meshs+5;
+					newEngine->ChangeThrowObject(5);
 					menuCheck(hMenu, &menuItemInfo, UI_THROW_HORSE, unCk_thrw, unCk_thrw_len); 
 					break;
 				case UI_THROW_ROCK:
-					for(int i=newEngine->BWH_QTY+newEngine->PLR_QTY; i<newEngine->OBJ_QTY; i++)
-						newEngine->objs[i].mesh = newEngine->meshs+14;
+					newEngine->ChangeThrowObject(14);
 					menuCheck(hMenu, &menuItemInfo, UI_THROW_ROCK, unCk_thrw, unCk_thrw_len); 
 					break;
 				case UI_THROW_REF:
@@ -607,7 +563,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							newEngine->meshs[9].meshInit( newEngine->meshNames[9], 9+1, 0);
 						}
 						if (newEngine->meshs[9].faces != nullptr)
-							newEngine->MakeCommonVBO(9);
+							newEngine->MakeCommonVBO((mesh3dGL*)(newEngine->meshs + 9));
 
 						for(int i=newEngine->BWH_QTY+newEngine->PLR_QTY; i<newEngine->OBJ_QTY; i++)
 							newEngine->objs[i].mesh = newEngine->meshs+9;
@@ -686,7 +642,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 			
 		case WM_MBUTTONDOWN:
-			if((wp&0x0004) != 0x0004) cmJD = 1; else cmJD = 2;
+			if(!(wp&0x0004)) cmJD = 1; else cmJD = 2;
 			cm_rot[0] = cm_rot[1] = MAKEPOINTS(lp);
 			break;
 			

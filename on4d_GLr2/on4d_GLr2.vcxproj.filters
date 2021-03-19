@@ -64,7 +64,10 @@
     <Filter Include="c++ header\OS/Hard依存部%28Windows%29">
       <UniqueIdentifier>{99f3ddce-7745-4081-aca5-60d09562a2f1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="c++ header\OS/Hard依存部%28Windows%29\UI系">
+    <Filter Include="c++ header\GL部\UI">
+      <UniqueIdentifier>{b6120a91-b36f-4821-a7b6-9445e7e9de0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="c++ header\OS/Hard依存部%28Windows%29\WinUI系">
       <UniqueIdentifier>{1d777d3a-076e-4f26-bb8c-ddf3724e49f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -186,19 +189,22 @@
     <ClCompile Include="NesEsVR.cpp">
       <Filter>c++ source\OS/Hard依存%28Windows%29</Filter>
     </ClCompile>
+    <ClCompile Include="MenuLgc.cpp">
+      <Filter>c++ source\GL部</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="rcFunc.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="rcFunc2.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="constants.h">
       <Filter>c++ header\core演算部</Filter>
@@ -252,10 +258,10 @@
       <Filter>c++ header\core演算部</Filter>
     </ClInclude>
     <ClInclude Include="editor.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="randomUI.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
     <ClInclude Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.h">
       <Filter>c++ header\OVR</Filter>
@@ -278,14 +284,14 @@
     <ClInclude Include="NesEsVR.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29</Filter>
     </ClInclude>
-    <ClInclude Include="GlScene.h">
-      <Filter>c++ header\GL部</Filter>
-    </ClInclude>
     <ClInclude Include="VRDeviceOperation.h">
       <Filter>c++ source\core演算部</Filter>
     </ClInclude>
     <ClInclude Include="MyWin32_GLAppUtil.h">
       <Filter>c++ header\OVR</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuLgc.h">
+      <Filter>c++ header\GL部\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -330,7 +336,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="objSetting.h">
-      <Filter>c++ header\OS/Hard依存部%28Windows%29\UI系</Filter>
+      <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </Text>
     <Text Include="pyUpd.py">
       <Filter>resource files</Filter>

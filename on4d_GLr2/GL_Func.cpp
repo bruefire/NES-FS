@@ -32,7 +32,8 @@ int engine3dGL::GL_Init()
 
 void engine3dGL::GL_InitScene()
 {
-	int texs = meshLen + 2;
+	glTexLen = meshLen + 3;
+	int texs = glTexLen;
 	texNames = new uint32_t[texs];	// ‰æ–Ê1 + mesh” + ‹OÕ1
 	buffers = new uint32_t[texs];
 
@@ -94,7 +95,7 @@ void engine3dGL::GL_InitScene()
 
 void engine3dGL::GL_DisposeScene()
 {
-	int texs = meshLen + 2;
+	int texs = glTexLen;
 
 	// ƒƒCƒ“VBO‰ğ•ú
 	glDeleteBuffers(texs, buffers + 0);

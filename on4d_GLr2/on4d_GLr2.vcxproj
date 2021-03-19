@@ -59,6 +59,7 @@
     <ClCompile Include="engine3dWinOVR.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="GL_Func.cpp" />
+    <ClCompile Include="MenuLgc.cpp" />
     <ClCompile Include="NesEsVR.cpp" />
     <ClCompile Include="PyInteract.cpp" />
     <ClCompile Include="VR_Manager.cpp" />
@@ -101,8 +102,8 @@
     <ClInclude Include="geometry.h" />
     <ClInclude Include="global_var.h" />
     <ClInclude Include="global_var2.h" />
-    <ClInclude Include="GlScene.h" />
     <ClInclude Include="guiItem.h" />
+    <ClInclude Include="MenuLgc.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="OculusTextureBuffer.h" />
     <ClInclude Include="operation.h" />

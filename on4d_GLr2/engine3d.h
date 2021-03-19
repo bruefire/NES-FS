@@ -7,6 +7,7 @@
 #include "player.h"
 #include "object.h"
 #include "operation.h"
+#include "MenuLgc.h"
 
 
 class engine3d {
@@ -91,6 +92,8 @@ public:
 
 	bool vrFlag;
 	object3d vrHand[2];	// hand for VR
+	object3d vrMenuObj;
+	mesh3d vrMenuMesh;
 
 	Player player;	//--プレイヤー
 
@@ -110,6 +113,8 @@ public:
 		pt3 rot;
 	}
 	mvObjParam;
+
+	MenuLgc menuLgc;
 
 	// メソッド //
 	void InitWorld();				// 世界初期化(共通)
@@ -143,6 +148,7 @@ public:
 		Player,
 		Energy
 	};
+	void RandLoc(engine3d::RandMode mode, int qty=100);
 	int RandLocS3(RandMode, int qty=100);
 	void RandLocH3(RandMode, ObjType, int qty=100);
 	pt3 randLocUniS3(int);
@@ -190,6 +196,8 @@ public:
 		ESCAPE
 	};
 	int inPutKey(int key, int opt);
+	void ChangeBasicObject(int, int, bool = false);
+	void ChangeThrowObject(int);
 
 };
 
