@@ -90,6 +90,8 @@ void MenuLgc::MakeMenu()
     GuiStringEx basicObjItems[]
     {
         GuiStringEx("None", MENU_ACT::MAKE_BASIC_OBJECT_INVISILE),
+        GuiStringEx("6 lines", MENU_ACT::CHANGE_BASIC_OBJECT_TO_LINES_LN),
+        GuiStringEx("Polar", MENU_ACT::CHANGE_BASIC_OBJECT_TO_POLAR_LN),
         GuiStringEx("120-cells", MENU_ACT::CHANGE_BASIC_OBJECT_TO_CELLS120),
         GuiStringEx("Torus", MENU_ACT::CHANGE_BASIC_OBJECT_TO_TORUS),
         GuiStringEx("Earth", MENU_ACT::CHANGE_BASIC_OBJECT_TO_EARTH),
@@ -240,7 +242,7 @@ void MenuLgc::disposeMenu(GuiContainer* ct)
 }
 
 
-void MenuLgc::InputProc(INPUT input)
+bool MenuLgc::InputProc(INPUT input)
 {
     // ターゲットメニュー
     GuiContainer* trg = (GuiContainer*)menu.childs[menu.selectedIdx];
@@ -269,7 +271,8 @@ void MenuLgc::InputProc(INPUT input)
     }
     case INPUT::OK:
     {
-        MenuMsgProc(((MenuLgc::GuiStringEx*)trg->SelectedChild())->act);
+        if(!MenuMsgProc(((MenuLgc::GuiStringEx*)trg->SelectedChild())->act))
+            return false;
         break;
     }
     case INPUT::CANCEL:
@@ -278,16 +281,18 @@ void MenuLgc::InputProc(INPUT input)
         menu.displayed = !menu.displayed;
         break;
     }
+
+    return true;
 }
 
 
 //== メニューメソッド
 
 // メニュープロシージャ
-void MenuLgc::MenuMsgProc(MENU_ACT act)
+bool MenuLgc::MenuMsgProc(MENU_ACT act)
 {
     if (!owner)
-        return;
+        return false;
 
     switch (act)
     {
@@ -326,10 +331,9 @@ void MenuLgc::MenuMsgProc(MENU_ACT act)
         MoveToOtherMenu(MENU::FIELD_OF_VIEW);
         break;
 
-    //    // 退出
-    //case QUIT_PROGRAM:
-    //    glfwSetWindowShouldClose(window, GLFW_TRUE);    // no problem ?
-    //    break;
+        // 退出
+    case QUIT_PROGRAM:
+        return false;
 
     //    // 視野
     //case MAKE_FOV_NARROW:
@@ -396,6 +400,12 @@ void MenuLgc::MenuMsgProc(MENU_ACT act)
     case MAKE_BASIC_OBJECT_INVISILE:
         MakeBasicObjectInvisible();
         break;
+    case CHANGE_BASIC_OBJECT_TO_LINES_LN:
+        ChangeBasicObject(BASIC_OBJ::LINES, DRAW_TYPE::LINE);
+        break;
+    case CHANGE_BASIC_OBJECT_TO_POLAR_LN:
+        ChangeBasicObject(BASIC_OBJ::POLAR, DRAW_TYPE::LINE);
+        break;
     case CHANGE_BASIC_OBJECT_TO_CELLS120:
         ChangeBasicObject(BASIC_OBJ::CELLS120, DRAW_TYPE::SURFACE);
         break;
@@ -421,8 +431,9 @@ void MenuLgc::MenuMsgProc(MENU_ACT act)
         break;
 
     }
-}
 
+    return true;
+}
 
 
 

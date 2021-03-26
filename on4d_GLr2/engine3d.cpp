@@ -188,15 +188,16 @@ int engine3d::update()
 	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- いずれこっちに変更
 
 	// World Geometry
+	bool result;
 	if (worldGeo == WorldGeo::SPHERICAL)
-		UpdateS3();
+		result = UpdateS3();
 	else if (worldGeo == WorldGeo::HYPERBOLIC)
-		UpdateH3();
+		result = UpdateH3();
 
 	// 入力状態 次回待機処理
 	PrepareInParamForNext();
 
-	return 1;
+	return result;
 };
 
 void engine3d::PrepareInParamForNext()
@@ -213,22 +214,27 @@ void engine3d::PrepareInParamForNext()
 /// <summary>
 /// S3世界更新
 /// </summary>
-void engine3d::UpdateS3()
+bool engine3d::UpdateS3()
 {
-	menuLgc.InputProc(ope.menuAction);
+	if(!menuLgc.InputProc(ope.menuAction))
+		return false;
 
 	// S3演算処理
 	if (GRAVITY && obMove) physics();
 	simulateS3();
+
+	return true;
 }
 
 /// <summary>
 /// H3世界更新
 /// </summary>
-void engine3d::UpdateH3()
+bool engine3d::UpdateH3()
 {
 	// H3演算処理
 	simulateH3();
+
+	return true;
 }
 
 

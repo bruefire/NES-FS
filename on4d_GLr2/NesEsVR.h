@@ -50,7 +50,7 @@ private:
 	ope;
 
 	void initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD) override;
-	void updateSceneLgc() override;
+	bool updateSceneLgc() override;
 	void updateGlScene(Eye) override;
 	void disposeGlScene() override;
 	void DeviceInputProcedure(ovrInputState, ovrControllerType) override;

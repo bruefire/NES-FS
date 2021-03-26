@@ -23,7 +23,7 @@ public:
 		Right
 	};
 	virtual void initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD) = 0;
-	virtual void updateSceneLgc() = 0;
+	virtual bool updateSceneLgc() = 0;
 	virtual void updateGlScene(Eye) = 0;
 	virtual void disposeGlScene() = 0;
 	virtual void SendPose(VRDeviceOperation dev[3], double eyeDst) = 0;

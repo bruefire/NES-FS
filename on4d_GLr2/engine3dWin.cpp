@@ -115,7 +115,8 @@ int engine3dWin::start()
 	while (wndProcFunc(&msg))
 	{
 		// 更新
-		update();
+		if(!update())
+			return 1;
 	}
 
 	return msg.wParam;
@@ -125,12 +126,13 @@ int engine3dWin::start()
 // 更新
 int engine3dWin::update()
 {
+	bool result;
 	pyInter.Update();
 
 	// 基底クラス
-	engine3dGL::update();
+	result = engine3dGL::update();
 
-	return 1;
+	return result;
 }
 
 

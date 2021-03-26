@@ -178,8 +178,8 @@ public:
 		HYPERBOLIC
 	}
 	worldGeo;
-	void UpdateS3();		// S3更新
-	void UpdateH3();		// H3更新
+	bool UpdateS3();		// S3更新
+	bool UpdateH3();		// H3更新
 	void ClearFloatObjs();
 
 	// 操作関係

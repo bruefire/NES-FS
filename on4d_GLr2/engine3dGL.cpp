@@ -354,8 +354,10 @@ int engine3dGL::init()
 
 int engine3dGL::update()
 {
+	bool result;
+
 	// 基底(演算)クラス
-	engine3d::update();
+	result = engine3d::update();
 
 
 	//======== << エンジン >> =======//
@@ -405,7 +407,7 @@ int engine3dGL::update()
 	drawGui();
 
 
-	return 1;
+	return result;
 }
 
 

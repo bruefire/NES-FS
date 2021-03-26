@@ -288,7 +288,11 @@ bool VR_Manager::MainLoop(bool retryCreate)
 
             // do main logical proccessing.
             SendPose(opeResult, 0);
-            updateSceneLgc();
+            if (!updateSceneLgc())
+            {
+                retryCreate = false;
+                break;
+            }
 
             // Render Scene to Eye Buffers
             for (int eye = 0; eye < 2; ++eye)

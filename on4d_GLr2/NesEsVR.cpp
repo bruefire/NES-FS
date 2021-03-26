@@ -32,11 +32,12 @@ void NesEsVR::initGlScnene(double w, double h, double fovL, double fovR, double 
 	}
 }
 
-void NesEsVR::updateSceneLgc()
+bool NesEsVR::updateSceneLgc()
 {
 	cmrStd[0] = cmrStd[1] = cmrStd[2] = 0;
 
-	owner->menuLgc.InputProc(owner->ope.menuAction);
+	if(!owner->menuLgc.InputProc(owner->ope.menuAction))
+		return false;
 	owner->engine3d::UpdFloatObjsS3();
 
 	// VR HMD, hand‚ÌˆÚ“®
@@ -45,6 +46,7 @@ void NesEsVR::updateSceneLgc()
 
 	owner->PrepareInParamForNext();
 
+	return true;
 }
 
 void NesEsVR::updateGlScene(Eye eye)

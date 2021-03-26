@@ -88,6 +88,8 @@ public:
 
         // 基底オブジェクト変更
         MAKE_BASIC_OBJECT_INVISILE,
+        CHANGE_BASIC_OBJECT_TO_LINES_LN,
+        CHANGE_BASIC_OBJECT_TO_POLAR_LN,
         CHANGE_BASIC_OBJECT_TO_CELLS120,
         CHANGE_BASIC_OBJECT_TO_TORUS,
         CHANGE_BASIC_OBJECT_TO_EARTH,
@@ -110,6 +112,8 @@ public:
     // 基底オブジェクト
     enum BASIC_OBJ
     {
+        LINES = 0,
+        POLAR = 3,
         TORUS = 13,
         CELLS120 = 11,
         EARTH2 = 2,
@@ -170,8 +174,8 @@ public:
     // メニューメソッド
     void Init();
     void Dispose();
-    void MenuMsgProc(MENU_ACT);
-    void InputProc(INPUT);
+    bool MenuMsgProc(MENU_ACT);
+    bool InputProc(INPUT);
 
     void MoveToOtherMenu(MENU);
     void ChangeThrowObject(THROW_OBJ);

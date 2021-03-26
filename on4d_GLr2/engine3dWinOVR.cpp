@@ -39,7 +39,8 @@ int engine3dWinOVR::start()
 
 int engine3dWinOVR::update()
 {
-	engine3d::update();
+	bool result;
+	result = engine3d::update();
 
 	if (worldGeo == WorldGeo::SPHERICAL)
 	{
@@ -50,7 +51,7 @@ int engine3dWinOVR::update()
 		SimulateH3GL();
 	}
 
-	return 0;
+	return result;
 }
 
 int engine3dWinOVR::dispose()
