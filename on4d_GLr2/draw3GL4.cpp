@@ -286,11 +286,10 @@ int engine3dGL::DrawEachObjsS3(int loop)
 int engine3dGL::DrawEachObjsS3_LQY(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
-	for (int h = -2; h < objCnt; h++)
+	for (int h = -5; h < objCnt; h++)
 	{
 
-		object3d* curObj;
-		if (h == -2) curObj = &markObj; else if (h == -1) curObj = &sun; else curObj = objs + h;
+		object3d* curObj = GetObject(h);
 
 		if (!curObj->used) continue;
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
@@ -311,7 +310,8 @@ int engine3dGL::DrawEachObjsS3_LQY(int loop)
 		xID = glGetUniformLocation(shader[SDR], "locR");
 		glUniform3f(xID, curObj->locr.x, curObj->locr.y, curObj->locr.z);
 		xID = glGetUniformLocation(shader[SDR], "decMode");
-		if (h != -1)	glUniform1i(xID, decMode);
+		if (h == -5) glUniform1i(xID, 0);
+		else if (h != -1)	glUniform1i(xID, decMode);
 		else		glUniform1i(xID, 3);
 		xID = glGetUniformLocation(shader[SDR], "bgMode");
 		glUniform1i(xID, bgCol);

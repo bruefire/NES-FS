@@ -16,6 +16,7 @@ uniform float revMd;
 
 uniform mat4 MVP;
 uniform vec4 WH_CR;
+uniform vec4 cRange;
 
 out vec2 s_b;
 out vec4 slopeC, betaC;
@@ -178,11 +179,16 @@ void main()
 	clcSlope4(tmPt[0], tmPt[1], slopeC, betaC);
 
 	//--scè„3ì_ÇÃ åXÇ´ & ó]ÇË--
-	vec3 glVtx0 = vec3(drawPt[0].x / (WH_CR.z * drawPt[0].y), drawPt[0].z / (WH_CR.w * drawPt[0].y), 0);
-	vec3 glVtx1 = vec3(drawPt[1].x / (WH_CR.z * drawPt[1].y), drawPt[1].z / (WH_CR.w * drawPt[1].y), 0);
+	float cRangeLR = cRange[0] + cRange[1];
+	float cRangeTB = cRange[2] + cRange[3];
+	vec2 glVtx0 = vec2(
+			(drawPt[0].x / drawPt[0].y + cRange[0]) / cRangeLR * WH_CR.x,
+			(drawPt[0].z / drawPt[0].y + cRange[3]) / cRangeTB * WH_CR.y);
+	vec2 glVtx1 = vec2(
+			(drawPt[1].x / drawPt[1].y + cRange[0]) / cRangeLR * WH_CR.x,
+			(drawPt[1].z / drawPt[1].y + cRange[3]) / cRangeTB * WH_CR.y);
 
-	vec2 sPt[2] = vec2[](vec2(0.5 * (glVtx0.x + 1) * WH_CR.x, 0.5 * (glVtx0.y + 1) * WH_CR.y),
-		vec2(0.5 * (glVtx1.x + 1) * WH_CR.x, 0.5 * (glVtx1.y + 1) * WH_CR.y));
+	vec2 sPt[2] = vec2[](glVtx0, glVtx1);
 
 	float slp, beta;
 	slp = (sPt[1].x - sPt[0].x) / (sPt[1].y - sPt[0].y);
