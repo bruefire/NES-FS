@@ -1014,6 +1014,7 @@ void engine3d::UpdVRObjectsS3(double* cmrStd)
 
 	// menu
 	vrMenuObj.used = menuLgc.menu.displayed;
+	vrHand[0].used = !menuLgc.menu.displayed;
 	vrMenuObj.loc = vrHand[0].loc;
 	vrMenuObj.std[0] = vrHand[0].std[0];
 	vrMenuObj.std[1] = vrHand[0].std[1];
