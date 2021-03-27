@@ -18,6 +18,7 @@ BEGIN
             MENUITEM "双曲面 (日本語)"	    UI_H3_JA
 			MENUITEM "Spherical (English)"	UI_LANG_EN
             MENUITEM "Hyperbolic (English)"	UI_H3_EN
+            MENUITEM "Spherical VR"	        UI_S3_VR
 		END
         MENUITEM "スクリプト実行",      UI_CALL_SCRIPT
 		MENUITEM SEPARATOR 

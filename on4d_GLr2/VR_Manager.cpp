@@ -282,7 +282,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
             opeResult[0] = VRDeviceOperation(vrLocDf, vrStdDf[0], vrStdDf[1]);
 
             for (int i = 0; i < 3; i++)
-                opeResult[i].loc = opeResult[i].loc.mtp(55);
+                opeResult[i].loc = opeResult[i].loc.mtp(14);
             eyeDstHf *= 14;
             // test
 

@@ -18,6 +18,7 @@ BEGIN
             MENUITEM "‘o‹È–Ê (“ú–{Œê)"	    UI_H3_JA
             MENUITEM "Spherical (English)"	UI_LANG_EN
             MENUITEM "Hyperbolic (English)"	UI_H3_EN
+            MENUITEM "Spherical VR"	        UI_S3_VR
         END
 		MENUITEM SEPARATOR 
         MENUITEM "Exit",                UI_END

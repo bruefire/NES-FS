@@ -28,6 +28,7 @@ void MenuLgc::Dispose()
 
 
 MenuLgc::MenuLgc()
+    : scale(1)
 {
 }
 
@@ -192,7 +193,7 @@ uint64_t MenuLgc::makeSubMenu(MENU TYPE, GuiContainer* menu, GuiStringEx* gs, in
         item->act = gs[i].act;
         double parL = menu->drawArea.l + menu->padding.l;
         double parT = menu->drawArea.t + menu->padding.t;
-        item->fontSz = 0.04;
+        item->fontSz = 0.04 * scale;
         item->fontSpan = 0.8;
         item->padding = GlRect(0.01, GlRect::STD::HORIZONAL);
         item->drawArea = GlRect
@@ -204,7 +205,7 @@ uint64_t MenuLgc::makeSubMenu(MENU TYPE, GuiContainer* menu, GuiStringEx* gs, in
                 item->fontSz + item->padding.t + item->padding.b
                 ),
             parL + 0.02,
-            parT + 0.02 + 0.08 * i,
+            parT + 0.02 + 0.08 * i * scale,
             GlRect::STD::HORIZONAL
             );
 

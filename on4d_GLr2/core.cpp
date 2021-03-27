@@ -78,7 +78,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	int awIdx = awakeCmd.find_last_of(" ") +1;
 	 
 	if(awIdx <= awakeCmd.length()){
-		if (awakeCmd.substr(awIdx) == "sim:S3;lang:JA;view:VR")
+		if (awakeCmd.substr(awIdx) == "sim:S3;lang:EN;view:VR")
 		{
 			newEngine = new engine3dWinOVR();
 			newEngine->lang = UI_LANG_JA;
@@ -374,6 +374,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					fName = myPath;
 					mpIdx = fName.find_last_of("\\") + 1;
 					fName = fName.substr(mpIdx) + " sim:H3;lang:EN";
+
+					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					PostQuitMessage(0);
+					break;
+
+				case UI_S3_VR:
+					GetModuleFileName(NULL, myPath, myPathLen);
+					fName = myPath;
+					mpIdx = fName.find_last_of("\\") + 1;
+					fName = fName.substr(mpIdx) + " sim:S3;lang:EN;view:VR";
 
 					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
 					PostQuitMessage(0);

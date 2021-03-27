@@ -11,6 +11,7 @@ public:
 
     engine3dGL* owner;
     GuiContainer menu;  // content
+    double scale;
 
     enum class INPUT
     {

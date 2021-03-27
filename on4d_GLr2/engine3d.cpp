@@ -1354,7 +1354,8 @@ int engine3d::InitS3()	// ‹…–Ê¢ŠE—p‰Šú‰»
 		vrMenuObj.used = true;
 		vrMenuMesh.meshInitC((meshLen - 1) + 3);
 		vrMenuObj.mesh = &vrMenuMesh;
-		vrMenuObj.scale = 4;
+		vrMenuObj.scale = 2;
+		menuLgc.scale = 2;
 	}
 
 
