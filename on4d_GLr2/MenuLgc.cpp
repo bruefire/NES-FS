@@ -91,8 +91,10 @@ void MenuLgc::MakeMenu()
     GuiStringEx basicObjItems[]
     {
         GuiStringEx("None", MENU_ACT::MAKE_BASIC_OBJECT_INVISILE),
-        GuiStringEx("6 lines", MENU_ACT::CHANGE_BASIC_OBJECT_TO_LINES_LN),
-        GuiStringEx("Polar", MENU_ACT::CHANGE_BASIC_OBJECT_TO_POLAR_LN),
+        GuiStringEx("6 lines (point)", MENU_ACT::CHANGE_BASIC_OBJECT_TO_LINES_PT),
+        GuiStringEx("6 lines (line)", MENU_ACT::CHANGE_BASIC_OBJECT_TO_LINES_LN),
+        GuiStringEx("Polar (point)", MENU_ACT::CHANGE_BASIC_OBJECT_TO_POLAR_PT),
+        GuiStringEx("Polar (line)", MENU_ACT::CHANGE_BASIC_OBJECT_TO_POLAR_LN),
         GuiStringEx("120-cells", MENU_ACT::CHANGE_BASIC_OBJECT_TO_CELLS120),
         GuiStringEx("Torus", MENU_ACT::CHANGE_BASIC_OBJECT_TO_TORUS),
         GuiStringEx("Earth", MENU_ACT::CHANGE_BASIC_OBJECT_TO_EARTH),
@@ -401,8 +403,14 @@ bool MenuLgc::MenuMsgProc(MENU_ACT act)
     case MAKE_BASIC_OBJECT_INVISILE:
         MakeBasicObjectInvisible();
         break;
+    case CHANGE_BASIC_OBJECT_TO_LINES_PT:
+        ChangeBasicObject(BASIC_OBJ::LINES, DRAW_TYPE::POINT);
+        break;
     case CHANGE_BASIC_OBJECT_TO_LINES_LN:
         ChangeBasicObject(BASIC_OBJ::LINES, DRAW_TYPE::LINE);
+        break;
+    case CHANGE_BASIC_OBJECT_TO_POLAR_PT:
+        ChangeBasicObject(BASIC_OBJ::POLAR, DRAW_TYPE::POINT);
         break;
     case CHANGE_BASIC_OBJECT_TO_POLAR_LN:
         ChangeBasicObject(BASIC_OBJ::POLAR, DRAW_TYPE::LINE);

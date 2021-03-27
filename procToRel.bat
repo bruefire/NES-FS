@@ -4,7 +4,7 @@ title CopyShaderFiles
 rem ファイル名, フォルダ名
 set v32=..\32bit-Win
 set v64=..\64bit-Win
-set exeNm=on4d_GLr3.exe
+set exeNm=nes-fs.exe
 set newExeNm=nes-fs.exe
 
 cd on4d_GLr2\
@@ -20,10 +20,14 @@ if exist "%v32%\sample_script" rmdir /s /q "%v32%\sample_script"
 if exist "%v64%\sample_script" rmdir /s /q "%v64%\sample_script"
 xcopy /i "sample_script" "%v32%\sample_script"
 xcopy /i "sample_script" "%v64%\sample_script"
+echo シェーダーフォルダコピー開始..
+if exist "%v32%\shader" rmdir /s /q "%v32%\shader"
+if exist "%v64%\shader" rmdir /s /q "%v64%\shader"
+xcopy /i "shader" "%v32%\shader"
+xcopy /i "shader" "%v64%\shader"
 
-rem シェーダファイルコピー
-echo シェーダファイル, pyファイルコピー開始..
-for %%A in ( *.c *.py ) do ( 
+echo pyファイルコピー開始..
+for %%A in ( *.py ) do ( 
 	copy /y "%%A" "%v32%\%%A" 
 	copy /y "%%A" "%v64%\%%A" 
 )
