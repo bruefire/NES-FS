@@ -2,7 +2,7 @@
 
 in vec3 vPos[];
 in vec3 fColor[];
-uniform vec4 WH_CR;
+uniform vec4 cRange;
 out vec3 fCol;
 out float Dec;
 
@@ -78,8 +78,8 @@ void main(){
 		float length = tan(curPt.y);
 		float scX = length * sin(curPt.x);
 		float scY = length * cos(curPt.x);
-		scX = scX/WH_CR.z;
-		scY = scY/WH_CR.w;
+		scX = (scX + cRange[0]) / (cRange[0] + cRange[1]) * 2 - 1;
+		scY = (scY + cRange[3]) / (cRange[2] + cRange[3]) * 2 - 1;
 
 		float dec;
 		if(curPt.y<0.5*PIE) dec = (PIE-curPt.z*0.5) /PIE; else dec = curPt.z*0.5 /PIE;

@@ -34,7 +34,7 @@ void engine3dGL::GL_InitScene()
 {
 	glTexLen = meshLen + 3;
 	int texs = glTexLen;
-	texNames = new uint32_t[texs];	// ‰æ–Ê1 + mesh” + ‹OÕ1
+	texNames = new uint32_t[texs];	// ‰æ–Ê1 + mesh” + ‹OÕ1 + ƒƒjƒ…[1
 	buffers = new uint32_t[texs];
 
 	glEnable(GL_CULL_FACE);

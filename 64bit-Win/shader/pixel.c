@@ -16,6 +16,7 @@ in float fn3Rt;
 in float fr;
 
 uniform vec4 WH_CR;
+uniform vec4 cRange;
 uniform vec4 sLoc;
 uniform sampler2D sfTex;
 uniform int texJD;
@@ -134,13 +135,15 @@ void main()
 {
 	vec2 gl = vec2(gl_FragCoord.x, gl_FragCoord.y);
 
-
+	// aymmetric fovの場合は透視中央!=画面中央
+	float cRangeLR = cRange[0] + cRange[1];
+	float cRangeTB = cRange[2] + cRange[3];
 
 	// 面属球法線から深度を導く//
 
 	// 視線方向の傾きを計算
-	float gzX = ((gl.x/WH_CR.x - 0.5)*2.0*WH_CR.z);
-	float gzY = ((gl.y/WH_CR.y - 0.5)*2.0*WH_CR.w);
+	float gzX = gl.x / WH_CR.x * cRangeLR - cRange[0];
+	float gzY = gl.y / WH_CR.y * cRangeTB - cRange[3];
 	float gzZ = 1.0;
 	float gzRate0 = pyth3(gzX, gzY, gzZ);
 	vec3 gaze = vec3(gzX, gzY, gzZ) / gzRate0;	// 再考不要

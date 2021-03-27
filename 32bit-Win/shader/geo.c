@@ -5,7 +5,6 @@ in vec3 fColor[3];
 in vec2 txrG[3];
 
 uniform mat4 MVP;
-uniform vec4 WH_CR;
 
 out vec2 txr[3];
 out vec3 fCol;

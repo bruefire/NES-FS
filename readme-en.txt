@@ -5,12 +5,14 @@ this program is OSS.
 there is no problem with modification, 
 redistribtion or etc.
 
+
 Overview:
 this program is simulator to fly 
 in "Spherical space" and "Hyperbolic space"
 which have diferent 
 features from Euclid space.
 the source was coded for windows.
+
 
 =========== Disclaimer ===========
 1. I'll not have responsibility about any 
@@ -30,7 +32,8 @@ maybe recommended GPU spec:
 (I have developed this with GTX770 
 and win10)
 
-*********　method of operation　*********
+
+*********　Method of operation　*********
 ------------- format -------------
 [keyboard and mouse / Xbox controller]
  result of operation
@@ -68,13 +71,17 @@ change move speed.
 
 #maybe other controllers can be used this program.
 but I don't know button layout about others. 
-***************************
+
+
+*************　About VR mode　*************
+hardwares that This software is apadpted to is only OculusRift/Quest.
+if you have a bad feeling, please stop playing and take a rest.
 
 models of "Izumo Oyashiro", Tori, and so on 
 were downloaded and used from here:
 http://www.3dchaya.com/
 ----------------------------------
 NES-FS (Non Euclidean Space Flight Simlator)
-version: 3.0.0
-release: Jan.10.2021
+version: 3.1.0
+release: Mar.2021
 creator: bruefire

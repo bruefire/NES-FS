@@ -1,0 +1,1 @@
+nes-fs.exe lang:JA

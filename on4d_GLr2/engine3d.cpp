@@ -84,7 +84,7 @@ int engine3d::init()
 	PLR_No = BWH_QTY;	
 
 	// メッシュ定義
-	meshLen = 23;
+	meshLen = 24;
 	meshNames = new char*[meshLen];
 	meshNames[0] = "wLines", 
 	meshNames[1] = "player", 
@@ -110,6 +110,7 @@ int engine3d::init()
 	meshNames[20] = "mapElm4";
 	meshNames[21] = "plane";
 	meshNames[22] = "hand";
+	meshNames[23] = "lhand";
 
 	///-- 雛形メッシュ
 	allocMesh();
@@ -1342,10 +1343,11 @@ int engine3d::InitS3()	// 球面世界用初期化
 	// VR hand
 	if (vrFlag)
 	{
+		int meshIdx[2] = {23, 22};
 		for (int i = 0; i < 2; i++)
 		{
 			vrHand[i].draw = 2;
-			vrHand[i].objInitS3(meshs + 22);
+			vrHand[i].objInitS3(meshs + meshIdx[i]);
 			vrHand[i].used = true;
 		}
 

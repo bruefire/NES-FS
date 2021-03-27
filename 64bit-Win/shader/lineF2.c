@@ -8,6 +8,7 @@ in vec4 slopeC, betaC;
 in vec3 fCol;
 
 uniform vec4 WH_CR;
+uniform vec4 cRange;
 uniform vec3 sLoc;
 uniform int decMode;
 uniform int bgMode;
@@ -29,8 +30,10 @@ float atan2(float x, float y);
 
 vec4 getTude(float scX, float scY, vec4 slopeC, vec4 betaC){///ok
 	///--Œğ“_‚ğ‹‚ß‚é
-	float xa = ((scX - 0.5*WH_CR.x) /(0.5*WH_CR.x)) *WH_CR.z;
-	float ya = ((scY - 0.5*WH_CR.y) /(0.5*WH_CR.y)) *WH_CR.w +pow(0.1, 25.0);
+	float cRangeLR = cRange[0] + cRange[1];
+	float cRangeTB = cRange[2] + cRange[3];
+	float xa = scX / WH_CR.x * cRangeLR - cRange[0];
+	float ya = scY / WH_CR.y * cRangeTB - cRange[3] + pow(0.1, 25.0);
 	float slopeV = xa/ya;	//-- x‚É‘Î‚·‚éy‚Ì‘‰Á—Ê
 	float crossY = betaC.x/(slopeV-slopeC.x);
 
