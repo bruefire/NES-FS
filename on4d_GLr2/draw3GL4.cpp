@@ -125,6 +125,18 @@ void engine3dGL::SimulateH3GL()
 	//=====カメラの範囲
 	double cRangeX = tan((LDBL)CR_RANGE_X / 2 * PIE / 180);
 	double cRangeY = tan((LDBL)CR_RANGE_Y / 2 * PIE / 180);
+	double cRangeR;
+	double cRangeD;
+	if (CR_RANGE_R < 0)
+	{
+		cRangeR = cRangeX;
+		cRangeD = cRangeY;
+	}
+	else
+	{
+		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PIE / 180);
+		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PIE / 180);
+	}
 
 	// todo★//-- 軌跡データ転送
 	//glBindBuffer(GL_ARRAY_BUFFER, buffers[markMesh.texNo]);
@@ -155,9 +167,11 @@ void engine3dGL::SimulateH3GL()
 		glUseProgram(shader[sdrs[i]]);
 		GLint xID = glGetUniformLocation(shader[sdrs[i]], "WH_CR");
 		glUniform4f(xID, (float)WIDTH, (float)HEIGHT, cRangeX, cRangeY);
+		xID = glGetUniformLocation(shader[sdrs[i]], "cRange");
+		glUniform4f(xID, cRangeX, cRangeR, cRangeY, cRangeD);
 
 		// MVPマトリックス設定
-		glm::mat4 Projection = glm::perspective((float)CR_RANGE_Y, (float)(cRangeX / cRangeY), 0.00001f, 2.0f);
+		glm::mat4 Projection = GetPerspective(-cRangeX, cRangeR, cRangeY, -cRangeD);
 		glm::mat4 View = glm::lookAt(
 			glm::vec3(0, 0, 0), // Camera location in World Space
 			glm::vec3(0, 1, 0), // direction of view
@@ -475,7 +489,7 @@ int engine3dGL::DrawEachObjsH3(int loop)
 	//==============オブジェクトごとのGL描画==============//
 	for (int h = 0; h < objCnt; h++)
 	{
-		object3d* curObj = objs + h;
+		object3d* curObj = GetObject(h);
 
 		if (!curObj->used) continue;
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
@@ -500,7 +514,8 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		glUniform1f(xID, H3_MAX_RADIUS);
 		//else		glUniform1i(xID, 3);
 		xID = glGetUniformLocation(shader[SDR], "decMode");
-		glUniform1i(xID, decMode);
+		if (h == -5) glUniform1i(xID, 0);
+		else glUniform1i(xID, decMode);
 		xID = glGetUniformLocation(shader[SDR], "texJD");
 		glUniform1i(xID, curObj->mesh->texJD);
 

@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			newEngine->lang = UI_LANG_JA;
 			newEngine->worldGeo = engine3d::WorldGeo::SPHERICAL;
 		}
-		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:JA;view:VR")
+		else if (awakeCmd.substr(awIdx) == "sim:H3;lang:EN;view:VR")
 		{
 			newEngine = new engine3dWinOVR();
 			newEngine->lang = UI_LANG_JA;

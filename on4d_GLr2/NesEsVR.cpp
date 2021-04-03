@@ -39,11 +39,23 @@ bool NesEsVR::updateSceneLgc()
 
 	if(!owner->menuLgc.InputProc(owner->ope.menuAction))
 		return false;
-	owner->engine3d::UpdFloatObjsS3();
 
-	// VR HMD, hand‚ÌˆÚ“®
-	owner->UpdPlayerObjsS3(cmrStd);	// cmrStd is unused.
-	owner->UpdVRObjectsS3(cmrStd);
+	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
+	{
+		owner->engine3d::UpdFloatObjsS3();
+
+		// VR HMD, hand‚ÌˆÚ“®
+		owner->UpdPlayerObjsS3(cmrStd);	// cmrStd is unused.
+		owner->UpdVRObjectsS3(cmrStd);
+	}
+	else
+	{
+		owner->engine3d::UpdFloatObjsH3();
+
+		// VR HMD, hand‚ÌˆÚ“®
+		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
+		owner->UpdVRObjectsH3(nullptr);
+	}
 
 	owner->PrepareInParamForNext();
 
@@ -66,14 +78,19 @@ void NesEsVR::updateGlScene(Eye eye)
 		owner->CR_RANGE_R = rMax;
 	}
 
+	owner->DrawGUIForVR();
+
 	if (owner->worldGeo == WorldGeo::SPHERICAL)
 	{
-		owner->DrawGUIForVR();
-
 		// ‘Š‘ÎˆÊ’uŒvŽZ
 		owner->ClcRelaivePosS3(cmrStd);	
 		owner->simulateS3GL();
-
+	}
+	else
+	{
+		// ‘Š‘ÎˆÊ’uŒvŽZ
+		owner->ClcRelaivePosH3(nullptr);
+		owner->SimulateH3GL();
 	}
 }
 

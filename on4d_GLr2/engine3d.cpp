@@ -188,6 +188,10 @@ int engine3d::update()
 
 	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- いずれこっちに変更
 
+
+	if (!menuLgc.InputProc(ope.menuAction))
+		return false;
+
 	// World Geometry
 	bool result;
 	if (worldGeo == WorldGeo::SPHERICAL)
@@ -217,9 +221,6 @@ void engine3d::PrepareInParamForNext()
 /// </summary>
 bool engine3d::UpdateS3()
 {
-	if(!menuLgc.InputProc(ope.menuAction))
-		return false;
-
 	// S3演算処理
 	if (GRAVITY && obMove) physics();
 	simulateS3();
@@ -803,6 +804,84 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 }
 
 // VRオブジェクト更新
+void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd)
+{
+	if (devOpe.std[0].isZero())
+		return;
+
+	pt3 preLoc = curObj->loc;
+
+	// 原点に移動
+	curObj->ParallelMove(curObj->loc, false);
+
+	double rotOn[3];
+	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
+	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
+
+	//---> 新規回転の反映
+	// 軸ベクトル定義
+	pt3 std1N = curObj->std[0].norm();
+	pt3 std2N = curObj->std[1].norm();
+	pt3 sideN = pt3::cross(std2N, std1N);
+
+	// 正面固定回転
+	pt2 tmpRt = pt2(0, 1);
+	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
+	pt3 s2y = std2N.mtp(tmpRt.y);
+	pt3 s2x = sideN.mtp(tmpRt.x);
+
+	// 上下方向回転
+	tmpRt = pt2(0, 1);
+	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
+	pt3 s1z = std1N.mtp(tmpRt.y);
+	pt3 s1y = std2N.mtp(tmpRt.x);
+	pt3 s2z = s2y.mtp(tmpRt.x * -1);
+	s2y = std2N.mtp(pt3::dot(std2N, s2y)).mtp(tmpRt.y);
+
+	// 左右方向回転
+	tmpRt = pt2(0, 1);
+	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
+	pt3 s1x = sideN.mtp(pt3::dot(std2N, s1y)).mtp(tmpRt.x);
+	s1y = s1y.mtp(tmpRt.y);
+	pt3 s2xy = s2x.pls(s2y);
+	pt3 s2xySd = pt3()
+		.pls(sideN.mtp(pt3::dot(std2N, s2y)))
+		.pls(std2N.mtp(pt3::dot(sideN, s2x) * -1));
+	pt3 s2xy1 = s2xy.mtp(tmpRt.y);
+	pt3 s2xy2 = s2xySd.mtp(tmpRt.x);
+
+	// set result
+	std1N = s1x.pls(s1y).pls(s1z);
+	std2N = s2xy1.pls(s2xy2).pls(s2z);
+	sideN = pt3::cross(std2N, std1N);
+
+	curObj->std[0] = std1N.mtp(H3_STD_LEN);
+	curObj->std[1] = std2N.mtp(H3_STD_LEN);
+
+
+	///-------- 位置,基準位置の更新 ----------
+	pt4 cmLc = pt4(0, devOpe.loc.x, devOpe.loc.y, devOpe.loc.z).mtp(1 / radius);
+	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
+	double eucW = object3d::ClcEucFromHypb(cmLc.w);
+
+	// 有効範囲チェック
+	if (cmLc.w > 0.0000000001 && eucW < H3_MAX_RADIUS)
+	{
+		// 移動方向ベクトル
+		pt3 lspX = std1N.mtp(cmLc.z)
+			.pls(std2N.mtp(cmLc.y))
+			.pls(sideN.mtp(cmLc.x))
+			.norm()
+			.mtp(eucW);
+
+		curObj->ParallelMove(lspX, true);	// 平行移動
+	}
+
+	// 元の位置に戻す
+	curObj->ParallelMove(preLoc, true);
+}
+
+// VRオブジェクト更新
 void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd)
 {
 	if (devOpe.std[0].isZero())
@@ -1022,6 +1101,32 @@ void engine3d::UpdVRObjectsS3(double* cmrStd)
 }
 
 
+void engine3d::UpdVRObjectsH3(double* cmrStd)
+{
+	// HMD
+	object3d* plrObj = &objs[PLR_No];
+	ClcVRObjectPosH3(ope.vrDev[0], plrObj, cmrStd);
+
+	// hands
+	for (int i = 0; i < 2; i++)
+	{
+		vrHand[i].loc = plrObj->loc;
+		vrHand[i].std[0] = plrObj->std[0];
+		vrHand[i].std[1] = plrObj->std[1];
+	}
+	//ClcVRObjectPosH3(ope.vrDev[1], &vrHand[0], nullptr);
+	//ClcVRObjectPosH3(ope.vrDev[2], &vrHand[1], nullptr);
+
+	// menu
+	vrMenuObj.used = menuLgc.menu.displayed;
+	vrHand[0].used = !menuLgc.menu.displayed;
+	vrMenuObj.loc = vrHand[0].loc;
+	vrMenuObj.std[0] = vrHand[0].std[0];
+	vrMenuObj.std[1] = vrHand[0].std[1];
+
+}
+
+
 // 相対位置計算
 void engine3d::ClcRelaivePosS3(double* cmrStd)
 {
@@ -1138,26 +1243,30 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[2], 0);
 
 		//-- 後方カメラなら
-		pt3 locT = curObj->loc;
-		object3d backObj(*curObj);
+		object3d viewObj(*curObj);
 		if (ope.cmBack) {
-			tudeRst(&backObj.loc.x, &backObj.loc.z, PIE, 1);
-			tudeRst(&backObj.std[0].x, &backObj.std[0].z, PIE, 1);
-			tudeRst(&backObj.std[1].x, &backObj.std[1].z, PIE, 1);
-			locT = backObj.loc;
-			backObj.ParallelMove(backObj.loc, false);
+			tudeRst(&viewObj.loc.x, &viewObj.loc.z, PIE, 1);
+			tudeRst(&viewObj.std[0].x, &viewObj.std[0].z, PIE, 1);
+			tudeRst(&viewObj.std[1].x, &viewObj.std[1].z, PIE, 1);
 		}
+		// VR
+		if (!ope.vrDev[0].std[0].isZero())
+		{
+			double cmLcX = ope.VREysDst * (1 / radius);
+			double eucW = object3d::ClcEucFromHypb(cmLcX);
 
-		curObj->locr = locT;
+			// 有効範囲チェック
+			if (cmLcX > 0.0000000001 && eucW < H3_MAX_RADIUS)
+				viewObj.ParallelMove(pt3(eucW, 0, 0), false);
+		}
+		curObj->locr = viewObj.loc;
+		viewObj.ParallelMove(viewObj.loc, false);
 
 		// std算出、調整、保存
 		pt3 locOld = curObj->loc;
 		curObj->ParallelMove(curObj->loc, false);
 		double objStd[3];
-		if(ope.cmBack)
-			curObj->clcStd(backObj.std[0], backObj.std[1], objStd);
-		else
-			curObj->clcStd(curObj->std[0], curObj->std[1], objStd);
+		curObj->clcStd(viewObj.std[0], viewObj.std[1], objStd);
 		curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
 
 		// std調整
@@ -1229,6 +1338,26 @@ void engine3d::InitWorld()	// 世界初期化
 	// プレイヤー座標obj初期化
 	cmData.loc.asg(0, 0, 0);
 	cmData.rot.asg(0, 0, 0);
+
+	// VR objects
+	if (vrFlag)
+	{
+		int meshIdx[2] = { 23, 22 };
+		for (int i = 0; i < 2; i++)
+		{
+			vrHand[i].draw = 2;
+			vrHand[i].objInitS3(meshs + meshIdx[i]);
+			vrHand[i].used = true;
+		}
+
+		vrMenuObj.draw = 2;
+		vrMenuObj.objInitS3(nullptr);
+		vrMenuObj.used = true;
+		vrMenuMesh.meshInitC((meshLen - 1) + 3);
+		vrMenuObj.mesh = &vrMenuMesh;
+		vrMenuObj.scale = 2;
+		menuLgc.scale = 2;
+	}
 
 	// 世界形状
 	if(worldGeo == WorldGeo::SPHERICAL)
@@ -1340,26 +1469,6 @@ int engine3d::InitS3()	// 球面世界用初期化
 	markObj.mesh = &markMesh;
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
-
-	// VR hand
-	if (vrFlag)
-	{
-		int meshIdx[2] = {23, 22};
-		for (int i = 0; i < 2; i++)
-		{
-			vrHand[i].draw = 2;
-			vrHand[i].objInitS3(meshs + meshIdx[i]);
-			vrHand[i].used = true;
-		}
-
-		vrMenuObj.draw = 2;
-		vrMenuObj.objInitS3(nullptr);
-		vrMenuObj.used = true;
-		vrMenuMesh.meshInitC((meshLen - 1) + 3);
-		vrMenuObj.mesh = &vrMenuMesh;
-		vrMenuObj.scale = 2;
-		menuLgc.scale = 2;
-	}
 
 
 	//-- 最初に全オブジェクトを用意
