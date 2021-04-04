@@ -60,6 +60,8 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="GL_Func.cpp" />
     <ClCompile Include="MenuLgc.cpp" />
+    <ClCompile Include="MenuLgcH3.cpp" />
+    <ClCompile Include="MenuLgcS3.cpp" />
     <ClCompile Include="NesEsVR.cpp" />
     <ClCompile Include="PyInteract.cpp" />
     <ClCompile Include="VR_Manager.cpp" />
@@ -104,6 +106,8 @@
     <ClInclude Include="global_var2.h" />
     <ClInclude Include="guiItem.h" />
     <ClInclude Include="MenuLgc.h" />
+    <ClInclude Include="MenuLgcH3.h" />
+    <ClInclude Include="MenuLgcS3.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="OculusTextureBuffer.h" />
     <ClInclude Include="operation.h" />

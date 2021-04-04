@@ -463,7 +463,6 @@ engine3dGL::engine3dGL()
 {
 	CR_RANGE_R = -1.0;
 	CR_RANGE_D = -1.0;
-	menuLgc.owner = this;
 
 	///¥ 3DƒXƒNƒŠ[ƒ“
 	tObj.ctr.asg(0, 0, 0);
@@ -998,7 +997,7 @@ void engine3dGL::makeGuiPlateVBO()
 // GUI •`‰æ
 void engine3dGL::drawGui()
 {
-	GuiContainer& menu = menuLgc.menu;
+	GuiContainer& menu = menuLgc->menu;
 
 	if (!menu.displayed)
 		return;

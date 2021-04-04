@@ -47,6 +47,7 @@ public:
 	bool InitWindow();
 	int createDIBS();
 	int disposeDIBS();
+	virtual void CreateNewEngine(std::string) override;
 
 	int SaveDIB32(char *lpFileName,const BYTE *lpPixel,const BITMAPINFO *lpBmpInfo, int loop);
 	char* nextInt(char* nowInt, char len, char rank);

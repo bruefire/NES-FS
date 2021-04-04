@@ -114,7 +114,7 @@ public:
 	}
 	mvObjParam;
 
-	MenuLgc menuLgc;
+	MenuLgc* menuLgc;
 
 	// ƒƒ\ƒbƒh //
 	void InitWorld();				// ¢ŠE‰Šú‰»(‹¤’Ê)
@@ -200,6 +200,7 @@ public:
 	int inPutKey(int key, int opt);
 	void ChangeBasicObject(int, int, bool = false);
 	void ChangeThrowObject(int);
+	virtual void CreateNewEngine(std::string) = 0;
 
 };
 

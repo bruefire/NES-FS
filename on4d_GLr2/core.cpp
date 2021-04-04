@@ -337,55 +337,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				//-- Œ¾Œê
 				case UI_LANG_JA:
-					//changeLang(hMenu, &menuItemInfo, UI_LANG_JA);
-					//menuCheck(hMenu, &menuItemInfo, UI_LANG_JA, unCk_lang, unCk_lang_len);
-					GetModuleFileName(NULL, myPath, myPathLen);
-					fName = myPath;
-					mpIdx = fName.find_last_of("\\") +1;
-					fName = fName.substr(mpIdx) + " lang:JA";
-
-					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					newEngine->CreateNewEngine(" lang:JA");
 					PostQuitMessage(0);
 					break;
 				case UI_LANG_EN:
-					//changeLang(hMenu, &menuItemInfo, UI_LANG_EN);
-					//menuCheck(hMenu, &menuItemInfo, UI_LANG_EN, unCk_lang, unCk_lang_len);
-					GetModuleFileName(NULL, myPath, myPathLen);
-					fName = myPath;
-					mpIdx = fName.find_last_of("\\") +1;
-					fName = fName.substr(mpIdx) + " lang:EN";
-
-					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					newEngine->CreateNewEngine(" lang:EN");
 					PostQuitMessage(0);
 					break;
 
 				case UI_H3_JA:
-					GetModuleFileName(NULL, myPath, myPathLen);
-					fName = myPath;
-					mpIdx = fName.find_last_of("\\") + 1;
-					fName = fName.substr(mpIdx) + " sim:H3;lang:JA";
-
-					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					newEngine->CreateNewEngine(" sim:H3;lang:JA");
 					PostQuitMessage(0);
 					break;
 
 				case UI_H3_EN:
-					GetModuleFileName(NULL, myPath, myPathLen);
-					fName = myPath;
-					mpIdx = fName.find_last_of("\\") + 1;
-					fName = fName.substr(mpIdx) + " sim:H3;lang:EN";
-
-					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					newEngine->CreateNewEngine(" sim:H3;lang:EN");
 					PostQuitMessage(0);
 					break;
 
 				case UI_S3_VR:
-					GetModuleFileName(NULL, myPath, myPathLen);
-					fName = myPath;
-					mpIdx = fName.find_last_of("\\") + 1;
-					fName = fName.substr(mpIdx) + " sim:S3;lang:EN;view:VR";
-
-					CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+					newEngine->CreateNewEngine(" sim:S3;lang:EN;view:VR");
 					PostQuitMessage(0);
 					break;
 

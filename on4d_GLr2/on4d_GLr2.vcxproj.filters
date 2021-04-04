@@ -192,6 +192,12 @@
     <ClCompile Include="MenuLgc.cpp">
       <Filter>c++ source\GL部</Filter>
     </ClCompile>
+    <ClCompile Include="MenuLgcS3.cpp">
+      <Filter>c++ source\GL部</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuLgcH3.cpp">
+      <Filter>c++ source\GL部</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">
@@ -291,6 +297,12 @@
       <Filter>c++ header\OVR</Filter>
     </ClInclude>
     <ClInclude Include="MenuLgc.h">
+      <Filter>c++ header\GL部\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuLgcS3.h">
+      <Filter>c++ header\GL部\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuLgcH3.h">
       <Filter>c++ header\GL部\UI</Filter>
     </ClInclude>
   </ItemGroup>

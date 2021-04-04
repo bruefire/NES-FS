@@ -37,7 +37,7 @@ bool NesEsVR::updateSceneLgc()
 {
 	cmrStd[0] = cmrStd[1] = cmrStd[2] = 0;
 
-	if(!owner->menuLgc.InputProc(owner->ope.menuAction))
+	if(!owner->menuLgc->InputProc(owner->ope.menuAction))
 		return false;
 
 	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
@@ -128,7 +128,7 @@ void NesEsVR::DeviceInputProcedure(ovrInputState state, ovrControllerType type)
 			owner->ope.menuAction = MenuLgc::INPUT::RETURN;
 		ope.buttonX_raw = state.Buttons & 0b100000000;
 
-		if (owner->menuLgc.menu.displayed)
+		if (owner->menuLgc->menu.displayed)
 		{
 			Ope::StickVState preStickVState = ope.lStickVState;
 
@@ -199,7 +199,7 @@ void NesEsVR::DeviceInputProcedure(ovrInputState state, ovrControllerType type)
 
 	case ovrControllerType::ovrControllerType_RTouch:
 	{
-		if (owner->menuLgc.menu.displayed)
+		if (owner->menuLgc->menu.displayed)
 		{
 			if (!ope.buttonA_raw && state.Buttons & 0b01)
 				owner->ope.menuAction = MenuLgc::INPUT::OK;

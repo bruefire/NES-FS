@@ -10,6 +10,8 @@
 #include "engine3d.h"
 #include "S3ErrorManager.h"
 #include "functions.h"
+#include "MenuLgcH3.h"
+#include "MenuLgcS3.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -57,6 +59,7 @@ engine3d::engine3d()
 	, h3objLoop(true)
 	, viewTrackIdx(-1)
 	, vrFlag(false)
+	, menuLgc(nullptr)
 {
 	adjTime[0] = adjTime[1] = 0;
 	
@@ -163,7 +166,13 @@ int engine3d::init()
 	mapMesh[1] = meshs + 16;
 
 	// menu
-	menuLgc.Init();
+	if (worldGeo == WorldGeo::HYPERBOLIC)
+		menuLgc = new MenuLgcH3();
+	else
+		menuLgc = new MenuLgcS3();
+	menuLgc->setOwner(this);
+	menuLgc->Init();
+	menuLgc->scale = 2;
 
 
 	return rtnVal;
@@ -189,7 +198,7 @@ int engine3d::update()
 	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- ‚¢‚¸‚ê‚±‚Á‚¿‚É•ÏX
 
 
-	if (!menuLgc.InputProc(ope.menuAction))
+	if (!menuLgc->InputProc(ope.menuAction))
 		return false;
 
 	// World Geometry
@@ -247,7 +256,8 @@ int engine3d::dispose()
 		return 0;
 
 	// ‰ğ•ú
-	menuLgc.Dispose();
+	menuLgc->Dispose();
+	delete menuLgc;
 	delete[] objs;
 	delete[] meshs;
 	delete[] meshNames;
@@ -1109,8 +1119,8 @@ void engine3d::UpdVRObjectsS3(double* cmrStd)
 	ClcVRObjectPosS3(ope.vrDev[2], &vrHand[1], nullptr);
 
 	// menu
-	vrMenuObj.used = menuLgc.menu.displayed;
-	vrHand[0].used = !menuLgc.menu.displayed;
+	vrMenuObj.used = menuLgc->menu.displayed;
+	vrHand[0].used = !menuLgc->menu.displayed;
 	vrMenuObj.loc = vrHand[0].loc;
 	vrMenuObj.std[0] = vrHand[0].std[0];
 	vrMenuObj.std[1] = vrHand[0].std[1];
@@ -1135,8 +1145,8 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 	ClcVRObjectPosH3(ope.vrDev[2], &vrHand[1], false);
 
 	// menu
-	vrMenuObj.used = menuLgc.menu.displayed;
-	vrHand[0].used = !menuLgc.menu.displayed;
+	vrMenuObj.used = menuLgc->menu.displayed;
+	vrHand[0].used = !menuLgc->menu.displayed;
 	vrMenuObj.loc = vrHand[0].loc;
 	vrMenuObj.std[0] = vrHand[0].std[0];
 	vrMenuObj.std[1] = vrHand[0].std[1];
@@ -1374,7 +1384,6 @@ void engine3d::InitWorld()	// ¢ŠE‰Šú‰»
 		vrMenuMesh.meshInitC((meshLen - 1) + 3);
 		vrMenuObj.mesh = &vrMenuMesh;
 		vrMenuObj.scale = 2;
-		menuLgc.scale = 2;
 	}
 
 	// ¢ŠEŒ`ó

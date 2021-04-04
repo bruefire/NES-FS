@@ -324,4 +324,21 @@ void engine3dWin::Write32(HANDLE fh,const BYTE *lpPixel,int w,int h)
 	HeapFree(GetProcessHeap(), 0, tmbm);
 }
 
+void engine3dWin::CreateNewEngine(string option)
+{
+	char myPath[256];
+	int myPathLen = 256;
+	int mpIdx;
+	string fName;
+
+	GetModuleFileName(NULL, myPath, myPathLen);
+	fName = myPath;
+	mpIdx = fName.find_last_of("\\") + 1;
+	fName = fName.substr(mpIdx) + option;
+	PROCESS_INFORMATION pi = { 0 };
+	STARTUPINFO si = { sizeof(STARTUPINFO) };
+
+	CreateProcess(NULL, &fName[0], NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+}
+
 
