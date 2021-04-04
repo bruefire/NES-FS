@@ -129,7 +129,7 @@ public:
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
 	void ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd);
-	void ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd);
+	void ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool isHmd);
 	void UpdVRObjectsS3(double* cmrSts);
 	void UpdVRObjectsH3(double* cmrSts);
 	void ClcCoordinate();

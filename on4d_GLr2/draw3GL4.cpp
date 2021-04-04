@@ -487,7 +487,7 @@ int engine3dGL::DrawEachObjsS3_LQY(int loop)
 int engine3dGL::DrawEachObjsH3(int loop)
 {
 	//==============オブジェクトごとのGL描画==============//
-	for (int h = 0; h < objCnt; h++)
+	for (int h = -5; h < objCnt; h++)
 	{
 		object3d* curObj = GetObject(h);
 

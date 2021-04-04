@@ -804,7 +804,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 }
 
 // VRオブジェクト更新
-void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd)
+void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool isHmd)
 {
 	if (devOpe.std[0].isZero())
 		return;
@@ -824,39 +824,54 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, doub
 	pt3 std2N = curObj->std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
-	// 正面固定回転
-	pt2 tmpRt = pt2(0, 1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
-	pt3 s2y = std2N.mtp(tmpRt.y);
-	pt3 s2x = sideN.mtp(tmpRt.x);
+	pt3 newStd1N = pt3()
+		.pls(std1N.mtp(devOpe.std[0].z))
+		.pls(std2N.mtp(devOpe.std[0].y))
+		.pls(sideN.mtp(devOpe.std[0].x));
+	pt3 newStd2N = pt3()
+		.pls(std1N.mtp(devOpe.std[1].z))
+		.pls(std2N.mtp(devOpe.std[1].y))
+		.pls(sideN.mtp(devOpe.std[1].x));
+	pt3 newSideN = pt3::cross(std2N, std1N);
 
-	// 上下方向回転
-	tmpRt = pt2(0, 1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
-	pt3 s1z = std1N.mtp(tmpRt.y);
-	pt3 s1y = std2N.mtp(tmpRt.x);
-	pt3 s2z = s2y.mtp(tmpRt.x * -1);
-	s2y = std2N.mtp(pt3::dot(std2N, s2y)).mtp(tmpRt.y);
+	//// 正面固定回転
+	//pt2 tmpRt = pt2(0, 1);
+	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
+	//pt3 s2y = std2N.mtp(tmpRt.y);
+	//pt3 s2x = sideN.mtp(tmpRt.x);
 
-	// 左右方向回転
-	tmpRt = pt2(0, 1);
-	tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
-	pt3 s1x = sideN.mtp(pt3::dot(std2N, s1y)).mtp(tmpRt.x);
-	s1y = s1y.mtp(tmpRt.y);
-	pt3 s2xy = s2x.pls(s2y);
-	pt3 s2xySd = pt3()
-		.pls(sideN.mtp(pt3::dot(std2N, s2y)))
-		.pls(std2N.mtp(pt3::dot(sideN, s2x) * -1));
-	pt3 s2xy1 = s2xy.mtp(tmpRt.y);
-	pt3 s2xy2 = s2xySd.mtp(tmpRt.x);
+	//// 上下方向回転
+	//tmpRt = pt2(0, 1);
+	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
+	//pt3 s1z = std1N.mtp(tmpRt.y);
+	//pt3 s1y = std2N.mtp(tmpRt.x);
+	//pt3 s2z = s2y.mtp(tmpRt.x * -1);
+	//s2y = std2N.mtp(pt3::dot(std2N, s2y)).mtp(tmpRt.y);
 
-	// set result
-	std1N = s1x.pls(s1y).pls(s1z);
-	std2N = s2xy1.pls(s2xy2).pls(s2z);
-	sideN = pt3::cross(std2N, std1N);
+	//// 左右方向回転
+	//tmpRt = pt2(0, 1);
+	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
+	//pt3 s1x = sideN.mtp(pt3::dot(std2N, s1y)).mtp(tmpRt.x);
+	//s1y = s1y.mtp(tmpRt.y);
+	//pt3 s2xy = s2x.pls(s2y);
+	//pt3 s2xySd = pt3()
+	//	.pls(sideN.mtp(pt3::dot(std2N, s2y)))
+	//	.pls(std2N.mtp(pt3::dot(sideN, s2x) * -1));
+	//pt3 s2xy1 = s2xy.mtp(tmpRt.y);
+	//pt3 s2xy2 = s2xySd.mtp(tmpRt.x);
 
-	curObj->std[0] = std1N.mtp(H3_STD_LEN);
-	curObj->std[1] = std2N.mtp(H3_STD_LEN);
+	//// set result
+	//pt3 newStd1N = s1x.pls(s1y).pls(s1z);
+	//pt3 newStd2N = s2xy1.pls(s2xy2).pls(s2z);
+	//pt3 newSideN = pt3::cross(std2N, std1N);
+	if (isHmd)
+	{
+		std1N = newStd1N;
+		std2N = newStd2N;
+		sideN = newSideN;
+	}
+	curObj->std[0] = newStd1N.mtp(H3_STD_LEN);
+	curObj->std[1] = newStd2N.mtp(H3_STD_LEN);
 
 
 	///-------- 位置,基準位置の更新 ----------
@@ -879,6 +894,8 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, doub
 
 	// 元の位置に戻す
 	curObj->ParallelMove(preLoc, true);
+	
+	curObj->rot = pt3(0, 0, 0);
 }
 
 // VRオブジェクト更新
@@ -1105,7 +1122,7 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 {
 	// HMD
 	object3d* plrObj = &objs[PLR_No];
-	ClcVRObjectPosH3(ope.vrDev[0], plrObj, cmrStd);
+	ClcVRObjectPosH3(ope.vrDev[0], plrObj, true);
 
 	// hands
 	for (int i = 0; i < 2; i++)
@@ -1114,8 +1131,8 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 		vrHand[i].std[0] = plrObj->std[0];
 		vrHand[i].std[1] = plrObj->std[1];
 	}
-	//ClcVRObjectPosH3(ope.vrDev[1], &vrHand[0], nullptr);
-	//ClcVRObjectPosH3(ope.vrDev[2], &vrHand[1], nullptr);
+	ClcVRObjectPosH3(ope.vrDev[1], &vrHand[0], false);
+	ClcVRObjectPosH3(ope.vrDev[2], &vrHand[1], false);
 
 	// menu
 	vrMenuObj.used = menuLgc.menu.displayed;
@@ -1199,9 +1216,10 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 
 
 	// 各obj位置ををプレイヤーからの相対位置に
-	for (int h = 0; h < OBJ_QTY; h++)
+	for (int h = -5; h < OBJ_QTY; h++)
 	{
-		object3d* curObj = objs + h;
+		object3d* curObj = GetObject(h);
+		if (!curObj->used) continue;
 
 		//プレイヤー中心の平行移動 原点へ
 		curObj->ParallelMove(plrLoc, false);
