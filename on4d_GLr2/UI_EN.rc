@@ -19,6 +19,7 @@ BEGIN
             MENUITEM "Spherical (English)"	UI_LANG_EN
             MENUITEM "Hyperbolic (English)"	UI_H3_EN
             MENUITEM "Spherical VR"	        UI_S3_VR
+            MENUITEM "Hyperbolic VR"	    UI_H3_VR
         END
 		MENUITEM SEPARATOR 
         MENUITEM "Exit",                UI_END

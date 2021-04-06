@@ -81,8 +81,8 @@ were downloaded and used from here:
 http://www.3dchaya.com/
 ----------------------------------
 NES-FS (Non Euclidean Space Flight Simlator)
-version: 3.1.0
-release: Mar.2021
+version: 3.2.0
+release: Apr.2021
 creator: bruefire
 
 
@@ -154,13 +154,13 @@ GPUであればスムーズに動作するはずです。
 *************　VRモードについて　*************
 VRモードに対応しているハードウェアは現在OculusRift/Questのみです。
 もし具合が悪くなったら無理せずプレイを中断して安静にしてください。
-
+特に超球面空間は気持ち悪くなりやすいかもしれません..
 
 
 出雲大社などのモデルは以下のサイト様から使用させて頂きました
 http://www.3dchaya.com/
 ----------------------------------
 NES-FS(非ユークリッド空間遊泳シミュレータ)
-バージョン 3.1.0
-2021.03
+バージョン 3.2.0
+2021.04
 製作者 bruefire

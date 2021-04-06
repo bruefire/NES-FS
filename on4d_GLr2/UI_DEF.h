@@ -16,6 +16,7 @@
 #define UI_LANG_EN 23
 #define UI_H3_EN 24
 #define UI_S3_VR 25
+#define UI_H3_VR 26
 
 // Pythonスクリプト
 #define UI_CALL_SCRIPT 30

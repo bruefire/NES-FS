@@ -360,6 +360,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					PostQuitMessage(0);
 					break;
 
+				case UI_H3_VR:
+					newEngine->CreateNewEngine(" sim:H3;lang:EN;view:VR");
+					PostQuitMessage(0);
+					break;
+
 				case UI_THROW_CLEAR:
 					newEngine->ClearFloatObjs();
 					break;
