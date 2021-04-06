@@ -1576,7 +1576,22 @@ void engine3d::ClearFloatObjs()
 void engine3d::RandLoc(engine3d::RandMode mode, int qty)
 {
 	if (worldGeo == WorldGeo::HYPERBOLIC)
+	{
+		object3d* plrObj = &objs[PLR_No];
+		int bgn = BWH_QTY + PLR_QTY;
+		int end = (bgn + qty <= OBJ_QTY) 
+			? bgn + qty
+			: OBJ_QTY;
+
+		for (int h = bgn; h < end; h++)
+		{
+			objs[h].loc = plrObj->loc;
+			objs[h].std[0] = plrObj->std[0];
+			objs[h].std[1] = plrObj->std[1];
+			objs[h].lspX = plrObj->lspX;
+		}
 		RandLocH3(mode, ObjType::Energy, qty);
+	}
 	else
 		RandLocS3(mode, qty);
 }
@@ -1586,7 +1601,9 @@ int engine3d::RandLocS3(engine3d::RandMode mode, int qty) {
 
 	//-- 放出オブジェクト ------
 	int bgn = BWH_QTY + PLR_QTY;
-	int end = (qty <= OBJ_QTY) ? qty : OBJ_QTY;
+	int end = (bgn + qty <= OBJ_QTY) 
+		? bgn + qty 
+		: OBJ_QTY;
 	ClearFloatObjs();
 
 	for (int h = bgn; h < end; h++) {
@@ -1633,7 +1650,9 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType, int qty)
 	else
 	{
 		bgn = BWH_QTY + PLR_QTY;
-		end = (qty <= OBJ_QTY) ? qty : OBJ_QTY;
+		end = (bgn + qty <= OBJ_QTY) 
+			? bgn + qty 
+			: OBJ_QTY;
 		ClearFloatObjs();
 	}
 

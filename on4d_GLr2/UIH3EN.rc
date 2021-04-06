@@ -84,6 +84,7 @@ BEGIN
 		END
 		POPUP "Replace shooted-obj"
 		BEGIN
+			MENUITEM "Random (Cluster)", UI_THROW_RANDOM2
 			MENUITEM "Random (Uniform)", UI_THROW_RANDOM2
 			MENUITEM "Clear", UI_THROW_CLEAR
 		END

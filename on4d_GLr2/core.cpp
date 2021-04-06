@@ -852,22 +852,7 @@ INT_PTR CALLBACK RandomRelocProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_COMMAND:
 		switch (LOWORD(wp)) {
 		case IDOK:
-			if (newEngine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
-			{
-				object3d* plrObj = &newEngine->objs[newEngine->PLR_No];
-				int end = (sRst <= newEngine->OBJ_QTY) ? sRst : newEngine->OBJ_QTY;
-				for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < end; h++)
-				{
-					newEngine->objs[h].loc = plrObj->loc;
-					newEngine->objs[h].std[0] = plrObj->std[0];
-					newEngine->objs[h].std[1] = plrObj->std[1];
-					newEngine->objs[h].lspX = plrObj->lspX;
-					newEngine->objs[h].used = true;
-				}
-				newEngine->RandLocH3(rdmRandMode, engine3d::ObjType::Energy, sRst);
-			}
-			else
-				newEngine->RandLocS3(rdmRandMode, sRst);
+			newEngine->RandLoc(rdmRandMode, sRst);
 
 			EndDialog(hDlg, IDOK);
 			return true;
