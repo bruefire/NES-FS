@@ -4,6 +4,10 @@ using namespace std;
 #define arraySizeof(ary) sizeof(ary)/sizeof(ary[0])
 
 
+MenuLgcS3::MenuLgcS3()
+{
+    scale = 2;
+}
 
 void MenuLgcS3::MakeMenu()
 {

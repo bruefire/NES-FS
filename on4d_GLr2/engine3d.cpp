@@ -172,7 +172,6 @@ int engine3d::init()
 		menuLgc = new MenuLgcS3();
 	menuLgc->setOwner(this);
 	menuLgc->Init();
-	menuLgc->scale = 2;
 
 
 	return rtnVal;
@@ -652,7 +651,7 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 
 
 	///-------- 位置,基準位置の更新 ----------
-	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(3);
+	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(2);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
 
 	std1 = std1N.mtp(SIN_1).pls(normO);
@@ -785,7 +784,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	curObj->std[1] = std2N.mtp(H3_STD_LEN);
 
 	///-------- 位置,基準位置の更新 ----------
-	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius);
+	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius).mtp(2);
 	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
 	double eucW = object3d::ClcEucFromHypb(cmLc.w);
 
@@ -1280,7 +1279,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		// VR
 		if (!ope.vrDev[0].std[0].isZero())
 		{
-			double cmLcX = ope.VREysDst * (1 / radius);
+			double cmLcX = ope.VREysDst * (2 / radius);	// why *2?
 			double eucW = object3d::ClcEucFromHypb(cmLcX);
 
 			// 有効範囲チェック
@@ -1453,7 +1452,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].rsp.asg(0 DEG, 0, 0);
 		objs[h].used = false;	//-- 有効化
 		objs[h].draw = 2;
-		objs[h].scale = 3;
+		objs[h].scale = 1;
 	}
 	// ランダムな位置
 	RandLocH3(RandMode::Uniform, ObjType::Energy);

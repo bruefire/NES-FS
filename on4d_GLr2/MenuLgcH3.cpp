@@ -5,6 +5,11 @@ using namespace std;
 
 
 
+MenuLgcH3::MenuLgcH3()
+{
+    scale = 2;
+}
+
 void MenuLgcH3::MakeMenu()
 {
     //== Gui Containerì¬

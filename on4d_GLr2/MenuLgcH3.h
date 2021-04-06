@@ -7,7 +7,7 @@ class MenuLgcH3 : public MenuLgc
 {
 public:
     // コンストラクタ
-    //MenuLgcH3();
+    MenuLgcH3();
 
     engine3dGL* owner;
 
