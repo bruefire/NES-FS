@@ -667,8 +667,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		case WM_RBUTTONUP:
 		{
-			if (!newEngine->CheckSelectedEnable())
-				break;
+			//if (!newEngine->CheckSelectedEnable())
+			//	break;
 			POINT po;
 			po.x = LOWORD(lp);
 			po.y = HIWORD(lp);
@@ -679,7 +679,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			miInfo.fMask = MIIM_TYPE;
 			miInfo.fType = MFT_STRING;
 
-			string itemStr = "object." + to_string(newEngine->selectedIdx) + "の設定";
+			string itemStr = (newEngine->selectedIdx != -1)
+				? ("object." + to_string(newEngine->selectedIdx))
+				: string("オブジェクト全体");
+			itemStr += "の設定";
+			
 			char* cstr = new char[itemStr.size() + 1];
 			strcpy(cstr, itemStr.c_str());
 			miInfo.dwTypeData = cstr;
@@ -1003,12 +1007,6 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		SendDlgItemMessage(hDlg, MODOBJ_VELOC_SLIDER, TBM_SETRANGE, true, MAKELPARAM(sMin, sMax));
 		SetDlgItemText(hDlg, MODOBJ_OBJNO_TXT, to_string(trgObjIdx).c_str());
 
-		if (!newEngine->CheckSelectedEnable())
-		{
-			DestroyWindow(modObjDlg);
-			return true;
-		}
-
 		// 現在の速度, スケールを取得してダイアログに反映
 		auto SetSliderVal = [sMin, sMax, hDlg](double inVal, int sliderID, double maxVal)
 		{
@@ -1022,18 +1020,36 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				sVal
 				);
 		};
-		// scale
-		sRst = newEngine->objs[newEngine->selectedIdx].scale;
-		SetSliderVal(sRst, MODOBJ_SCALE_SLIDER, scaleMax);
-		SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
-		// velocity
-		sRst = newEngine->objs[newEngine->selectedIdx].lspX.w;
-		SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
-		SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
-		// rot x velocity
-		sRst = newEngine->objs[newEngine->selectedIdx].rsp.x / PIE * 180;
-		SetSliderVal(sRst, MODOBJ_ROTX_SLIDER, rotvMax);
-		SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
+		if (trgObjIdx == -1)
+		{
+			// scale
+			sRst = 1;
+			SetSliderVal(sRst, MODOBJ_SCALE_SLIDER, scaleMax);
+			SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
+			// velocity
+			sRst = newEngine->SPEED_MAX;
+			SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
+			SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+			// rot x velocity
+			sRst = 0;
+			SetSliderVal(sRst, MODOBJ_ROTX_SLIDER, rotvMax);
+			SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
+		}
+		else 
+		{
+			// scale
+			sRst = newEngine->objs[newEngine->selectedIdx].scale;
+			SetSliderVal(sRst, MODOBJ_SCALE_SLIDER, scaleMax);
+			SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
+			// velocity
+			sRst = newEngine->objs[newEngine->selectedIdx].lspX.w;
+			SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
+			SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
+			// rot x velocity
+			sRst = newEngine->objs[newEngine->selectedIdx].rsp.x / PIE * 180;
+			SetSliderVal(sRst, MODOBJ_ROTX_SLIDER, rotvMax);
+			SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
+		}
 
 		// add comboBox strings
 		HWND cmb = GetDlgItem(hDlg, MODOBJ_MESH_CBOX);
@@ -1061,9 +1077,6 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			return true;
 
 		case MODOBJ_MESH_CBOX:
-			if (!newEngine->CheckSelectedEnable(trgObjIdx))
-				break;
-
 			if (HIWORD(wp) == CBN_SELCHANGE)
 			{
 				// get selected string
@@ -1072,10 +1085,30 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				LRESULT idx = SendMessage(cmb, CB_GETCURSEL, 0, 0);
 				SendMessage(cmb, CB_GETLBTEXT, idx, (LPARAM)tmpc);
 
-				for (int i = 0; i < newEngine->meshLen; i++)
+				if (trgObjIdx == -1)
 				{
-					if (newEngine->meshs[i].objNameS == tmpc)
-						newEngine->objs[trgObjIdx].mesh = &newEngine->meshs[i];
+					for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < newEngine->OBJ_QTY; h++)
+					{
+						for (int i = 0; i < newEngine->meshLen; i++)
+						{
+							if (newEngine->meshs[i].objNameS == tmpc)
+							{
+								newEngine->objs[h].mesh = &newEngine->meshs[i];
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < newEngine->meshLen; i++)
+					{
+						if (newEngine->meshs[i].objNameS == tmpc)
+						{
+							newEngine->objs[trgObjIdx].mesh = &newEngine->meshs[i];
+							break;
+						}
+					}
 				}
 			}
 			return true;
@@ -1083,9 +1116,6 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		break;
 
 	case WM_HSCROLL:
-		if (!newEngine->CheckSelectedEnable(trgObjIdx))
-			break;
-
 		if (lp != 0)
 		{
 			sVal = SendMessage((HWND)lp, (UINT)TBM_GETPOS, NULL, NULL);
@@ -1097,19 +1127,31 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			{
 			case MODOBJ_SCALE_SLIDER:
 				sRst = (double)sVal / sMax * scaleMax;
-				newEngine->objs[trgObjIdx].scale = sRst;
+				if(trgObjIdx == -1)
+					for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < newEngine->OBJ_QTY; h++)
+						newEngine->objs[h].scale = sRst;
+				else
+					newEngine->objs[trgObjIdx].scale = sRst;
 				SetDlgItemText(hDlg, MODOBJ_SCALE_TXT, to_string((long double)sRst).c_str());
 				break;
 
 			case MODOBJ_VELOC_SLIDER:
 				sRst = (double)sVal / sMax * velocMax;
-				newEngine->objs[trgObjIdx].lspX.w = sRst;
+				if (trgObjIdx == -1)
+					for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < newEngine->OBJ_QTY; h++)
+						newEngine->objs[h].lspX.w = sRst;
+				else
+					newEngine->objs[trgObjIdx].lspX.w = sRst;
 				SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
 				break;
 
 			case MODOBJ_ROTX_SLIDER:
 				sRst = (double)sVal / sMax * rotvMax;
-				newEngine->objs[trgObjIdx].rsp.x = sRst / 180 * PIE;
+				if (trgObjIdx == -1)
+					for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < newEngine->OBJ_QTY; h++)
+						newEngine->objs[h].rsp.x = sRst / 180 * PIE;
+				else
+					newEngine->objs[trgObjIdx].rsp.x = sRst / 180 * PIE;
 				SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
 				break;
 			}

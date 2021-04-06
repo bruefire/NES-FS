@@ -1455,7 +1455,7 @@ int engine3d::InitH3()	// ‘o‹È¢ŠE—p‰Šú‰»
 		objs[h].scale = 1;
 	}
 	// ƒ‰ƒ“ƒ_ƒ€‚ÈˆÊ’u
-	RandLocH3(RandMode::Uniform, ObjType::Energy);
+	RandLocH3(RandMode::Cluster, ObjType::Energy);
 
 	///-- ‹¤’Ê
 	for (h = 0; h < OBJ_QTY; h++) 
