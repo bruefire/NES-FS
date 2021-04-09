@@ -841,7 +841,7 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool
 		.pls(std1N.mtp(devOpe.std[1].z))
 		.pls(std2N.mtp(devOpe.std[1].y))
 		.pls(sideN.mtp(devOpe.std[1].x));
-	pt3 newSideN = pt3::cross(std2N, std1N);
+	pt3 newSideN = pt3::cross(newStd2N, newStd1N);
 
 	//// ³–ÊŒÅ’è‰ñ“]
 	//pt2 tmpRt = pt2(0, 1);
@@ -932,50 +932,57 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
 	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
 	{
-		pt4 tmp;
-		pt4 s1x, s1y, s1z;
-		pt4 s2x, s2y, s2z;
-		// Ž‹üŒÅ’è‰ñ“]
-		pt4 tmpN[2];
-		pt2 tmpRt = pt2(0, 1);
-		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
-		//
-		s2y = std2N.mtp(tmpRt.y); 
-		s2x = sideN.mtp(tmpRt.x);
+		//pt4 tmp;
+		//pt4 s1x, s1y, s1z;
+		//pt4 s2x, s2y, s2z;
+		//// Ž‹üŒÅ’è‰ñ“]
+		//pt4 tmpN[2];
+		//pt2 tmpRt = pt2(0, 1);
+		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
+		////
+		//s2y = std2N.mtp(tmpRt.y); 
+		//s2x = sideN.mtp(tmpRt.x);
 
-		// Ž‹üˆÚ“®‰ñ“]1
-		tmpRt = pt2(0, 1);
-		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
-		//
-		s1z = std1N.mtp(tmpRt.y);
-		s1y = std2N.mtp(tmpRt.x);
-		tmp = s2y.mtp(tmpRt.y);
-		s2z = std1N.mtp(-1 * pt4::dot(std2N, s2y)).mtp(tmpRt.x);
-		s2y = tmp;
+		//// Ž‹üˆÚ“®‰ñ“]1
+		//tmpRt = pt2(0, 1);
+		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
+		////
+		//s1z = std1N.mtp(tmpRt.y);
+		//s1y = std2N.mtp(tmpRt.x);
+		//tmp = s2y.mtp(tmpRt.y);
+		//s2z = std1N.mtp(-1 * pt4::dot(std2N, s2y)).mtp(tmpRt.x);
+		//s2y = tmp;
 
-		// Ž‹üˆÚ“®‰ñ“]2
-		tmpRt = pt2(0, 1);
-		tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
-		//
-		tmp = s1y.mtp(tmpRt.y);
-		s1x = sideN.mtp(pt4::dot(std2N, s1y)).mtp(tmpRt.x);
-		s1y = tmp;
-		pt4 s2xy = s2x.pls(s2y);
-		pt4 s2xy1 = s2xy.mtp(tmpRt.y);
-		double s2xy_yL = pt4::dot(std2N, s2xy);
-		double s2xy_xL = pt4::dot(sideN, s2xy);
-		pt4 s2xy_y = std2N.mtp(s2xy_yL);
-		pt4 s2xy_x = s2xy.mns(s2xy_y);
-		pt4 s2xyS = pt4()
-			.pls(sideN.mtp(s2xy_yL))
-			.pls(std2N.mtp(-1 * s2xy_xL));
-		pt4 s2xy2 = s2xyS.mtp(tmpRt.x);
+		//// Ž‹üˆÚ“®‰ñ“]2
+		//tmpRt = pt2(0, 1);
+		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
+		////
+		//tmp = s1y.mtp(tmpRt.y);
+		//s1x = sideN.mtp(pt4::dot(std2N, s1y)).mtp(tmpRt.x);
+		//s1y = tmp;
+		//pt4 s2xy = s2x.pls(s2y);
+		//pt4 s2xy1 = s2xy.mtp(tmpRt.y);
+		//double s2xy_yL = pt4::dot(std2N, s2xy);
+		//double s2xy_xL = pt4::dot(sideN, s2xy);
+		//pt4 s2xy_y = std2N.mtp(s2xy_yL);
+		//pt4 s2xy_x = s2xy.mns(s2xy_y);
+		//pt4 s2xyS = pt4()
+		//	.pls(sideN.mtp(s2xy_yL))
+		//	.pls(std2N.mtp(-1 * s2xy_xL));
+		//pt4 s2xy2 = s2xyS.mtp(tmpRt.x);
 
 
 		// set result
-		pt4 newStd1N = s1x.pls(s1y).pls(s1z).norm();
-		pt4 newStd2N = s2xy1.pls(s2xy2).pls(s2z).norm();
-		pt4 newSideN = pt4::cross(normN, std1N, std2N);
+		pt4 newStd1N = pt4()
+			.pls(std1N.mtp(devOpe.std[0].z))
+			.pls(std2N.mtp(devOpe.std[0].y))
+			.pls(sideN.mtp(devOpe.std[0].x));
+		pt4 newStd2N = pt4()
+			.pls(std1N.mtp(devOpe.std[1].z))
+			.pls(std2N.mtp(devOpe.std[1].y))
+			.pls(sideN.mtp(devOpe.std[1].x));
+		pt4 newSideN = pt4::cross(normN, newStd1N, newStd2N);
+
 		if (cmrStd == nullptr)
 		{
 			std1NDf = pt3(
