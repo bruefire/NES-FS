@@ -394,7 +394,8 @@ int engine3dGL::update()
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 
-		// ç¿ïWï`âÊ
+		// draw info
+		DrawDistancesH3();
 		DrawCoordinateH3();
 
 		glDisable(GL_BLEND);
@@ -848,9 +849,10 @@ void engine3dGL::DrawDistancesH3()
 			if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
 			object3d* eObj = objs + h;
 
-			double len = pyth2(eObj->loc.x, eObj->loc.y);
-			double dx = len * sin(eObj->loc.x);
-			double dy = len * cos(eObj->loc.x);
+			double dx = eObj->locr.x / eObj->locr.z;
+			double dy = eObj->locr.y / eObj->locr.z;
+			if (eObj->locr.z < 0 || isinf(dx) || isinf(dy))
+				continue;
 
 			double sPtX = (dx / cRangeX + 1.0) * 0.5;
 			double sPtY = (dy / cRangeY + 1.0) * -0.5 + 1.0;
@@ -858,10 +860,8 @@ void engine3dGL::DrawDistancesH3()
 			//-- âÊñ ì‡Ç»ÇÁï\é¶
 			if ((0 < sPtX && sPtX < 1) && (0 < sPtY && sPtY < 1))
 			{
-				//-- ï®ëÃä‘ÇÃãóó£
-				pt4 pLoc = pObj->tudeToEuc(pObj->loc);
-				pt4 eLoc = pObj->tudeToEuc(eObj->loc);
-				double val = asin((pyth4(pLoc.mns(eLoc)) * 0.5)) * 2 * radius;
+				//-- get distance between player and obj.
+				double val = object3d::ClcHypbFromEuc(pyth3(eObj->locr)) * radius;
 				string dstR =
 					to_string((long double)(val));
 				int dstLen = (val < 100.0) ? 4 : 3;		// óLå¯åÖêî

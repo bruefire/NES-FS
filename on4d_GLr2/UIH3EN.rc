@@ -96,7 +96,7 @@ BEGIN
 		MENUITEM "Player object", UI_PLR
 		MENUITEM "Map", UI_MAP
 		//MENUITEM "ˆÚ“®/‰ñ“]•ûŒü", UI_LR_RESULT
-		//MENUITEM "‹——£", UI_DST
+		MENUITEM "Distance", UI_DST
 		//MENUITEM "‹OÕ", UI_PAST
 	END
 	POPUP "Help"

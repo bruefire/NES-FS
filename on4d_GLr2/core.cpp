@@ -22,7 +22,7 @@
 #include "objSetting.h"
 using namespace std;
 
-// プロシージャ
+// procedures..
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK RandomRelocProc(HWND, UINT, WPARAM, LPARAM);
@@ -58,21 +58,18 @@ engine3d::RandMode rdmRandMode;
 
 
 
-//windowsプログラムのエントリーポイント
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow)
 {
-	// コントロール
 	//InitCommonControls();
-	//
 	curInst = hCurInst;
 	GetCurrentDirectory(MAX_PATH, curDir);
 
-	//-- コンソール作成 --//
+	//-- create console
     if(!AllocConsole()) return 0;
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
 
-	//---- コマンド取得 英語か日本語
+	//---- handle command strings;
 	string awakeCmd = GetCommandLine();
 	cout << awakeCmd << endl;
 	int awIdx = awakeCmd.find_last_of(" ") +1;
@@ -126,12 +123,12 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 
-	// S3シミュレータクラス 初期化
+	// initialize the simulator
 	void* iparam[2] = {&hCurInst, &nCmdShow};
 	if (!newEngine->init(iparam, InitStdWndFunc, StdWndMsgLoop))
 		PostQuitMessage(0);
 
-	///-- ゲームパッド
+	///-- init gamepad
 	JoyInfoEx.dwSize = sizeof(JOYINFOEX);
 	JoyInfoEx.dwFlags = JOY_RETURNALL;
 	if (JOYERR_NOERROR == joySetCapture(preWnd, JOYSTICKID1, 1, FALSE))
@@ -142,16 +139,14 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 
-	//**** 本処理 ****//
+	//**** main processing ****//
 	int result = newEngine->start();
 
 
-	///-- 後処理 --//
+	///-- dispose resources
 	newEngine->dispose();
 	delete newEngine;
-
 	FreeConsole();
-	///--
 	
 
 	return result;
