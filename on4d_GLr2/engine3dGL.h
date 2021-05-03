@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
 #include "constants.h"
 #include "guiItem.h"
 #include "engine3d.h"
@@ -100,7 +100,8 @@ public:
 	void DisposeCharVBO();
 	void DrawCoordinateS3();	// À•W•`‰æ
 	void DrawCoordinateH3();	// À•W•`‰æ h3
-	void DrawDistances();	// ‹——£•`‰æ
+	void DrawDistancesS3();	// ‹——£•`‰æ
+	void DrawDistancesH3();	// ‹——£•`‰æ
 	void DrawChar(uint8_t dChar, double x, double y, double w, double h);
 	void DrawChars(GuiString);
 	int DrawMapS3();

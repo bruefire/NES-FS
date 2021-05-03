@@ -1359,5 +1359,3 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	}
 	return false;
 }
-
-

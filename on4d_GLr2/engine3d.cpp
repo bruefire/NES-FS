@@ -292,6 +292,8 @@ void engine3d::simulateH3()
 
 	// 基objとの相対位置計算 (表示座標)
 	ClcCoordinate();
+
+	//MakeTracingLines();
 }
 
 ///=============== >>>ループ(球面空間)<<< ==================
@@ -311,8 +313,20 @@ int engine3d::simulateS3()
 	UpdPlayerObjsS3(cmrStd);
 
 
-	///===============^^^^^^^^^~~~~~~~~~~-----------
-		//-- 軌跡形成 --//
+	///===============^^^^^^
+	MakeTracingLines();
+
+	// 相対位置計算
+	ClcRelaivePosS3(cmrStd);
+	//===============^^^^^^^^^--
+
+	return 0;
+}
+
+
+void engine3d::MakeTracingLines()
+{
+	//-- 軌跡形成 --//
 	for (int h = 0; h < OBJ_QTY; h++) {
 		object3d* curObj = objs + h;
 
@@ -338,12 +352,6 @@ int engine3d::simulateS3()
 
 		}
 	}
-
-	// 相対位置計算
-	ClcRelaivePosS3(cmrStd);
-	//===============^^^^^^^^^~~~~~~~~~~-----------
-
-	return 0;
 }
 
 

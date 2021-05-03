@@ -174,9 +174,6 @@
     <ClCompile Include="CppPythonIF.cpp">
       <Filter>c++ source\core演算部</Filter>
     </ClCompile>
-    <ClCompile Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp">
-      <Filter>c++ source\OVR</Filter>
-    </ClCompile>
     <ClCompile Include="PyInteract.cpp">
       <Filter>c++ source</Filter>
     </ClCompile>
@@ -197,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="MenuLgcH3.cpp">
       <Filter>c++ source\GL部</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp">
+      <Filter>c++ source\OVR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,12 +269,6 @@
     <ClInclude Include="randomUI.h">
       <Filter>c++ header\OS/Hard依存部%28Windows%29\WinUI系</Filter>
     </ClInclude>
-    <ClInclude Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE.h">
-      <Filter>c++ header\OVR</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OVR\LibOVRKernel\Src\GL\CAPI_GLE_GL.h">
-      <Filter>c++ header\OVR</Filter>
-    </ClInclude>
     <ClInclude Include="PyInteract.h">
       <Filter>c++ header\core演算部</Filter>
     </ClInclude>
@@ -304,6 +298,12 @@
     </ClInclude>
     <ClInclude Include="MenuLgcH3.h">
       <Filter>c++ header\GL部\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE.h">
+      <Filter>c++ header\OVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE_GL.h">
+      <Filter>c++ header\OVR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

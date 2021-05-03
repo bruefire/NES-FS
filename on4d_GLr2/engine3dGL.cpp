@@ -373,7 +373,7 @@ int engine3dGL::update()
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 
-		DrawDistances();
+		DrawDistancesS3();
 		DrawCoordinateS3();
 
 		glDisable(GL_BLEND);
@@ -773,7 +773,7 @@ void engine3dGL::DrawCoordinateH3()
 }
 
 // プレイヤーと他オブジェクト間の距離を描画
-void engine3dGL::DrawDistances()
+void engine3dGL::DrawDistancesS3()
 {
 	if (VIEW_DST)
 	{
@@ -805,6 +805,58 @@ void engine3dGL::DrawDistances()
 
 			//-- 画面内なら表示
 			if ((0 < sPtX && sPtX < 1) && (0 < sPtY && sPtY < 1)) 
+			{
+				//-- 物体間の距離
+				pt4 pLoc = pObj->tudeToEuc(pObj->loc);
+				pt4 eLoc = pObj->tudeToEuc(eObj->loc);
+				double val = asin((pyth4(pLoc.mns(eLoc)) * 0.5)) * 2 * radius;
+				string dstR =
+					to_string((long double)(val));
+				int dstLen = (val < 100.0) ? 4 : 3;		// 有効桁数
+
+				// GL描画
+				guiStr.content = dstR.substr(0, dstLen);
+				guiStr.drawArea.l = sPtX * 2;
+				guiStr.drawArea.t = sPtY * 2;
+				DrawChars(guiStr);
+			}
+		}
+	}
+}
+
+// プレイヤーと他オブジェクト間の距離を描画
+void engine3dGL::DrawDistancesH3()
+{
+	if (VIEW_DST)
+	{
+		double asp = GetAsp();
+		GuiString guiStr;
+		guiStr.fontSz = 0.025;
+		guiStr.fontSpan = 0.8;
+		guiStr.padding.l = 0;
+		guiStr.padding.t = 0;
+
+		//=====カメラの範囲
+		double cRangeX = tan((LDBL)CR_RANGE_X * 0.5 * PIE / 180);
+		double cRangeY = tan((LDBL)CR_RANGE_Y * 0.5 * PIE / 180);
+		object3d* pObj = objs + PLR_No;
+
+		for (int h = 0; h < objCnt; h++) 	//-- 距離の表示
+		{
+			if (h == PLR_No) continue;
+			if (!(objs + h)->used) continue;
+			if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
+			object3d* eObj = objs + h;
+
+			double len = pyth2(eObj->loc.x, eObj->loc.y);
+			double dx = len * sin(eObj->loc.x);
+			double dy = len * cos(eObj->loc.x);
+
+			double sPtX = (dx / cRangeX + 1.0) * 0.5;
+			double sPtY = (dy / cRangeY + 1.0) * -0.5 + 1.0;
+
+			//-- 画面内なら表示
+			if ((0 < sPtX && sPtX < 1) && (0 < sPtY && sPtY < 1))
 			{
 				//-- 物体間の距離
 				pt4 pLoc = pObj->tudeToEuc(pObj->loc);
