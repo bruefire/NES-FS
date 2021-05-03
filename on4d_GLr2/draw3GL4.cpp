@@ -36,12 +36,12 @@ void engine3dGL::simulateS3GL()
 		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PIE / 180);
 	}
 
-	
 	//-- ãOê’ÉfÅ[É^ì]ëó
+	int trackLen = (qyMode == engine3dGL::QY_MODE::HIGH) ? 16 : 24;
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[ markMesh.texNo ]);
 	glBufferData(	//---- ptsì]ëó
 		GL_ARRAY_BUFFER,
-		markMesh.lLen*16 * sizeof(float),
+		markMesh.lLen * trackLen * sizeof(float),
 		markMesh.pts2,
 		GL_STATIC_DRAW
 	);

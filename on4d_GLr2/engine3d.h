@@ -133,7 +133,7 @@ public:
 	void UpdVRObjectsS3(double* cmrSts);
 	void UpdVRObjectsH3(double* cmrSts);
 	void ClcCoordinate();
-	void MakeTracingLines();
+	virtual void MakeTracingLines();
 	object3d* GetObject(int idx);
 	int physics();
 	bool CheckSelectedEnable(int idx = -1);

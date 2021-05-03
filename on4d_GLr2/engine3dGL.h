@@ -123,6 +123,7 @@ public:
 	void CreateBuffersForVRMenu();
 	void DisposeBuffersForVRMenu();
 	void DrawGUIForVR();
+	virtual void MakeTracingLines();
 
 	uint32_t LoadShaders(const char* vPath, const char* fPath);
 	uint32_t LoadShaders2(const char* vPath, const char* gPath, const char* fPath, char mode);

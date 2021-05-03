@@ -194,7 +194,7 @@ int engine3d::update()
 
 	////-----------------time
 
-	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- Ç¢Ç∏ÇÍÇ±Ç¡ÇøÇ…ïœçX
+	loop = (loop+1) % INT_MAX;//std::numeric_limits<int>::max(); <- Ç±Ç¡ÇøÇ…ïœçX
 
 
 	if (!menuLgc->InputProc(ope.menuAction))
@@ -326,32 +326,6 @@ int engine3d::simulateS3()
 
 void engine3d::MakeTracingLines()
 {
-	//-- ãOê’å`ê¨ --//
-	for (int h = 0; h < OBJ_QTY; h++) {
-		object3d* curObj = objs + h;
-
-		for (int i = 0; i < object3d::PAST_QTY - 1; i++) {
-			int idx = h * (object3d::PAST_QTY - 1) * 16 + i * 16;
-
-			markMesh.pts2[idx + 0] = curObj->past[i].x;
-			markMesh.pts2[idx + 1] = curObj->past[i].y;
-			markMesh.pts2[idx + 2] = curObj->past[i].z;
-			markMesh.pts2[idx + 3] = 1.0;
-			markMesh.pts2[idx + 4] = 0;
-			markMesh.pts2[idx + 5] = (double)i / object3d::PAST_QTY;
-
-			markMesh.pts2[idx + 8] = curObj->past[i + 1].x;
-			markMesh.pts2[idx + 9] = curObj->past[i + 1].y;
-			markMesh.pts2[idx + 10] = curObj->past[i + 1].z;
-			markMesh.pts2[idx + 11] = 1.0;
-			markMesh.pts2[idx + 12] = 0;
-			markMesh.pts2[idx + 13] = (double)i / object3d::PAST_QTY;
-
-			markMesh.pts2[idx + 6] = markMesh.pts2[idx + 7] =
-				markMesh.pts2[idx + 14] = markMesh.pts2[idx + 15] = 0;
-
-		}
-	}
 }
 
 

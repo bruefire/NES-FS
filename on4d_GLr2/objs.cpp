@@ -633,7 +633,7 @@ int mesh3d::setNull()
 // ‹OÕê—p
 int mesh3d::meshInitB(int qty, uint32_t texNo)
 {
-	pts2 = new float[qty*16];
+	pts2 = new float[qty*24];
 	
 	faceLen = 0;
 	lLen = qty;
