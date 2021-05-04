@@ -129,8 +129,9 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 
 		// 球面原点からの垂線ベクトル (接点)
 		pt4 trgToGrd = grdPt.mns(trgPt);
-		double ip = pt4::dot(trgToGrd.norm(pt4(0, 0, 0, 0), 0), trgPt.norm(pt4(0, 0, 0, 0), 0));
-		double ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
+		double ttgRate = trgToGrd.lenRatioOf(trgPt);
+		double ttgLen = pyth4(trgToGrd);
+		double ip = pt4::dot(trgToGrd.mtp(1 / ttgLen), trgPt.mtp(1 / (ttgLen * ttgRate)));
 		pt4 ttgNorm = trgToGrd.mtp(ttgRate).mtp(ip);
 
 		// 結果

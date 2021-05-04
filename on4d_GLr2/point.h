@@ -60,6 +60,7 @@ public:
 	pt3 qtrMtp(pt3);
 	static double dot(pt4, pt4);		// “àÏ
 	static pt4 cross(pt4, pt4, pt4);	// ŠOÏ(ƒNƒƒXÏ)
+	double lenRatioOf(pt4);
 
 	pt4();
 	pt4(double, double, double, double);

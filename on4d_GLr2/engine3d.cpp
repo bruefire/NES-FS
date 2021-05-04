@@ -2116,7 +2116,13 @@ pt4 pt4::cross(pt4 a, pt4 b, pt4 c)
 		- a.x * b.y * c.w - a.y * b.w * c.x - a.w * b.x * c.y
 		+ a.x * b.w * c.y + a.y * b.x * c.w + a.w * b.y * c.x
 	);
+}
 
+double pt4::lenRatioOf(pt4 t)
+{
+	return sqrt(
+		 (t.x * t.x + t.y * t.y + t.z * t.z + t.w * t.w)
+		/ (x * x + y * y + z * z + w * w));
 }
 
 // オブジェクト有効性チェック
