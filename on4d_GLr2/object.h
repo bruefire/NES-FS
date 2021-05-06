@@ -73,6 +73,7 @@ public:
 	void init_stdH3(bool);
 	void OptimStd();
 	object3d ReflectionH3(pt3, pt3);	// ïΩçsà⁄ìÆ (H3)
+	object3d ReflectionH3(pt4, pt4);	// ïΩçsà⁄ìÆ (H3)
 	void ParallelMove(pt3, bool);
 	void DealH3OohObj(bool);
 	void TrackObjDirection(object3d*);

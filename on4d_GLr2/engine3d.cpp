@@ -61,6 +61,8 @@ engine3d::engine3d()
 	, vrFlag(false)
 	, menuLgc(nullptr)
 {
+	H3_REF_RADIUS_OS = sqrt(1 - powi(H3_REF_RADIUS, 2));
+	H3_REF_RADIUS_HF_OS = sqrt(1 - powi(H3_REF_RADIUS * 0.5, 2));
 	adjTime[0] = adjTime[1] = 0;
 	
 	vrHand[0].owner = this;

@@ -22,6 +22,8 @@ public:
 	const double H3_STD_LEN;	// クラインstd長 (EUC長)
 	double H3_MAX_RADIUS;		// クライン有効半径 (EUC長)
 	double H3_REF_RADIUS;		// クライン鏡映半径 (EUC長)
+	double H3_REF_RADIUS_OS;
+	double H3_REF_RADIUS_HF_OS;
 	bool h3objLoop;
 
 	enum CLS_TYPE

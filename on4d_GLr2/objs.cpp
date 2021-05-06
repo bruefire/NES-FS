@@ -100,13 +100,8 @@ void object3d::OptimStd()
 
 // 鏡映 (H3)
 // dstPts: 移動方向ベクトル (原点から離れた点を指定する)
-object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
+object3d object3d::ReflectionH3(pt4 dstR, pt4 ctrR)
 {
-
-	// 鏡映用球面上の点 src, dst
-	pt4 ctrR = pt4(pyth3OS(ctr), ctr.x, ctr.y, ctr.z);
-	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
-
 	// locR, dstRを通りクライン球面に接する直線
 	// 切片、傾き算出
 	pt4 ldDif = ctrR.mns(dstR);
@@ -122,22 +117,22 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 
 
 	// 鏡映結果を算出
-	auto ClcReflected = [](pt4 grdPt, pt3 trg) 
+	auto ClcReflected = [](pt4 grdPt, pt3 trg)
 	{
 		// 鏡映用球面上の点 std1, std2
 		pt4 trgPt = pt4(pyth3OS(trg), trg.x, trg.y, trg.z);
 
 		// 球面原点からの垂線ベクトル (接点)
 		pt4 trgToGrd = grdPt.mns(trgPt);
-		double ttgRate = trgToGrd.lenRatioOf(trgPt);
 		double ttgLen = pyth4(trgToGrd);
-		double ip = pt4::dot(trgToGrd.mtp(1 / ttgLen), trgPt.mtp(1 / (ttgLen * ttgRate)));
+		double ttgRate = 1.0 / ttgLen;
+		double ip = pt4::dot(trgToGrd.mtp(ttgRate), trgPt);
 		pt4 ttgNorm = trgToGrd.mtp(ttgRate).mtp(ip);
 
 		// 結果
 		pt4 result = trgPt.mns(ttgNorm).mns(ttgNorm);
 
-		return result; 
+		return result;
 	};
 	pt4 ntd1R = ClcReflected(grdPt, std[0]);
 	pt4 ntd2R = ClcReflected(grdPt, std[1]);
@@ -147,12 +142,21 @@ object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
 
 	// 結果を格納
 	object3d moved(*this); // コピー
-	moved.loc	 = nLocR.xyz();
+	moved.loc = nLocR.xyz();
 	moved.std[0] = ntd1R.xyz();
 	moved.std[1] = ntd2R.xyz();
-	moved.lspX	 = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
+	moved.lspX = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
 
 	return moved;
+}
+
+object3d object3d::ReflectionH3(pt3 dst, pt3 ctr)
+{
+	// 鏡映用球面上の点 src, dst
+	pt4 dstR = pt4(pyth3OS(dst), dst.x, dst.y, dst.z);
+	pt4 ctrR = pt4(pyth3OS(ctr), ctr.x, ctr.y, ctr.z);
+
+	return ReflectionH3(dstR, ctrR);
 }
 
 /// <summary>
@@ -162,26 +166,36 @@ void object3d::ParallelMove(pt3 tLoc, bool mode)
 {
 	double tLocPh = pyth3(tLoc);
 	float refBrRatio = 0.8;
-	pt3 refVec;
 
+	pt4 refVecR;
 	if (tLocPh < 0.001)
-		refVec = pt3(0.0, 0.0, owner->H3_REF_RADIUS);
+	{
+		pt3 refVec = pt3(0.0, 0.0, owner->H3_REF_RADIUS);
+		refVecR = pt4(owner->H3_REF_RADIUS_OS, refVec.x, refVec.y, refVec.z);
+	}
 	else if (tLocPh < owner->H3_REF_RADIUS * refBrRatio)
-		refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
+	{
+		pt3 refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
+		refVecR = pt4(owner->H3_REF_RADIUS_OS, refVec.x, refVec.y, refVec.z);
+	}
 	else
-		refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh * 0.5);
-
-	pt3 bgnPt, endPt;
-	if (mode){
-		bgnPt = pt3(0, 0, 0);
-		endPt = tLoc;
-	} else {
-		bgnPt = tLoc;
-		endPt = pt3(0, 0, 0);
+	{
+		pt3 refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh * 0.5);
+		refVecR = pt4(owner->H3_REF_RADIUS_HF_OS, refVec.x, refVec.y, refVec.z);
 	}
 
-	object3d mrr = ReflectionH3(refVec, bgnPt);
-	object3d rst = mrr.ReflectionH3(endPt, refVec);
+	pt4 tmPt1 = pt4(1, 0, 0, 0);
+	pt4 tmPt2 = pt4(pyth3OS(tLoc), tLoc.x, tLoc.y, tLoc.z);
+	pt4 bgnPt, endPt;
+	if (mode){
+		bgnPt = tmPt1;
+		endPt = tmPt2;
+	} else {
+		bgnPt = tmPt2;
+		endPt = tmPt1;
+	}
+	object3d mrr = ReflectionH3(refVecR, bgnPt);
+	object3d rst = mrr.ReflectionH3(endPt, refVecR);
 	
 	// 結果反映
 	loc    = rst.loc;

@@ -159,9 +159,9 @@ vec4 ClcReflected(vec4 grdPt, vec3 trg)
 
 	// 球面原点からの垂線ベクトル (接点)
 	vec4 trgToGrd = grdPt - trgPt;
-	float ttgRate = lenRatio(trgPt, trgToGrd);
 	float ttgLen = pyth4(trgToGrd);
-	float ip = dot(trgToGrd * (1.0 / ttgLen), trgPt * (1.0 / (ttgLen * ttgRate)));
+	float ttgRate = 1.0 / ttgLen;
+	float ip = dot(trgToGrd * ttgRate, trgPt);
 	vec4 ttgNorm = trgToGrd * ttgRate * ip;
 
 	// 結果
