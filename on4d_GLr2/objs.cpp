@@ -1344,12 +1344,18 @@ pts[0].z;
  rsp.asg(0 DEG,0 DEG,0, 0 DEG,0 DEG,0 DEG);
 }
 ///¥ 2DŠÖŒW ====================
-pt2::pt2() {}
+pt2::pt2() :x(0), y(0)
+{}
 pt2::pt2(double x, double y)
 {
 	this->x = x; this->y = y;
 }
 pt2 pt2::mtp(double mt) { pt2 tmpt(x * mt, y * mt); return tmpt; };
+pt2 pt2::pls(pt2 pts) { return pt2(x + pts.x, y + pts.y); }
+pt2 pt2::cross(pt2 a) 
+{
+	return pt2(a.y, -a.x);
+}
 pt2i::pt2i() {}
 pt2i::pt2i(int x, int y)
 {

@@ -114,17 +114,16 @@ void prismPts(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t* idxs, int len)	//
 ///-----on4d
 void tudeRst(double* vec1, double* vec2, double locT, bool mode){//-- 緯,経,深リセット回転
 	
-	double tRot = atan2(*vec1, *vec2);
+	pt2 axs1(*vec1, *vec2);
+	pt2 axs2 = pt2::cross(axs1);
+	double asign = mode ? 1 : -1;
 
-	double R = pyth2(*vec1, *vec2);
-	if(!mode){
-		*vec1 = R * sin(tRot - locT);
-		*vec2 = R * cos(tRot - locT);
-	}else{
-		*vec1 = R * sin(tRot + locT);
-		*vec2 = R * cos(tRot + locT);
-	}
+	pt2 result = pt2()
+		.pls(axs1.mtp(cos(asign * locT)))
+		.pls(axs2.mtp(sin(asign * locT)));
 
+	*vec1 = result.x;
+	*vec2 = result.y;
 }
 void all_tudeRst(pt4* vec, pt3 locT, bool mode){//-- 緯,経,深リセット回転
 

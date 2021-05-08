@@ -5,6 +5,9 @@ public:
 	double x;
 	double y;
 	pt2 mtp(double);
+	pt2 pls(pt2 pts);
+
+	static pt2 cross(pt2);
 
 	pt2();
 	pt2(double, double);
