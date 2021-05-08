@@ -32,17 +32,16 @@ float atan2(float x, float y);
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)///ok
 {//-- 緯,経,深リセット回転
 
-	vec2 axs1 = vec2(vec_1, vec_2);
-	vec2 axs2 = vec2(vec_2, -vec_1);
 	float asign = 1.0;
-	if (mode == 0) asign = -1.0;
+	if(mode==0) asign = -1.0;
 
-	vec2 result = vec2(0.0, 0.0)
-		+ (axs1 * cos(asign * locT))
-		+ (axs2 * sin(asign * locT));
+	float cosVal = cos(asign * locT);
+	float sinVal = sin(asign * locT);
+	float tVec1 = (vec_1) * cosVal + (vec_2) * sinVal;
+	float tVec2 = (vec_2) * cosVal + (-vec_1) * sinVal;
 
-	vec_1 = result.x;
-	vec_2 = result.y;
+	vec_1 = tVec1;
+	vec_2 = tVec2;
 }
 void all_tudeRst_1(inout vec4 vect, vec3 locT)///ok
 {//-- 緯,経,深リセット回転

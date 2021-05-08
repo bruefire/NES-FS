@@ -113,17 +113,27 @@ void prismPts(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t* idxs, int len)	//
 
 ///-----on4d
 void tudeRst(double* vec1, double* vec2, double locT, bool mode){//-- 緯,経,深リセット回転
-	
-	pt2 axs1(*vec1, *vec2);
-	pt2 axs2 = pt2::cross(axs1);
+
+	//// pt2を使用すると(?)なぜか遅い..
+	//pt2 axs1(*vec1, *vec2);
+	//pt2 axs2 = pt2::cross(axs1);
+	//double asign = mode ? 1 : -1;
+
+	//pt2 result = pt2()
+	//	.pls(axs1.mtp(cos(asign * locT)))
+	//	.pls(axs2.mtp(sin(asign * locT)));
+
+	//*vec1 = result.x;
+	//*vec2 = result.y;
 	double asign = mode ? 1 : -1;
 
-	pt2 result = pt2()
-		.pls(axs1.mtp(cos(asign * locT)))
-		.pls(axs2.mtp(sin(asign * locT)));
+	double cosVal = cos(asign * locT);
+	double sinVal = sin(asign * locT);
+	double tVec1 = (*vec1) * cosVal + (*vec2) * sinVal;
+	double tVec2 = (*vec2) * cosVal + (-*vec1) * sinVal;
 
-	*vec1 = result.x;
-	*vec2 = result.y;
+	*vec1 = tVec1;
+	*vec2 = tVec2;
 }
 void all_tudeRst(pt4* vec, pt3 locT, bool mode){//-- 緯,経,深リセット回転
 

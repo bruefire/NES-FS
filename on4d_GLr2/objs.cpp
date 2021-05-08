@@ -1350,7 +1350,7 @@ pt2::pt2(double x, double y)
 {
 	this->x = x; this->y = y;
 }
-pt2 pt2::mtp(double mt) { pt2 tmpt(x * mt, y * mt); return tmpt; };
+pt2 pt2::mtp(double mt) {  return pt2(x * mt, y * mt); };
 pt2 pt2::pls(pt2 pts) { return pt2(x + pts.x, y + pts.y); }
 pt2 pt2::cross(pt2 a) 
 {
