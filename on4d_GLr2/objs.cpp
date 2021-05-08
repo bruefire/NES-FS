@@ -136,7 +136,7 @@ object3d object3d::ReflectionH3(pt4 dstR, pt4 ctrR)
 	};
 	pt4 ntd1R = ClcReflected(grdPt, std[0]);
 	pt4 ntd2R = ClcReflected(grdPt, std[1]);
-	pt4 nspXR = ClcReflected(grdPt, lspX.xyz());
+	//pt4 nspXR = ClcReflected(grdPt, lspX.xyz());
 	pt4 nLocR = ClcReflected(grdPt, loc);
 
 
@@ -145,7 +145,7 @@ object3d object3d::ReflectionH3(pt4 dstR, pt4 ctrR)
 	moved.loc = nLocR.xyz();
 	moved.std[0] = ntd1R.xyz();
 	moved.std[1] = ntd2R.xyz();
-	moved.lspX = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
+	//moved.lspX = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
 
 	return moved;
 }
@@ -201,7 +201,7 @@ void object3d::ParallelMove(pt3 tLoc, bool mode)
 	loc    = rst.loc;
 	std[0] = rst.std[0];
 	std[1] = rst.std[1];
-	lspX   = rst.lspX;
+	//lspX   = rst.lspX;
 }
 
 void object3d::DealH3OohObj(bool loopFlg)
@@ -347,7 +347,7 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	reObj.objInitH3(nullptr);
 	reObj.std[0] = trgCpy.std[0];
 	reObj.std[1] = trgCpy.std[1];
-	reObj.lspX.asgPt3(reObj.std[0]);
+	reObj.lspX.asgPt3(pt3(0, 0, owner->H3_STD_LEN));
 	reObj.lspX.w = owner->SPEED_MAX;
 
 	pt3 std1N = trgCpy.std[0].norm();

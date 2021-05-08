@@ -507,7 +507,15 @@ void engine3d::UpdFloatObjsH3()
 		double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w * adjSpd / radius);
 		if (lspEuc > abs(0.000000001))
 		{
-			pt3 drc = curObj->lspX.xyz().norm().mtp(lspEuc);
+			pt3 std1N = curObj->std[0].mtp(1 / H3_STD_LEN);
+			pt3 std2N = curObj->std[1].mtp(1 / H3_STD_LEN);
+			pt3 sideN = pt3::cross(std2N, std1N);
+			pt3 drc = pt3()
+				.pls(std1N.mtp(curObj->lspX.z))
+				.pls(std2N.mtp(curObj->lspX.y))
+				.pls(sideN.mtp(curObj->lspX.x))
+				.mtp(1 / H3_STD_LEN)
+				.mtp(lspEuc);
 
 			// 有効範囲チェック
 			if (pyth3(drc) < H3_MAX_RADIUS)
@@ -1248,17 +1256,17 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[0], 0);
 		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[0], 0);
 		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[0], 0);
-		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[0], 0);
+		//tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[0], 0);
 
 		tudeRst(&curObj->loc.y, &curObj->loc.z, rotOn[1], 0);
 		tudeRst(&curObj->std[0].y, &curObj->std[0].z, rotOn[1], 0);
 		tudeRst(&curObj->std[1].y, &curObj->std[1].z, rotOn[1], 0);
-		tudeRst(&curObj->lspX.y, &curObj->lspX.z, rotOn[1], 0);
+		//tudeRst(&curObj->lspX.y, &curObj->lspX.z, rotOn[1], 0);
 
 		tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[2], 0);
 		tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[2], 0);
 		tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
-		tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[2], 0);
+		//tudeRst(&curObj->lspX.x, &curObj->lspX.y, rotOn[2], 0);
 
 		//-- 後方カメラなら
 		object3d viewObj(*curObj);
@@ -1290,7 +1298,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		// std調整
 		curObj->OptimStd();
 		// 速度vec調整
-		curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
+		//curObj->lspX.asgPt3(curObj->lspX.xyz().norm().mtp(H3_STD_LEN));
 		
 		// 元の位置に戻す
 		curObj->ParallelMove(locOld, true);	
@@ -1432,7 +1440,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	// 一期は中心に
 	objs[BWH_QTY].loc = pt3(0, 0, 0);
 	objs[BWH_QTY].init_stdH3(0);
-	objs[BWH_QTY].lspX.asgPt3(objs[BWH_QTY].std[0]);
+	objs[BWH_QTY].lspX.asgPt3(pt3(0, 0, H3_STD_LEN));
 
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++)
@@ -1579,7 +1587,7 @@ void engine3d::RandLoc(engine3d::RandMode mode, int qty)
 			objs[h].loc = plrObj->loc;
 			objs[h].std[0] = plrObj->std[0];
 			objs[h].std[1] = plrObj->std[1];
-			objs[h].lspX = plrObj->lspX;
+			objs[h].lspX.asgPt3(pt3(0, 0, H3_STD_LEN));
 		}
 		RandLocH3(mode, ObjType::Energy, qty);
 	}
@@ -1949,8 +1957,10 @@ void engine3d::shoot()
 				objs[i].loc = objs[PLR_No].loc;
 				objs[i].std[0] = objs[PLR_No].std[0];
 				objs[i].std[1] = objs[PLR_No].std[1];
-				objs[i].lspX = pt4(0, objs[PLR_No].std[0]);
-				objs[i].lspX.w = SPEED_MAX;
+				if (worldGeo == WorldGeo::SPHERICAL)
+					objs[i].lspX = pt4(SPEED_MAX, objs[PLR_No].std[0]);
+				else
+					objs[i].lspX = pt4(SPEED_MAX, 0, 0, H3_STD_LEN);
 
 				objs[i].cnvForce();
 				objs[i].markInitS3(radius);
