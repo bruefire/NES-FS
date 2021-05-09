@@ -169,9 +169,9 @@ void main()
 	if(isnan(curEc.w)) curEc = vec4(gaze, 0)*fr;
 	//-------
 	float dec;
-	vec3 curTd = eucToTude( curEc );
+	float curLen = atan2(pyth3(curEc.xyz), curEc.w);
 	
-	if(curTd.y<0.5*PIE) dec = (PIE-curTd.z*0.5) /PIE; else dec = curTd.z*0.5 /PIE;
+	if(curEc.z>0.0) dec = (PIE-curLen*0.5) /PIE; else dec = curLen*0.5 /PIE;
 	
 	
 	///--
@@ -195,7 +195,7 @@ void main()
 	//-- ãPìxÇéZèo
 	float bright_ = 0.2*nDeg / ( curEc.x*curEc.x + curEc.y*curEc.y + curEc.z*curEc.z );// ãå
 	float bright;
-	if(curTd.y<0.5*PIE) bright = 1.2 / ( curTd.z*curTd.z ); else bright = 1.2 / ( (2*PIE-curTd.z)*(2*PIE-curTd.z) );
+	if(curEc.z>0.0) bright = 1.2 / ( curLen*curLen ); else bright = 1.2 / ( (2*PIE-curLen)*(2*PIE-curLen) );
 	if(2.0<bright) bright = 2.0;	//ç≈ëÂãPìx
 	bright = bright*nDeg;
 
