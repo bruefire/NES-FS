@@ -1152,6 +1152,87 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 }
 
 
+void engine3d::HoldObjWithVRHand(bool holdFlag)
+{
+	if (worldGeo == WorldGeo::HYPERBOLIC)
+		HoldObjWithVRHandH3(holdFlag);
+	else
+		HoldObjWithVRHandS3(holdFlag);
+}
+
+
+void engine3d::HoldObjWithVRHandH3(bool holdFlag)
+{
+	if (holdFlag)
+	{
+		pt3 pLoc = vrHand[1].loc;
+
+		// find the nearest object.
+		double nearestLen = DBL_MAX;	// farthestLen => ((unit=1)*2)^2
+		int nearObjIdx = -1;
+		for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
+		{
+			object3d* curObj = objs + h;
+			object3d curCpy(*curObj);
+
+			curCpy.ParallelMove(pLoc, false);
+			double len = object3d::ClcHypbFromEuc(pyth3(curCpy.loc));
+			if (nearestLen > len)
+			{
+				nearestLen = len;
+				nearObjIdx = h;
+			}
+		}
+
+		if (nearObjIdx == -1)
+			return;
+
+		if (ope.OBJ_HOLD_RANGE > nearestLen / radius)
+			player.holdedObj = objs + nearObjIdx;
+	}
+	else
+	{
+		player.holdedObj = nullptr;
+	}
+}
+
+
+void engine3d::HoldObjWithVRHandS3(bool holdFlag)
+{
+	if (holdFlag)
+	{
+		pt4 pLocE = object3d::tudeToEuc(vrHand[1].loc);
+
+		// find the nearest object.
+		double nearestLen = DBL_MAX;	// farthestLen => ((unit=1)*2)^2
+		int nearObjIdx = -1;
+		for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
+		{
+			object3d* curObj = objs + h;
+			
+			pt4 cLocE = object3d::tudeToEuc(curObj->loc);
+			double len = pyth4Sq(cLocE.mns(pLocE));
+			if (nearestLen > len)
+			{
+				nearestLen = len;
+				nearObjIdx = h;
+			}
+		}
+
+		if (nearObjIdx == -1)
+			return;
+
+		if(ope.OBJ_HOLD_RANGE > asin(sqrt(nearestLen) * 0.5) * 2 / radius)
+			player.holdedObj = objs + nearObjIdx;
+
+	}
+	else
+	{
+		player.holdedObj = nullptr;
+	}
+}
+
+
 // ‘Š‘ÎˆÊ’uŒvŽZ
 void engine3d::ClcRelaivePosS3(double* cmrStd)
 {

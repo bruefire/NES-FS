@@ -17,6 +17,10 @@ double pyth3OS(pt3 pts, double hLen)
 { 
 	return sqrt(hLen*hLen - (pts.x * pts.x + pts.y * pts.y + pts.z * pts.z));
 }
+double pyth4Sq(pt4 pts)
+{ 
+	return pts.w * pts.w + pts.x * pts.x + pts.y * pts.y + pts.z * pts.z;
+}
 
 //==
 double powi(double x, int y)

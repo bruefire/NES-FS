@@ -1,10 +1,15 @@
 #pragma once
 
+
+class object3d;
+
 class Player {
 public:
-	double hp;		//-- 体力
-	int ep;			//-- エナジーポイント
-	double sp;		//-- スペシャルパワー
-	int score;		//-- スコア
+	double hp;		
+	int ep;			
+	//double sp;		
+	//int score;
+	object3d* holdedObj;
+
 	Player();
 };

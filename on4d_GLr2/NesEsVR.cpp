@@ -7,9 +7,9 @@ double _trash = round(1);	// for linking std lib..
 
 
 
-NesEsVR::NesEsVR(engine3dWinOVR* owner)
+NesEsVR::NesEsVR(engine3dWinOVR* _owner)
+	: owner(_owner)
 {
-	this->owner = owner;
 }
 
 void NesEsVR::initGlScnene(double w, double h, double fovL, double fovR, double fovT, double fovD)
@@ -55,6 +55,15 @@ bool NesEsVR::updateSceneLgc()
 		// VR HMD, hand‚ÌˆÚ“®
 		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
 		owner->UpdVRObjectsH3(nullptr);
+	}
+
+	object3d* holdObj = owner->player.holdedObj;
+	if (holdObj)
+	{
+		holdObj->loc = owner->vrHand[1].loc;
+		holdObj->std[0] = owner->vrHand[1].std[0];
+		holdObj->std[1] = owner->vrHand[1].std[1];
+		holdObj->lspX = owner->vrHand[1].lspX;
 	}
 
 	owner->PrepareInParamForNext();
@@ -229,6 +238,27 @@ void NesEsVR::DeviceInputProcedure(ovrInputState state, ovrControllerType type)
 			//	owner->ope.cmRot.z = owner->adjSpd * 0.1;
 			//else
 			//	owner->ope.cmRot.z = 0.0;
+
+			Ope::TriggerState preRHandTriggerState = ope.rHandTriggerState;
+			if (ope.rHandTriggerState == Ope::TriggerState::UnHold)
+			{
+				if (state.HandTriggerRaw[1] > ope.TriggerStateExTH)
+					ope.rHandTriggerState = Ope::TriggerState::Hold;
+			}
+			else if (ope.rHandTriggerState == Ope::TriggerState::Hold)
+			{
+				if (state.HandTriggerRaw[1] < ope.TriggerStateNtTH)
+					ope.rHandTriggerState = Ope::TriggerState::UnHold;
+			}
+
+			if (preRHandTriggerState != ope.rHandTriggerState)
+			{
+				if (ope.rHandTriggerState == Ope::TriggerState::UnHold)
+					owner->HoldObjWithVRHand(false);
+				else if (ope.rHandTriggerState == Ope::TriggerState::Hold)
+					owner->HoldObjWithVRHand(true);
+			}
+			
 		}
 		break;
 	}

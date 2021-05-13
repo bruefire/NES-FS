@@ -1,7 +1,7 @@
 // ユーザによる入力(キー, ジョイパッドetc)を保持する
 #pragma once
 
-#include "point.h"
+#include "object.h"
 #include "VRDeviceOperation.h"
 #include "MenuLgc.h"
 
@@ -9,6 +9,7 @@
 class Operation
 {
 public:
+	const double OBJ_HOLD_RANGE;
 
 	pt3 cmLoc;
 	pt3 cmRot;

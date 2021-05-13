@@ -7,6 +7,7 @@ double pyth3(double x, double y, double z);
 double pyth4(double w, double x, double y, double z);
 double pyth3(pt3 pts);
 double pyth4(pt4 pts);
+double pyth4Sq(pt4 pts);
 double pyth3OS(pt3 pts, double hLen = 1);	// ‘Î•Ó(Î•Ó‚Å‚È‚¢•û)‚Ì’·‚³
 double powi(double, int);
 //=====¥’l‚Ì’²®

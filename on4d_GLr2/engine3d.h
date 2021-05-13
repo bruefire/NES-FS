@@ -134,6 +134,9 @@ public:
 	void ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool isHmd);
 	void UpdVRObjectsS3(double* cmrSts);
 	void UpdVRObjectsH3(double* cmrSts);
+	void HoldObjWithVRHand(bool);
+	void HoldObjWithVRHandS3(bool);
+	void HoldObjWithVRHandH3(bool);
 	void ClcCoordinate();
 	virtual void MakeTracingLines();
 	object3d* GetObject(int idx);

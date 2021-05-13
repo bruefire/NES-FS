@@ -38,6 +38,15 @@ private:
 		StickHState lStickHState;
 		StickHState rStickHState;
 
+		const double TriggerStateExTH = 0.5;
+		const double TriggerStateNtTH = 0.35;
+		enum class TriggerState
+		{
+			Hold,
+			UnHold
+		};
+		TriggerState rHandTriggerState;
+
 		Ope()
 			: buttonA_raw(false)
 			, buttonX_raw(false)
@@ -45,6 +54,7 @@ private:
 			, rStickVState(StickVState::Neutral)
 			, lStickHState(StickHState::Neutral)
 			, rStickHState(StickHState::Neutral)
+			, rHandTriggerState(TriggerState::UnHold)
 		{}
 	} 
 	ope;
