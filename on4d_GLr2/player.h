@@ -1,4 +1,5 @@
 #pragma once
+#include "point.h"
 
 
 class object3d;
@@ -10,6 +11,7 @@ public:
 	//double sp;		
 	//int score;
 	object3d* holdedObj;
+	pt3 holdedPreLoc;
 
 	Player();
 };

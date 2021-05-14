@@ -2,7 +2,7 @@
 
 
 Operation::Operation()
-	: OBJ_HOLD_RANGE(0.5)
+	: OBJ_HOLD_RANGE(1.0)
 	, cmBack(false)
 	, speed(0)
 	, chgMapStateOld(0)

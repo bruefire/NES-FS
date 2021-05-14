@@ -1187,11 +1187,36 @@ void engine3d::HoldObjWithVRHandH3(bool holdFlag)
 		if (nearObjIdx == -1)
 			return;
 
-		if (ope.OBJ_HOLD_RANGE > nearestLen / radius)
+		if (ope.OBJ_HOLD_RANGE > nearestLen * radius)
 			player.holdedObj = objs + nearObjIdx;
 	}
 	else
 	{
+		if (!player.holdedObj)
+			return;
+		object3d holdedCpy(*player.holdedObj);
+		holdedCpy.ParallelMove(player.holdedPreLoc, false);
+		double veloc = object3d::ClcHypbFromEuc(pyth3(holdedCpy.loc)) * radius;
+		pt3 velVec = holdedCpy.loc.norm().mtp(H3_STD_LEN);
+		pt3 tpLoc = holdedCpy.loc;
+		holdedCpy.ParallelMove(tpLoc, false);
+
+		pt3 std1N = holdedCpy.std[0].norm();
+		pt3 std2N = holdedCpy.std[1].norm();
+		pt3 sideN = pt3::cross(std2N, std1N);
+		velVec = pt3(
+			pt3::dot(sideN, velVec),
+			pt3::dot(std2N, velVec),
+			pt3::dot(std1N, velVec));
+		holdedCpy.lspX.asgPt3(velVec);
+		holdedCpy.lspX.w = veloc;
+		//holdedCpy.ParallelMove(tpLoc, true);
+		//holdedCpy.ParallelMove(player.holdedPreLoc, true);
+
+		player.holdedObj->lspX = holdedCpy.lspX;
+		player.holdedObj->lspX.w = veloc;
+		player.holdedObj = nullptr;
+		
 		player.holdedObj = nullptr;
 	}
 }
@@ -1222,12 +1247,22 @@ void engine3d::HoldObjWithVRHandS3(bool holdFlag)
 		if (nearObjIdx == -1)
 			return;
 
-		if(ope.OBJ_HOLD_RANGE > asin(sqrt(nearestLen) * 0.5) * 2 / radius)
+		if(ope.OBJ_HOLD_RANGE > asin(sqrt(nearestLen) * 0.5) * 2 * radius)
 			player.holdedObj = objs + nearObjIdx;
 
 	}
 	else
 	{
+		if (!player.holdedObj)
+			return;
+		pt4 pLoc = object3d::tudeToEuc(player.holdedObj->loc);
+		pt4 ppLoc = object3d::tudeToEuc(player.holdedPreLoc);
+		double dstVecLen = pyth4(pLoc.mns(ppLoc));
+		double veloc = asin(dstVecLen * 0.5) * 2 * radius;
+		pt4 newLspX = pLoc.mtp(COS_1).pls(pLoc.mtp(COS_1).mns(ppLoc));
+		player.holdedObj->lspX.asgPt3(object3d::eucToTude(newLspX));
+		player.holdedObj->lspX.w = veloc;
+
 		player.holdedObj = nullptr;
 	}
 }

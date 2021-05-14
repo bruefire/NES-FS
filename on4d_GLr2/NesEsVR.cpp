@@ -40,6 +40,16 @@ bool NesEsVR::updateSceneLgc()
 	if(!owner->menuLgc->InputProc(owner->ope.menuAction))
 		return false;
 
+	object3d* holdObj = owner->player.holdedObj;
+	if (holdObj)
+	{
+		owner->player.holdedPreLoc = holdObj->loc;
+		holdObj->loc = owner->vrHand[1].loc;
+		holdObj->std[0] = owner->vrHand[1].std[0];
+		holdObj->std[1] = owner->vrHand[1].std[1];
+		holdObj->lspX = owner->vrHand[1].lspX;
+	}
+
 	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
 	{
 		owner->engine3d::UpdFloatObjsS3();
@@ -55,15 +65,6 @@ bool NesEsVR::updateSceneLgc()
 		// VR HMD, hand‚ÌˆÚ“®
 		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
 		owner->UpdVRObjectsH3(nullptr);
-	}
-
-	object3d* holdObj = owner->player.holdedObj;
-	if (holdObj)
-	{
-		holdObj->loc = owner->vrHand[1].loc;
-		holdObj->std[0] = owner->vrHand[1].std[0];
-		holdObj->std[1] = owner->vrHand[1].std[1];
-		holdObj->lspX = owner->vrHand[1].lspX;
 	}
 
 	owner->PrepareInParamForNext();
