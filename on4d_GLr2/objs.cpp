@@ -1480,7 +1480,7 @@ pt3 pt4::qtrMtp(pt3 _v)
 
 	return q.qtrMtp(v).qtrMtp(r).xyz();
 }
-void pt4::asgPt3(pt3 pts3){ x = pts3.x, y = pts3.y, z = pts3.z; }
+pt4 pt4::asgPt3(pt3 pts3) { x = pts3.x, y = pts3.y, z = pts3.z; return *this; }
 pt4::pt4()
 { 
 	w = 0; x = 0; y = 0; z = 0; 
@@ -1549,15 +1549,14 @@ void object3d::mkLspX_S3(pt4 vec)
 {
 	pt4 locE = tudeToEuc(loc);		// ˆÊ’u
 	pt4 vecT = tudeToEuc(vec.xyz());		// ‘¬“x
-	all_tudeRst(&vecT, loc, 0);
 
-	double vecRt = vecT.w;
+	double vecRt = pt4::dot(locE, vecT);
 	if (abs(vecRt) > 0.999999999)
 	{
-		vecT = pt4(0,0,0,1);
+		vecT = pt4(0, 0, 0, 1);
+		all_tudeRst(&vecT, loc, true);
 		vecRt = 0;
 	}
-	all_tudeRst(&vecT, loc, 1);
 
 	pt4 vecTm = vecT.mns( locE.mtp(vecRt) );
 	pt4 lspXE = vecTm.mtp(1.0 / pyth4(vecTm)).mtp( owner->SIN_1 )

@@ -1259,9 +1259,10 @@ void engine3d::HoldObjWithVRHandS3(bool holdFlag)
 		pt4 ppLoc = object3d::tudeToEuc(player.holdedPreLoc);
 		double dstVecLen = pyth4(pLoc.mns(ppLoc));
 		double veloc = asin(dstVecLen * 0.5) * 2 * radius;
-		pt4 newLspX = pLoc.mtp(COS_1).pls(pLoc.mtp(COS_1).mns(ppLoc));
-		player.holdedObj->lspX.asgPt3(object3d::eucToTude(newLspX));
-		player.holdedObj->lspX.w = veloc;
+		double ppIp = pt4::dot(ppLoc, pLoc);
+		pt4 newLspXV = pLoc.mtp(ppIp).pls(pLoc.mtp(ppIp).mns(ppLoc));
+		pt4 newLspX = pt4(veloc, 0, 0, 0).asgPt3(object3d::eucToTude(newLspXV));
+		player.holdedObj->mkLspX_S3(newLspX);
 
 		player.holdedObj = nullptr;
 	}

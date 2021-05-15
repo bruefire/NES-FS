@@ -55,7 +55,7 @@ public:
 	pt4 mtp(pt4 pts);
 	pt3 xyz();
 	pt4 norm(pt4 errPt= pt4(1, 0, 0, 0), double lim=0.000000000001);
-	void asgPt3(pt3);
+	pt4 asgPt3(pt3);
 	double length();
 	bool isZero();
 
