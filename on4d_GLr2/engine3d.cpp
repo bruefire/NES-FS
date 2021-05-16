@@ -1516,6 +1516,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	player.ep = ENR_QTY;
 
 	//-- 太陽
+	sun.mesh = nullptr;
 	sun.used = false;	// 無効化
 
 	//-- 軌跡オブジェクト

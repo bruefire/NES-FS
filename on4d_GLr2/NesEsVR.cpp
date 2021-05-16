@@ -3,7 +3,7 @@
 #include "engine3dWinOVR.h"
 #include "functions.h"
 using WorldGeo = engine3d::WorldGeo;
-double _trash = round(1);	// for linking std lib.. 
+volatile double _trash = round(1.23);	// hack: for linking std lib.. [OVR problem]
 
 
 

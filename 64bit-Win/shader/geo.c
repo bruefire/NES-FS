@@ -33,15 +33,16 @@ float atan2(float x, float y);
 
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)///ok
 {//-- 緯,経,深リセット回転
-	float tRot = atan2(vec_1, vec_2);
-	float R = pyth2(vec_1, vec_2);
-	if(0==mode){
-		vec_1 = R * sin(tRot - locT);
-		vec_2 = R * cos(tRot - locT);
-	}else{
-		vec_1 = R * sin(tRot + locT);
-		vec_2 = R * cos(tRot + locT);
-	}
+	float asign = 1.0;
+	if (mode == 0) asign = -1.0;
+
+	float cosVal = cos(asign * locT);
+	float sinVal = sin(asign * locT);
+	float tVec1 = (vec_1)*cosVal + (vec_2)*sinVal;
+	float tVec2 = (vec_2)*cosVal + (-vec_1) * sinVal;
+
+	vec_1 = tVec1;
+	vec_2 = tVec2;
 }
 void all_tudeRst_0(inout vec4 vect, vec3 locT)///ok
 {//-- 緯,経,深リセット回転

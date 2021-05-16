@@ -75,15 +75,8 @@ but I don't know button layout about others.
 hardwares that This software is apadpted to is only OculusRift/Quest.
 if you have a bad feeling, please stop playing and take a rest.
 
-
-models of "Izumo Oyashiro", Tori, and so on 
-were downloaded and used from here:
-http://www.3dchaya.com/
 ----------------------------------
-NES-FS (Non Euclidean Space Flight Simlator)
-version: 3.2.0
-release: Apr.2021
-creator: bruefire
+
 
 
 
@@ -157,10 +150,12 @@ VRモードに対応しているハードウェアは現在OculusRift/Questのみです。
 特に超球面空間は気持ち悪くなりやすいかもしれません..
 
 
-出雲大社などのモデルは以下のサイト様から使用させて頂きました
+
+models of "Izumo Oyashiro", Tori, and so on 
+were downloaded and used from here:
 http://www.3dchaya.com/
 ----------------------------------
-NES-FS(非ユークリッド空間遊泳シミュレータ)
-バージョン 3.2.0
-2021.04
-製作者 bruefire
+NES-FS (Non Euclidean Space Flight Simlator)
+version: 3.3.0
+release: May.2021
+creator: bruefire

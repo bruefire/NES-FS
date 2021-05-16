@@ -36,6 +36,7 @@ float pyth3OS(vec3 pts);
 void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len);
 void ReflectionH3(vec3 dst, vec3 ctr, inout vec3 mvPt[3], int len);
 vec4 ClcReflected(vec4 grdPt, vec3 trg);
+float lenRatio(vec4 v1, vec4 v2);
 
 
 // functions (define)
@@ -43,6 +44,13 @@ float pyth3(float x, float y, float z) { return sqrt(x * x + y * y + z * z); }//
 float pyth4(vec4 vec) {
 	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }///ok
+
+float lenRatio(vec4 v1, vec4 v2)
+{
+	return sqrt(
+		(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z + v1.w * v1.w)
+		/ (v2.x * v2.x + v2.y * v2.y + v2.z * v2.z + v2.w * v2.w));
+}
 
 // Euc距離から双曲距離に変換 (原点-任意点)
 float ClcHypbFromEuc(float dst)
@@ -151,8 +159,9 @@ vec4 ClcReflected(vec4 grdPt, vec3 trg)
 
 	// 球面原点からの垂線ベクトル (接点)
 	vec4 trgToGrd = grdPt - trgPt;
-	float ip = dot(normalize(trgToGrd), normalize(trgPt));
-	float ttgRate = pyth4(trgPt) / pyth4(trgToGrd);
+	float ttgLen = pyth4(trgToGrd);
+	float ttgRate = 1.0 / ttgLen;
+	float ip = dot(trgToGrd * ttgRate, trgPt);
 	vec4 ttgNorm = trgToGrd * ttgRate * ip;
 
 	// 結果

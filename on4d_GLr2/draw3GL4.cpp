@@ -491,7 +491,7 @@ int engine3dGL::DrawEachObjsH3(int loop)
 	{
 		object3d* curObj = GetObject(h);
 
-		if (!curObj->used) continue;
+		if (!curObj->used || !curObj->mesh) continue;
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
 		if (h == PLR_No) continue;
 		///...++++++++++++ ˆêŠ‡GL•`‰æ +++++++++++++...///

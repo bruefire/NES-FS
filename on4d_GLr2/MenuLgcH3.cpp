@@ -76,6 +76,7 @@ void MenuLgcH3::MakeMenu()
         GuiStringEx("120-cells", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_CELLS120),
         GuiStringEx("Torus", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_TORUS),
         GuiStringEx("Earth", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_EARTH),
+        GuiStringEx("Green Field", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_GREEN_FIELD),
         GuiStringEx("<< Back", (MENU_ACT)MENU_ACT_H3::MOVE_TO_OBJECT_MENU)
     };
     makeSubMenu((MENU)MENU_H3::CHANGE_BASIC_OBJECT, &menu, basicObjItems, arraySizeof(basicObjItems));
@@ -299,6 +300,8 @@ bool MenuLgcH3::MenuMsgProc(MENU_ACT act)
         break;
     case CHANGE_BASIC_OBJECT_TO_EARTH:
         ChangeBasicObject(BASIC_OBJ::EARTH2, DRAW_TYPE::SURFACE);
+    case CHANGE_BASIC_OBJECT_TO_GREEN_FIELD:
+        ChangeBasicObject(BASIC_OBJ::GREEN_FIELD, DRAW_TYPE::SURFACE);
         break;
 
         // スローオブジェクト再配置

@@ -230,8 +230,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;OpenGL32.lib;dsound.lib;dxguid.lib;glew32sd.lib;LibOVR.lib;LibOVRKernel.lib;PCSDK_Logging.lib;python39_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Python39-32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files (x86)\Python39-32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -246,8 +250,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;OpenGL32.lib;dsound.lib;dxguid.lib;glew32sd.lib;LibOVR.lib;LibOVRKernel.lib;PCSDK_Logging.lib;python39_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files\Python39\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files\Python39\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -267,8 +275,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;OpenGL32.lib;dsound.lib;dxguid.lib;glew32s.lib;LibOVR.lib;LibOVRKernel.lib;PCSDK_Logging.lib;python39.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files (x86)\Python39-32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files (x86)\Python39-32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -288,8 +300,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;OpenGL32.lib;dsound.lib;dxguid.lib;glew32s.lib;LibOVR.lib;LibOVRKernel.lib;PCSDK_Logging.lib;python39.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\vsAddition\lib\x64;C:\Program Files\Python39\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/OVR/LibOVR/Lib/Windows/$(Platform)/$(Configuration);../lib/OVR/LibOVRKernel/Lib/$(Platform)/$(Configuration);../lib/glew-2.1.0/lib/$(Configuration)/$(Platform);C:\Program Files\Python39\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

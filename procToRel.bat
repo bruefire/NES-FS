@@ -38,16 +38,16 @@ if exist "..\Release\%exeNm%" (copy /y "..\Release\%exeNm%" "%v32%\%newExeNm%") 
 if exist "..\x64\Release\%exeNm%" (copy /y "..\x64\Release\%exeNm%" "%v64%\%newExeNm%") else (echo 64bit版のexeは存在しないので未コピー)
 
 rem 中間ファイル等を削除
-echo 中間ファイル, 結果ファイル, vsファイル等を削除
-rmdir /s /q Debug
-rmdir /s /q Release
-rmdir /s /q x64
+REM echo 中間ファイル, 結果ファイル, vsファイル等を削除
+REM rmdir /s /q Debug
+REM rmdir /s /q Release
+REM rmdir /s /q x64
 cd ..
-rmdir /s /q Debug
-rmdir /s /q Release
-rmdir /s /q x64
-rmdir /s /q .vs
-rmdir /s /q on4d_GLr3.sdf
+REM rmdir /s /q Debug
+REM rmdir /s /q Release
+REM rmdir /s /q x64
+REM rmdir /s /q .vs
+REM rmdir /s /q on4d_GLr3.sdf
 
 
 echo -処理終了-

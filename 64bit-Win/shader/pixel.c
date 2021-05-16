@@ -69,15 +69,16 @@ void clcSlope4(vec4 drawP1, vec4 drawP2, out vec4 slopeC, out vec4 betaC)///ok
 }
 void tudeRst(inout float vec_1, inout float vec_2, float locT, int mode)///ok
 {//-- à‹,åo,ê[ÉäÉZÉbÉgâÒì]
-	float tRot = atan2(vec_1, vec_2);
-	float R = pyth2(vec_1, vec_2);
-	if(0==mode){
-		vec_1 = R * sin(tRot - locT);
-		vec_2 = R * cos(tRot - locT);
-	}else{
-		vec_1 = R * sin(tRot + locT);
-		vec_2 = R * cos(tRot + locT);
-	}
+	float asign = 1.0;
+	if (mode == 0) asign = -1.0;
+
+	float cosVal = cos(asign * locT);
+	float sinVal = sin(asign * locT);
+	float tVec1 = (vec_1)*cosVal + (vec_2)*sinVal;
+	float tVec2 = (vec_2)*cosVal + (-vec_1) * sinVal;
+
+	vec_1 = tVec1;
+	vec_2 = tVec2;
 }
 void all_tudeRst_0(inout vec4 vect, vec3 locT)///ok
 {//-- à‹,åo,ê[ÉäÉZÉbÉgâÒì]
@@ -168,9 +169,9 @@ void main()
 	if(isnan(curEc.w)) curEc = vec4(gaze, 0)*fr;
 	//-------
 	float dec;
-	vec3 curTd = eucToTude( curEc );
+	float curLen = atan2(pyth3(curEc.xyz), curEc.w);
 	
-	if(curTd.y<0.5*PIE) dec = (PIE-curTd.z*0.5) /PIE; else dec = curTd.z*0.5 /PIE;
+	if(curEc.z>0.0) dec = (PIE-curLen*0.5) /PIE; else dec = curLen*0.5 /PIE;
 	
 	
 	///--
@@ -194,7 +195,7 @@ void main()
 	//-- ãPìxÇéZèo
 	float bright_ = 0.2*nDeg / ( curEc.x*curEc.x + curEc.y*curEc.y + curEc.z*curEc.z );// ãå
 	float bright;
-	if(curTd.y<0.5*PIE) bright = 1.2 / ( curTd.z*curTd.z ); else bright = 1.2 / ( (2*PIE-curTd.z)*(2*PIE-curTd.z) );
+	if(curEc.z>0.0) bright = 1.2 / ( curLen*curLen ); else bright = 1.2 / ( (2*PIE-curLen)*(2*PIE-curLen) );
 	if(2.0<bright) bright = 2.0;	//ç≈ëÂãPìx
 	bright = bright*nDeg;
 
