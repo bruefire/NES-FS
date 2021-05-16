@@ -1,1 +1,1 @@
-nes-fs.exe sim:H3;lang:JA
+nes-fs.exe sim:H3;lang:EN

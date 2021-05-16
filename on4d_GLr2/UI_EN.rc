@@ -12,7 +12,7 @@ BEGIN
 			MENUITEM "30 (CFR)"			UI_FPS_30
 			MENUITEM "60 (CFR)"			UI_FPS_60
 		END
-        POPUP "Select Simlator (Lang)"		//UI_LANG
+        POPUP "Sinulator/Language"		//UI_LANG
         BEGIN
             MENUITEM "’´‹…–Ê (“ú–{Œê)"		UI_LANG_JA
             MENUITEM "‘o‹È–Ê (“ú–{Œê)"	    UI_H3_JA
@@ -85,7 +85,7 @@ BEGIN
 				MENUITEM "Torus(polygons)",           UI_TORUS_SURFACE
 				MENUITEM "Earth",				  UI_MK_EARTH
 				MENUITEM SEPARATOR 
-				MENUITEM "Irregular field",				  UI_MK_TC
+				MENUITEM "Green field",				  UI_MK_TC
 			END
 			POPUP "Shooted object"
 			BEGIN

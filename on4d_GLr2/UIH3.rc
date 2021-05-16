@@ -12,7 +12,7 @@ BEGIN
 MENUITEM "30(固定)"			UI_FPS_30
 MENUITEM "60(固定)"			UI_FPS_60
 END
-POPUP "シミュレータ選択 (Lang)"		//UI_LANG
+POPUP "Sinulator/Language"		//UI_LANG
 BEGIN
 MENUITEM "超球面 (日本語)"		UI_LANG_JA
 MENUITEM "双曲面 (日本語)"	    UI_H3_JA
