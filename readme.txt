@@ -19,11 +19,6 @@ problem by execusion of this program.
 content in the program.
 ================================
 
-Windows 32bit exe file location is
-./32bit-Win/nes-fs.exe
-Windows 64bit exe file location is
-./64bit-Win/nes-fs.exe
-
 recommended Windows version: 10
 maybe recommended GPU spec: 
  GTX770 or equivalent others.
@@ -100,12 +95,6 @@ NES-FS
 万が一不具合が起きても責任は負いかねます。
 内容の正確性は保証できません。
 ---------------------------------------
-
-windows 32bit版の実行ファイルは
-"このフォルダ"/32bit-Win/nes-fs.exe
-windows 64bit版の実行ファイルは
-"このフォルダ"/64bit-Win/nes-fs.exe
-です。
 
 
 開発・動作確認はwindows10上で行いました。

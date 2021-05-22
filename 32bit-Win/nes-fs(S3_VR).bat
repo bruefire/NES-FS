@@ -1,1 +1,0 @@
-nes-fs.exe sim:S3;lang:EN;view:VR
