@@ -3,7 +3,6 @@
 #include "constants.h"
 #include "geometry.h"
 #include "functions.h"
-#include "global_var2.h"
 
 
 

@@ -9,7 +9,6 @@
 #include <String>
 #include <commctrl.h>
 #include "constants.h"
-#include "global_var.h"
 #include "VR_Manager.h"
 #include "engine3dWin.h"
 #include "engine3dWinOVR.h"

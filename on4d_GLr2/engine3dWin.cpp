@@ -3,7 +3,6 @@
 #include <GL/gl.h>
 #include <iostream>
 #include "constants.h"
-#include "global_var2.h"
 #include "engine3dWin.h"
 #include "S3ErrorManager.h"
 #include "UI_DEF.h"

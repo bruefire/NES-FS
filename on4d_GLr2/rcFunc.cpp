@@ -3,7 +3,6 @@
 #include <iostream>
 #include <time.h>
 #include "constants.h"
-#include "global_var2.h"
 #include "engine3dWin.h"
 #include "functions.h"
 #include "UI_DEF.h"

@@ -102,8 +102,6 @@
     <ClInclude Include="engine3dWinOVR.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="geometry.h" />
-    <ClInclude Include="global_var.h" />
-    <ClInclude Include="global_var2.h" />
     <ClInclude Include="guiItem.h" />
     <ClInclude Include="MenuLgc.h" />
     <ClInclude Include="MenuLgcH3.h" />
