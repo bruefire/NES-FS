@@ -65,6 +65,8 @@ bool NesEsVR::updateSceneLgc()
 		// VR HMD, hand‚ÌˆÚ“®
 		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
 		owner->UpdVRObjectsH3(nullptr);
+		
+		owner->UpdateBaseObjH3();
 	}
 
 	owner->PrepareInParamForNext();

@@ -74,6 +74,21 @@ public:
 	//uint32_t vtxBuf;	// 頂点バッファ番号
 	//uint32_t texBuf;	// テクスチャバッファ番号
 
+	bool isLazyLoaded;
+
+	enum class Symmetric	// for object size saving
+	{
+		None,
+		X_Symm,
+		Y_Symm,
+		Z_Symm,
+		XY_Symm,
+		YZ_Symm,
+		XZ_Symm,
+		XYZ_Symm
+	}
+	symmType;
+
 	int meshInit(std::string, uint32_t, int);
 	int meshInitB(int, uint32_t);
 	void meshInitC(int);

@@ -3,13 +3,14 @@
 
 
 // ÉOÉãÅ[Év
-int unCk_mark_len = 14;
-int unCk_mark[14] = {
+int unCk_mark_len = 17;
+int unCk_mark[17] = {
 	UI_WL_NONE, 
 	UI_6_POINT, UI_6_LINE, 
 	UI_TUDE_POINT, UI_TUDE_LINE, 
 	UI_120C_POINT, UI_120C_LINE, UI_120C_SURFACE,
 	UI_TORUS_POINT, UI_TORUS_LINE, UI_TORUS_SURFACE,
+	UI_Dodeca_POINT, UI_Dodeca_LINE, UI_Dodeca_SURFACE,
 	UI_MK_EARTH, UI_MK_TC, UI_PLANE_SURFACE
 };
 

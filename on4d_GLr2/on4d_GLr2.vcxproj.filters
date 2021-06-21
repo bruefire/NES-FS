@@ -133,6 +133,9 @@
     <None Include="shader/pxlLowPt.c">
       <Filter>resource files\GL部\GLSLシェーダ</Filter>
     </None>
+    <None Include="pyInit.py">
+      <Filter>resource files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rcFunc.cpp">
@@ -347,6 +350,5 @@
     <Text Include="pyUpd.py">
       <Filter>resource files</Filter>
     </Text>
-    <Text Include="shader/pyInit.py" />
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <string>
+#include <memory>
 #include "object.h"
 #include "engine3d.h"
 
@@ -28,14 +29,16 @@ public:
         SetWorldScale,
         GetWorldScale,
         TrackObjDirection,
-        GetDistance
+        GetDistance,
+        TrackObjDirectionHead
     };
     static FuncObject funcID;
 
 
     static engine3d* engine;
-    static char rawCode[8186];
+    static std::unique_ptr<char> rawCode;
     static PyObject* GetObjData(PyObject* self, PyObject* args);
+    static PyObject* SetLoc(PyObject* self, PyObject* args);
     static PyObject* SetLocRelative(PyObject* self, PyObject* args);
     static PyObject* SetRotRelative(PyObject* self, PyObject* args);
     static PyObject* GetPlayerObj(PyObject* self, PyObject* args);

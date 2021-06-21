@@ -6,6 +6,8 @@
 #include <String>
 #include <chrono>
 #include <thread>
+#include <map>
+#include <fstream>
 #include "constants.h"
 #include "engine3d.h"
 #include "S3ErrorManager.h"
@@ -20,7 +22,7 @@ using namespace std::chrono;
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
 	, PLR_QTY(10)	// プレイヤー
-	, ENR_QTY(550)	// 隕石()
+	, ENR_QTY(1000)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
 	, ATK_QTY(1)	// ﾌﾟﾚｲﾔと敵の攻撃
@@ -88,60 +90,9 @@ int engine3d::init()
 	//-- プレイヤー空き番号を設定
 	PLR_No = BWH_QTY;	
 
-	// メッシュ定義
-	meshLen = 24;
-	meshNames = new char*[meshLen];
-	meshNames[0] = "wLines", 
-	meshNames[1] = "player", 
-	meshNames[2] = "earth", 
-	meshNames[3] = "wLines3",
-	meshNames[4] = "cube8", 
-	meshNames[5] = "horse", 
-	meshNames[6] = "sun", 
-	//meshNames[7] = "plane",
-	meshNames[7] = "sphereM",
-	meshNames[8] = "earth2", 
-	meshNames[9] = "cube8", 
-	meshNames[10] = "p120", 
-	meshNames[11] = "p120c", 
-	meshNames[12] = "torus", 
-	meshNames[13] = "torus2", 
-	meshNames[14] = "rock";
-	meshNames[15] = "map2";
-	meshNames[16] = "map1";
-	meshNames[17] = "mapElm1";
-	meshNames[18] = "mapElm2";
-	meshNames[19] = "mapElm3";
-	meshNames[20] = "mapElm4";
-	meshNames[21] = "plane";
-	meshNames[22] = "hand";
-	meshNames[23] = "lhand";
 
 	///-- 雛形メッシュ
-	allocMesh();
-	try
-	{
-		for(int i=0;i<meshLen;i++)//-- メッシュ作成
-		{	
-			if(!meshs[i].meshInit( meshNames[i], i+1, 0))
-				rtnVal = 0;
-		}
-	}
-	// disposeして終了に向かう
-	catch(S3ErrorManager ex)
-	{
-		dispose();
-
-		if(clsType == CLS_TYPE::LOGIC)
-		{
-			cout << ex.errMsg << endl;
-			return 0;
-		}
-		else
-		{
-			throw  ex;
-		}
-	}
+	rtnVal = InitMesh();
 
 	///-- 初期オブジェクト作成
 	objs = new object3d[ OBJ_QTY ];
@@ -212,6 +163,83 @@ int engine3d::update()
 	// 入力状態 次回待機処理
 	PrepareInParamForNext();
 
+	if (0)
+	{
+		// 前準備2 idxr
+		int idxr = 111;
+		int idxr2 = 222;
+		for (int h = BWH_QTY + PLR_QTY; h < idxr; h++)
+		{
+			object3d* curObj = objs + h;
+			curObj->used = false;
+		}
+
+		ofstream fs("out.txt");
+		streambuf* oldO = cout.rdbuf();
+		cout.rdbuf(fs.rdbuf());
+
+		map<int, int> test;
+		cout << "vertices = []" << endl;
+		cout << "faces = []" << endl;
+		int cnt = 0;
+
+		for (int h = idxr; h < OBJ_QTY; h++)
+		{
+			object3d* curObj = objs + h;
+			if (!curObj->used)
+				continue;
+
+			double hpLen = object3d::ClcHypbFromEuc(pyth3(curObj->loc));
+			pt3 tmp = curObj->loc.norm().mtp(hpLen);
+
+			cout << "vertices.append(" 
+				<< "[" << tmp.x
+				<< ", " << tmp.y
+				<< ", " << tmp.z
+				<< "])" << endl;
+			test[h] = cnt++;
+		}
+
+		for (int h = idxr; h < idxr2 - 1; h += 2)
+		{
+			object3d* curObj = objs + h;
+			if (!curObj->used)
+				continue;
+
+			if ((h - idxr) % 8 != 6)
+			{
+				cout << "faces.append("
+					<< "[" << test[h + 1]
+					<< ", " << test[h + 0]
+					<< ", " << test[h + 2]
+					<< "])" << endl;
+				cout << "faces.append("
+					<< "[" << test[h + 2]
+					<< ", " << test[h + 3]
+					<< ", " << test[h + 1]
+					<< "])" << endl;
+			}
+			else
+			{
+				cout << "faces.append("
+					<< "[" << test[h + 1]
+					<< ", " << test[h + 0]
+					<< ", " << test[h + 2 - 8]
+					<< "])" << endl;
+				cout << "faces.append("
+					<< "[" << test[h + 2 - 8]
+					<< ", " << test[h + 3 - 8]
+					<< ", " << test[h + 1]
+					<< "])" << endl;
+			}
+
+			
+		}
+
+		cout.rdbuf(oldO);
+		fs.close();
+	}
+
 	return result;
 };
 
@@ -272,10 +300,83 @@ int engine3d::dispose()
 
 //**** その他 ****//
 
+int engine3d::InitMesh()
+{
+	int rtnVal = 1;
+
+	// メッシュ定義
+	meshLen = 26;
+	meshNames = new char* [meshLen];
+	meshNames[0] = "wLines",
+	meshNames[1] = "player",
+	meshNames[2] = "earth",
+	meshNames[3] = "wLines3",
+	meshNames[4] = "cube8",
+	meshNames[5] = "horse",
+	meshNames[6] = "sun",
+	//meshNames[7] = "plane",
+	meshNames[7] = "sphereM",
+	meshNames[8] = "earth2",
+	meshNames[9] = "cube8",
+	meshNames[10] = "p120",
+	meshNames[11] = "p120c",
+	meshNames[12] = "torus",
+	meshNames[13] = "torus2",
+	meshNames[14] = "rock";
+	meshNames[15] = "map2";
+	meshNames[16] = "map1";
+	meshNames[17] = "mapElm1";
+	meshNames[18] = "mapElm2";
+	meshNames[19] = "mapElm3";
+	meshNames[20] = "mapElm4";
+	meshNames[21] = "plane";
+	meshNames[22] = "hand";
+	meshNames[23] = "lhand";
+	meshNames[24] = "h3-12hc";
+	meshNames[25] = "h3-12hc2";
+
+	allocMesh();
+	meshs[25].isLazyLoaded = true;
+	meshs[25].symmType = mesh3d::Symmetric::XYZ_Symm;
+
+	try
+	{
+		for (int i = 0; i < meshLen; i++)//-- メッシュ作成
+		{
+			if (meshs[i].isLazyLoaded)
+				continue;
+
+			if (!meshs[i].meshInit(meshNames[i], i + 1, 0))
+				rtnVal = 0;
+		}
+	}
+	// disposeして終了に向かう
+	catch (S3ErrorManager ex)
+	{
+		dispose();
+
+		if (clsType == CLS_TYPE::LOGIC)
+		{
+			cout << ex.errMsg << endl;
+			return 0;
+		}
+		else
+		{
+			throw  ex;
+		}
+	}
+
+	return rtnVal;
+}
+
+mesh3d* engine3d::GetMesh(int idx)
+{
+	return meshs + idx;
+}
+
 int engine3d::allocMesh()
 {
 	meshs = new mesh3d[meshLen];
-
 	return 1;
 }
 
@@ -294,6 +395,72 @@ void engine3d::simulateH3()
 
 	// 基objとの相対位置計算 (表示座標)
 	ClcCoordinate();
+
+	// 12面体移動
+	UpdateBaseObjH3();
+}
+
+void engine3d::UpdateBaseObjH3()
+{
+	if (objs[0].mesh == meshs + 24 || objs[0].mesh == meshs + 25)
+	{
+		double lineDst = 0.78614817104;
+
+		if (pyth3(objs[0].loc) > lineDst)
+		{
+			object3d* baseObj = objs + 0;
+			object3d baseCpy = objs[0];
+			object3d plrCpy = objs[PLR_No];
+
+			// 各点からの距離を確認
+			pt3 baseLoc = baseObj->loc;
+			baseCpy.ParallelMove(baseLoc, false);
+			plrCpy.ParallelMove(baseLoc, false);
+
+			pt3 std1N = baseCpy.std[0].norm();
+			pt3 std2N = baseCpy.std[1].norm();
+			pt3 sideN = pt3::cross(std2N, std1N);
+
+
+			pt3 cross[6] =
+			{
+				std1N.mtp(+lineDst), std2N.mtp(+lineDst), sideN.mtp(+lineDst),
+				std1N.mtp(-lineDst), std2N.mtp(-lineDst), sideN.mtp(-lineDst)
+			};
+
+			double minDst = DBL_MAX;
+			int minIdx = -1;
+			for (int i = 0; i < 6; i++)
+			{
+				object3d plrCpy2 = plrCpy;
+				plrCpy2.ParallelMove(cross[i], false);
+
+				double dst = pyth3(plrCpy2.loc);
+				if (dst < minDst)
+				{
+					minDst = dst;
+					minIdx = i;
+				}
+			}
+
+			baseObj->ParallelMove(baseLoc, false);
+
+			if (minIdx == 0)
+				baseObj->ParallelMove(std1N.mtp(lineDst), true);
+			else if (minIdx == 1)
+				baseObj->ParallelMove(std2N.mtp(lineDst), true);
+			else if (minIdx == 2)
+				baseObj->ParallelMove(sideN.mtp(lineDst), true);
+			else if (minIdx == 3)
+				baseObj->ParallelMove(std1N.mtp(lineDst), false);
+			else if (minIdx == 4)
+				baseObj->ParallelMove(std2N.mtp(lineDst), false);
+			else if (minIdx == 5)
+				baseObj->ParallelMove(sideN.mtp(lineDst), false);
+
+			baseObj->ParallelMove(baseLoc, true);
+		}
+	}
 
 	//MakeTracingLines();
 }
@@ -1446,15 +1613,18 @@ object3d* engine3d::GetObject(int idx)
 // 現プレイヤー座標計算
 void engine3d::ClcCoordinate()
 {
-	object3d* baseObj = objs + 0;
-	pt3 baseLoc = baseObj->loc;
-	object3d* plrObj = &objs[PLR_No];
+	if (viewTrackIdx < 0)
+		return;
 
+	object3d* baseObj = objs + viewTrackIdx;
 	if (!baseObj->used)
 	{
 		cmCo = pt3(0, 0, 0);
 		return;
 	}
+
+	pt3 baseLoc = baseObj->loc;
+	object3d* plrObj = &objs[PLR_No];
 
 	object3d plrCpy(*plrObj);	// コピー
 	object3d baseCpy(*baseObj);	// コピー
@@ -1489,12 +1659,12 @@ void engine3d::InitWorld()	// 世界初期化
 		for (int i = 0; i < 2; i++)
 		{
 			vrHand[i].draw = 2;
-			vrHand[i].objInitS3(meshs + meshIdx[i]);
+			vrHand[i].objInitS3(meshIdx[i]);
 			vrHand[i].used = true;
 		}
 
 		vrMenuObj.draw = 2;
-		vrMenuObj.objInitS3(nullptr);
+		vrMenuObj.objInitS3(-1);
 		vrMenuObj.used = true;
 		vrMenuMesh.meshInitC((meshLen - 1) + 3);
 		vrMenuObj.mesh = &vrMenuMesh;
@@ -1520,7 +1690,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	sun.used = false;	// 無効化
 
 	//-- 軌跡オブジェクト
-	markObj.objInitH3(meshs + 0);
+	markObj.objInitH3(0);
 	markObj.loc = pt3(	//-- 位置
 		0,
 		0,
@@ -1537,7 +1707,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	// todo★ 基準線
 	for (h; h < BWH_QTY; h++) 
 	{
-		objs[h].objInitH3(meshs + 0);
+		objs[h].objInitH3(0);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
 		objs[h].init_stdH3(0);	//-- std
@@ -1547,7 +1717,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	///-- プレイヤー ----------
 	for (h; h < BWH_QTY + PLR_QTY; h++)
 	{
-		objs[h].objInitH3(meshs + 1);
+		objs[h].objInitH3(1);
 
 		objs[h].rsp.asg(1 DEG, 0, 0);
 		objs[h].used = true;	//-- 有効化
@@ -1563,7 +1733,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++)
 	{
-		objs[h].objInitH3(meshs + 4);
+		objs[h].objInitH3(4);
 
 		objs[h].rot.asg(0, 0 DEG, 0);
 		objs[h].rsp.asg(0 DEG, 0, 0);
@@ -1590,7 +1760,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	player.ep = ENR_QTY;
 
 	//-- 太陽
-	sun.objInitS3(meshs + 6);
+	sun.objInitS3(6);
 	sun.loc = pt3(	//-- 位置
 		0.0, 0.0, 0.0
 	);
@@ -1602,7 +1772,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	sun.init_stdS3(0);//-- 標準の設定
 
 	//-- 軌跡オブジェクト
-	markObj.objInitS3(meshs + 0);
+	markObj.objInitS3(0);
 	markObj.loc = pt3(	//-- 位置
 		0,
 		0,
@@ -1618,7 +1788,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	int h = 0;
 	///-- 基準線
 	for (h; h < BWH_QTY; h++) {
-		objs[h].objInitS3(meshs + 0);
+		objs[h].objInitS3(0);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
 		objs[h].init_stdS3(0);	//-- std
@@ -1626,7 +1796,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	}
 	///-- プレイヤー ----------
 	for (h; h < BWH_QTY + PLR_QTY; h++) {
-		objs[h].objInitS3(meshs + 1);
+		objs[h].objInitS3(1);
 		objs[h].loc = pt3(	//-- 位置
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
@@ -1645,7 +1815,7 @@ int engine3d::InitS3()	// 球面世界用初期化
 	}
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++) {
-		objs[h].objInitS3(meshs + 4);
+		objs[h].objInitS3(4);
 		objs[h].loc = pt3(	//-- 位置
 			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
 			((double)rand() / RAND_MAX) * PIE,
@@ -2201,22 +2371,43 @@ void engine3d::InitInputParams()
 
 void engine3d::ChangeBasicObject(int bufIdx, int drawMode, bool sunFlg)
 {
+	object3d* baseObj = objs + 0;
+
 	if (bufIdx < 0)
 	{
-		objs[0].used = false;
+		baseObj->used = false;
 		sun.used = false;
 	}
 	else
 	{
-		objs[0].mesh = meshs + bufIdx;
-		objs[0].draw = drawMode;
-		objs[0].used = true;
+		if (!meshs[bufIdx].pts)
+		{
+			if (!LoadLazyObject(bufIdx))
+				return;
+		}
+
+		baseObj->mesh = meshs + bufIdx;
+		baseObj->draw = drawMode;
+		baseObj->used = true;
 		sun.used = sunFlg;
 	}
 }
 
+bool engine3d::LoadLazyObject(int idx)
+{
+	if (!meshs[idx].meshInit(meshNames[idx], idx + 1, 0))	// todo: "+ 1"を別の場所へ
+		return false;
+
+	return true;
+}
+
 void engine3d::ChangeThrowObject(int bufIdx)
 {
+	if (!meshs[bufIdx].pts)
+	{
+		if (!LoadLazyObject(bufIdx))
+			return;
+	}
 	for (int i = BWH_QTY + PLR_QTY; i < OBJ_QTY; i++)
 	{
 		objs[i].mesh = meshs + bufIdx;

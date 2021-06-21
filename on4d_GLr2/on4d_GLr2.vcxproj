@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
+    <None Include="pyInit.py" />
     <None Include="メモ.txt" />
     <ResourceCompile Include="chgPlayerLoc.rc">
       <FileType>Text</FileType>
@@ -138,9 +139,6 @@
     <None Include="shader/h3vtxPt.c">
       <FileType>CppCode</FileType>
     </None>
-    <Text Include="shader/pyInit.py">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </Text>
     <Text Include="objSetting.h" />
     <Text Include="pyUpd.py" />
     <ResourceCompile Include="UIH3EN.rc" />

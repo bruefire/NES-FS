@@ -28,6 +28,7 @@ class FuncObject(IntEnum) :
 	GetWorldScale = 10
 	TrackObjDirection = 11
 	GetDistance = 12
+	TrackObjDirectionHead = 13
 
 
 class World :
@@ -98,6 +99,9 @@ class ObjData :
 	def SetIdx(self, val) :
 		self.idx = val
 
+	def SetLoc(self, x, y, z) :
+		h3sim.SetLoc(self, x, y, z)
+
 	def SetLocRelative(self, trg, dst, x, y, z) :
 		h3sim.SetLocRelative(self, trg, dst, x, y, z)
 
@@ -133,6 +137,10 @@ class ObjData :
 
 	def TrackObjDirection(self, trg) :
 		h3sim.SetCommonFunc(int(FuncObject.TrackObjDirection))
+		return h3sim.ExecCommonFunc(self, trg)
+
+	def TrackObjDirectionHead(self, trg) :
+		h3sim.SetCommonFunc(int(FuncObject.TrackObjDirectionHead))
 		return h3sim.ExecCommonFunc(self, trg)
 
 	def GetDistance(self, trg) :

@@ -11,7 +11,8 @@
 #include "MenuLgc.h"
 
 
-
+// todo: フィールドを追加する場合は"meshs + n"or"meshs[n]"etc部分を仮想関数に変更
+// さもないと恐らくアクセスエラー
 class mesh3dGL : public mesh3d
 {
 public:
@@ -93,6 +94,7 @@ public:
 	int DrawEachObjsS3(int);
 	int DrawEachObjsS3_LQY(int);
 	int DrawEachObjsH3(int);
+	int DrawObjectH3(int);
 	double GetAsp();
 	double clcRangeY(double rangeX);
 	
@@ -124,11 +126,13 @@ public:
 	void DisposeBuffersForVRMenu();
 	void DrawGUIForVR();
 	virtual void MakeTracingLines();
+	virtual bool LoadLazyObject(int idx);
 
 	uint32_t LoadShaders(const char* vPath, const char* fPath);
 	uint32_t LoadShaders2(const char* vPath, const char* gPath, const char* fPath, char mode);
 
-	int allocMesh();
+	virtual mesh3d* GetMesh(int idx);
+	virtual int allocMesh();
 
 	// マップ
 	void end4D();

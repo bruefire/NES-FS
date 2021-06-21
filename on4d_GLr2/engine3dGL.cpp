@@ -345,7 +345,8 @@ int engine3dGL::init()
 	//-- ƒƒbƒVƒ…“]‘—
 	for (int i = 0; i < meshLen; i++)
 	{
-		MakeCommonVBO((mesh3dGL*)(meshs + i));
+		if(!meshs[i].isLazyLoaded)
+			MakeCommonVBO((mesh3dGL*)(meshs + i));
 	}
 
 
@@ -730,9 +731,6 @@ void engine3dGL::DrawCoordinateS3()
 
 void engine3dGL::DrawCoordinateH3()
 {
-	if (!objs[0].used)
-		return;
-
 	//
 	double asp = GetAsp();
 	GuiString guiStr;
@@ -747,13 +745,17 @@ void engine3dGL::DrawCoordinateH3()
 	{
 		// “à—eİ’è
 		string locMode = "", loc_X = "", loc_Y = "", loc_Z = "", loc_W = "";
-		locMode = "Coordinate";
+		locMode = "Relative Coords";
 		loc_X = "Radius   : ";
 		loc_Y = "Longitude: ";
 		loc_Z = "Latitude : ";
-		loc_X.append(to_string((long double)(cmCo.x)));
-		loc_Y.append(to_string((long double)(cmCo.y / PIE * 180)));
-		loc_Z.append(to_string((long double)(-cmCo.z / PIE * 180 + 90)));
+
+		if (viewTrackIdx >= 0 && objs[viewTrackIdx].used)
+		{
+			loc_X.append(to_string((long double)(cmCo.x)));
+			loc_Y.append(to_string((long double)(cmCo.y / PIE * 180)));
+			loc_Z.append(to_string((long double)(-cmCo.z / PIE * 180 + 90)));
+		}
 
 		// •`‰æˆ—
 		guiStr.content = locMode;
@@ -939,6 +941,11 @@ void engine3dGL::DrawChar(uint8_t dChar, double x, double y, double w, double h)
 }
 
 //**** ‚»‚Ì‘¼ ****//
+
+mesh3d* engine3dGL::GetMesh(int idx)
+{
+	return (mesh3dGL*)meshs + idx;
+}
 
 int engine3dGL::allocMesh()
 {
@@ -1275,6 +1282,15 @@ void engine3dGL::MakeTracingLines()
 			}
 		}
 	}
+}
+
+bool engine3dGL::LoadLazyObject(int idx)
+{
+	if (!engine3d::LoadLazyObject(idx))
+		return false;
+
+	MakeCommonVBO((mesh3dGL*)(meshs + idx));
+	return true;
 }
 
 

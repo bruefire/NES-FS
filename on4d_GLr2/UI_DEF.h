@@ -59,6 +59,9 @@
 #define UI_TORUS_LINE 710
 #define UI_TORUS_SURFACE 711
 #define UI_PLANE_SURFACE 712
+#define UI_Dodeca_POINT 713
+#define UI_Dodeca_LINE 714
+#define UI_Dodeca_SURFACE 715
 
 #define UI_LR_RESULT 800
 

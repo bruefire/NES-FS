@@ -73,7 +73,7 @@ void MenuLgcH3::MakeMenu()
         GuiStringEx("6 lines (line)", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_LINES_LN),
         GuiStringEx("Polar (point)", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_POLAR_PT),
         GuiStringEx("Polar (line)", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_POLAR_LN),
-        GuiStringEx("120-cells", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_CELLS120),
+        GuiStringEx("Dodecahedrons", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_DODECA),
         GuiStringEx("Torus", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_TORUS),
         GuiStringEx("Earth", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_EARTH),
         GuiStringEx("Green Field", (MENU_ACT)MENU_ACT_H3::CHANGE_BASIC_OBJECT_TO_GREEN_FIELD),
@@ -292,8 +292,8 @@ bool MenuLgcH3::MenuMsgProc(MENU_ACT act)
     case CHANGE_BASIC_OBJECT_TO_POLAR_LN:
         ChangeBasicObject(BASIC_OBJ::POLAR, DRAW_TYPE::LINE);
         break;
-    case CHANGE_BASIC_OBJECT_TO_CELLS120:
-        ChangeBasicObject(BASIC_OBJ::CELLS120, DRAW_TYPE::SURFACE);
+    case CHANGE_BASIC_OBJECT_TO_DODECA:
+        ChangeBasicObject(BASIC_OBJ::DODECA, DRAW_TYPE::LINE);
         break;
     case CHANGE_BASIC_OBJECT_TO_TORUS:
         ChangeBasicObject(BASIC_OBJ::TORUS, DRAW_TYPE::SURFACE);

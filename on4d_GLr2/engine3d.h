@@ -138,6 +138,7 @@ public:
 	void HoldObjWithVRHandS3(bool);
 	void HoldObjWithVRHandH3(bool);
 	void ClcCoordinate();
+	void UpdateBaseObjH3();
 	virtual void MakeTracingLines();
 	object3d* GetObject(int idx);
 	int physics();
@@ -164,6 +165,8 @@ public:
 	pt3 randVec3(double);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
+	int InitMesh();
+	virtual mesh3d* GetMesh(int idx);
 	virtual int allocMesh();
 	void shoot();
 	void InitInputParams();	// 入力値初期化
@@ -207,6 +210,7 @@ public:
 	void ChangeBasicObject(int, int, bool = false);
 	void ChangeThrowObject(int);
 	virtual void CreateNewEngine(std::string) = 0;
+	virtual bool LoadLazyObject(int idx);
 
 };
 

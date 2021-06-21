@@ -3,7 +3,7 @@
 using namespace std;
 
 engine3d* CppPythonIF::engine = nullptr;
-char CppPythonIF::rawCode[8186] = "";
+unique_ptr<char> CppPythonIF::rawCode(nullptr);
 PyObject* CppPythonIF::pModule;
 PyObject* CppPythonIF::pDict;
 CppPythonIF::FuncObject CppPythonIF::funcID;
@@ -36,6 +36,48 @@ PyObject* CppPythonIF::GetObjData(PyObject* self, PyObject* args)
 
     return pList;
 };
+
+
+// 相対的な位置設定
+PyObject* CppPythonIF::SetLoc(PyObject* self, PyObject* args)
+{
+
+    if (engine == nullptr)
+        return NULL;
+
+    PyObject* src;
+    pt3 nLoc;
+    if (!PyArg_ParseTuple(args, "Oddd", &src, &nLoc.x, &nLoc.y, &nLoc.z))
+        return NULL;
+
+    // 型チェック
+    PyObject* objDataType = PyDict_GetItemString(pDict, "ObjData");
+    if (!PyObject_IsInstance(src, objDataType))
+        return NULL;  // エラーにはしない
+
+
+    PyObject* result = NULL;
+    PyObject* selfIdx = PyObject_GetAttrString(src, "idx");
+
+    // 位置再設定
+    object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+
+    if (engine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+    {
+        if (selfObj->SetLocH3(nLoc))
+            result = PyLong_FromLong(0);
+    }
+    else if (engine->worldGeo == engine3d::WorldGeo::SPHERICAL)
+    {
+        if (selfObj->SetLocS3(nLoc))
+            result = PyLong_FromLong(0);
+    }
+
+    Py_XDECREF(selfIdx);
+
+
+    return result;
+}
 
 
 // 相対的な位置設定
@@ -359,6 +401,22 @@ PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
         ReleaseObjObj(trgIdx);
         break;
     }
+    case FuncObject::TrackObjDirectionHead:
+    {
+        PyObject* src, * trg, * selfIdx, * trgIdx;
+        if (!PyArg_ParseTuple(args, "OO", &src, &trg) || !GetObjObj(&src, &selfIdx) || !GetObjObj(&trg, &trgIdx))
+            return NULL;
+
+        object3d* selfObj = &engine->objs[PyLong_AsLong(selfIdx)];
+        object3d* trgObj = &engine->objs[PyLong_AsLong(trgIdx)];
+
+        selfObj->TrackObjDirectionHead(trgObj);
+        result = PyLong_FromLong(1);
+
+        ReleaseObjObj(selfIdx);
+        ReleaseObjObj(trgIdx);
+        break;
+    }
     case FuncObject::GetDistance:
     {
         PyObject* src, * trg, * selfIdx, * trgIdx;
@@ -397,6 +455,12 @@ PyMethodDef methods[] =
         CppPythonIF::GetObjData,    
         METH_VARARGS,
         "explanation."            
+    },
+    {
+        "SetLoc",
+        CppPythonIF::SetLoc,
+        METH_VARARGS,
+        "explanation."
     },
     {
         "SetLocRelative",

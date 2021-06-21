@@ -66,6 +66,9 @@ BEGIN
 				MENUITEM "6 lines (lines)", UI_6_LINE
 				MENUITEM "Polar (points)", UI_TUDE_POINT
 				MENUITEM "Polar (lines)", UI_TUDE_LINE
+				MENUITEM "Dodecahedral (points)"	UI_Dodeca_POINT
+				MENUITEM "Dodecahedral (lines)"		UI_Dodeca_LINE
+				MENUITEM "Dodecahedral (surfaces)"		UI_Dodeca_SURFACE
 				MENUITEM "Torus(points)", UI_TORUS_POINT
 				MENUITEM "Torus(lines)", UI_TORUS_LINE
 				MENUITEM "Torus(polygons)", UI_TORUS_SURFACE

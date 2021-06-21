@@ -487,6 +487,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					newEngine->ChangeBasicObject(10, 1);
 					menuCheck(hMenu, &menuItemInfo, UI_120C_LINE, unCk_mark, unCk_mark_len);
 					break;
+				case UI_Dodeca_POINT:
+					newEngine->ChangeBasicObject(24, 0);
+					menuCheck(hMenu, &menuItemInfo, UI_Dodeca_POINT, unCk_mark, unCk_mark_len);
+					break;
+				case UI_Dodeca_LINE:
+					newEngine->ChangeBasicObject(24, 1);
+					menuCheck(hMenu, &menuItemInfo, UI_Dodeca_LINE, unCk_mark, unCk_mark_len);
+					break;
+				case UI_Dodeca_SURFACE:
+					newEngine->ChangeBasicObject(25, 2);
+					menuCheck(hMenu, &menuItemInfo, UI_Dodeca_SURFACE, unCk_mark, unCk_mark_len);
+					break;
 				case UI_120C_SURFACE:
 					newEngine->ChangeBasicObject(11, 2);
 					menuCheck(hMenu, &menuItemInfo, UI_120C_SURFACE, unCk_mark, unCk_mark_len);
@@ -943,11 +955,19 @@ INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	};
 	
 	switch (msg) {
+	case WM_INITDIALOG:
+		SendMessage(GetDlgItem(hDlg, EDITDLG_CODE_TXT), EM_SETLIMITTEXT, INT_MAX, 0);
+		break;
+
 	case WM_COMMAND:
 		switch (LOWORD(wp)) {
 		case IDOK:
-			GetDlgItemText(editDlg, EDITDLG_CODE_TXT, CppPythonIF::rawCode, 8186);
+		{
+			LRESULT len = SendMessage(GetDlgItem(hDlg, EDITDLG_CODE_TXT), WM_GETTEXTLENGTH, 0, 0) + 1;
+			CppPythonIF::rawCode.reset(new char[len]);
+			GetDlgItemText(editDlg, EDITDLG_CODE_TXT, CppPythonIF::rawCode.get(), len);
 			return true;
+		}
 		case IDCANCEL:
 			DestroyWindow(editDlg);
 			return true;
@@ -1092,7 +1112,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 						{
 							if (newEngine->meshs[i].objNameS == tmpc)
 							{
-								newEngine->objs[h].mesh = &newEngine->meshs[i];
+								newEngine->objs[h].SetMesh(i);
 								break;
 							}
 						}
@@ -1104,7 +1124,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 					{
 						if (newEngine->meshs[i].objNameS == tmpc)
 						{
-							newEngine->objs[trgObjIdx].mesh = &newEngine->meshs[i];
+							newEngine->objs[trgObjIdx].SetMesh(i);
 							break;
 						}
 					}

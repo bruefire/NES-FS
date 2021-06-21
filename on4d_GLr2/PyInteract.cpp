@@ -52,17 +52,17 @@ void PyInteract::Update()
 		// exec constant script
 		PyRun_SimpleString(updPyStr.c_str());
 	}
-	if (initPyFlg && CppPythonIF::rawCode[0] != 0)
+	if (initPyFlg && CppPythonIF::rawCode)
 	{
 		// exec instant script
-		PyRun_SimpleString(CppPythonIF::rawCode);
+		PyRun_SimpleString(CppPythonIF::rawCode.get());
 
 		PyObject* output = PyObject_GetAttrString(catcher, "value");
 		const char* cnvStr = PyUnicode_AsUTF8AndSize(output, nullptr);
 		if (cnvStr != nullptr)
 			cout << cnvStr << endl;
 
-		ZeroMemory(CppPythonIF::rawCode, 8186);
+		CppPythonIF::rawCode.reset(nullptr);
 		Py_XDECREF(output);
 		PyRun_SimpleString("sys.stdout.value = ''");
 	}

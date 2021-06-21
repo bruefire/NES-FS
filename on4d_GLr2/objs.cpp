@@ -43,7 +43,9 @@ poly::~poly(){
 
 void mesh3d::Init()
 {
+	symmType = Symmetric::None;
 	coorType = COOR::POLAR;
+	isLazyLoaded = false;
 	setNull();
 }
 mesh3d::mesh3d()
@@ -219,8 +221,11 @@ void object3d::DealH3OohObj(bool loopFlg)
 		used = false;
 }
 
-void object3d::TrackObjDirection(object3d* trgObj)
+bool object3d::TrackObjDirection(object3d* trgObj)
 {
+	if (!trgObj->used)
+		return false;
+
 	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
 	{
 		pt4 locE = tudeToEuc(loc);
@@ -303,6 +308,48 @@ void object3d::TrackObjDirection(object3d* trgObj)
 		// 元の位置に戻す
 		this->ParallelMove(preLoc, true);
 	}
+
+	return true;
+}
+
+/// <summary>
+/// 正面方向を維持して上方向をターゲットに向ける
+/// </summary>
+bool object3d::TrackObjDirectionHead(object3d* trgObj)
+{
+	if (!trgObj->used)
+		return false;
+
+	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
+	{
+		// not implements yet
+		return false;
+	}
+	else
+	{
+		object3d trgCpy = *trgObj;
+
+		pt3 preLoc = this->loc;
+		this->ParallelMove(preLoc, false);
+		trgCpy.ParallelMove(preLoc, false);
+
+		pt3 std1N = this->std[0].norm();
+		pt3 std2N = this->std[1].norm();
+		pt3 sideN = pt3::cross(std2N, std1N);
+
+		pt3 nStd1Comp = pt3()
+			.pls(std2N.mtp(pt3::dot(trgCpy.loc, std2N)))
+			.pls(sideN.mtp(pt3::dot(trgCpy.loc, sideN)));
+
+		if (nStd1Comp.isZero())
+			return false;
+
+		this->std[1] = nStd1Comp.norm().mtp(owner->H3_STD_LEN);
+
+		this->ParallelMove(preLoc, true);
+	}
+
+	return true;
 }
 
 double object3d::GetDistance(object3d* trgObj)
@@ -332,6 +379,21 @@ double object3d::GetDistance(object3d* trgObj)
 	}
 }
 
+void object3d::SetMesh(int idx)
+{
+	if (idx < 0)
+	{
+		mesh = nullptr;
+		return;
+	}
+	else if (!owner->meshs[idx].pts)
+	{
+		if (!owner->LoadLazyObject(idx))
+			return;
+	}
+	mesh = &owner->meshs[idx];
+}
+
 // 相対的に位置再設定
 bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 {
@@ -344,7 +406,7 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	trgCpy.ParallelMove(preLoc, false);
 
 	object3d reObj(owner);
-	reObj.objInitH3(nullptr);
+	reObj.objInitH3(-1);
 	reObj.std[0] = trgCpy.std[0];
 	reObj.std[1] = trgCpy.std[1];
 	reObj.lspX.asgPt3(pt3(0, 0, owner->H3_STD_LEN));
@@ -374,6 +436,33 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	this->std[0] = reObj.std[0];
 	this->std[1] = reObj.std[1];
 	this->lspX = reObj.lspX;
+
+	return true;
+}
+
+// 位置再設定
+bool object3d::SetLocS3(pt3 nLoc)
+{
+	this->used = true;
+	this->loc = nLoc;
+	this->init_stdS3(false);
+	this->lspX.asgPt3(this->std[0]);
+
+	return true;
+}
+
+// 位置再設定
+bool object3d::SetLocH3(pt3 nLoc)
+{
+	if (pyth3(nLoc) >= owner->H3_MAX_RADIUS)
+		return false;
+
+	this->used = true;
+	this->loc = pt3(0, 0, 0);
+	this->std[0] = pt3(0, 0, owner->H3_STD_LEN);
+	this->std[1] = pt3(0, owner->H3_STD_LEN, 0);
+	this->lspX.asgPt3(this->std[0]);
+	this->ParallelMove(nLoc, true);
 
 	return true;
 }
@@ -973,14 +1062,10 @@ void mesh3d::CartesianToPolar()
 }
 
 
-void object3d::objInitH3(mesh3d* pForm)
+void object3d::objInitH3(int meshIdx)
 {
-	mesh = pForm;
-	//-- モデルメッシュからコピー
+	SetMesh(meshIdx);
 
-
-
-	///--------
 	///-----------///
 	//alfa = 0.4;
 	scale = 1;
@@ -1003,14 +1088,10 @@ void object3d::objInitH3(mesh3d* pForm)
 
 }
 
-void object3d::objInitS3(mesh3d* pForm)
+void object3d::objInitS3(int meshIdx)
 {
-  mesh = pForm;
-  //-- モデルメッシュからコピー
-
-	
+  SetMesh(meshIdx);
   
-  ///--------
   ///-----------///
   //alfa = 0.4;
   scale = 1;

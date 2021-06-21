@@ -47,6 +47,8 @@ public:
 	void mkLspX_H3(pt4);	// H3用
 	bool SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst);	// S3
 	bool SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst);	// H3
+	bool SetLocS3(pt3 nLoc);	
+	bool SetLocH3(pt3 nLoc);	// H3
 	bool SetRotRelative(pt3 nRot);	// H3
 	bool SetRotRelativeS3(pt3 nRot);	// S3
 	bool SetScale(double);
@@ -67,8 +69,8 @@ public:
 
 	char draw;	//-- 0:ポイント, 1:ライン, 2:サーフェス. 
 	bool used;
-	void objInitS3(mesh3d*);
-	void objInitH3(mesh3d*);
+	void objInitS3(int);
+	void objInitH3(int);
 	void init_stdS3(bool);
 	void init_stdH3(bool);
 	void OptimStd();
@@ -76,8 +78,10 @@ public:
 	object3d ReflectionH3(pt4, pt4);	// 平行移動 (H3)
 	void ParallelMove(pt3, bool);
 	void DealH3OohObj(bool);
-	void TrackObjDirection(object3d*);
+	bool TrackObjDirection(object3d*);
+	bool TrackObjDirectionHead(object3d*);
 	double GetDistance(object3d*);
+	void SetMesh(int idx);
 
 	bool copyFlg;	// 宣言、引数、戻り値からの作成
 	object3d();
