@@ -18,10 +18,10 @@ void NesEsVR::initGlScnene(double w, double h, double fovL, double fovR, double 
 	glCullFace(GL_FRONT);
 	owner->WIDTH = w;
 	owner->HEIGHT = h;
-	owner->CR_RANGE_X = atan(fovL) * 2 / PIE * 180;
-	owner->CR_RANGE_R = atan(fovR) * 2 / PIE * 180;
-	owner->CR_RANGE_Y = atan(fovT) * 2 / PIE * 180;
-	owner->CR_RANGE_D = atan(fovD) * 2 / PIE * 180;
+	owner->CR_RANGE_X = atan(fovL) * 2 / PI * 180;
+	owner->CR_RANGE_R = atan(fovR) * 2 / PI * 180;
+	owner->CR_RANGE_Y = atan(fovT) * 2 / PI * 180;
+	owner->CR_RANGE_D = atan(fovD) * 2 / PI * 180;
 
 	owner->InitGUI();
 	owner->CreateBuffersForVRMenu();

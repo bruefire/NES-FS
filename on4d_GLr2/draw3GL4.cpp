@@ -21,8 +21,8 @@ using namespace std;
 void engine3dGL::simulateS3GL()
 {
 	//=====カメラの範囲
-	double cRangeX = tan((LDBL)CR_RANGE_X/2 *PIE/180);	
-	double cRangeY = tan((LDBL)CR_RANGE_Y/2 *PIE/180);
+	double cRangeX = tan((LDBL)CR_RANGE_X/2 *PI/180);	
+	double cRangeY = tan((LDBL)CR_RANGE_Y/2 *PI/180);
 	double cRangeR;
 	double cRangeD;
 	if (CR_RANGE_R < 0)
@@ -32,8 +32,8 @@ void engine3dGL::simulateS3GL()
 	}
 	else
 	{
-		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PIE / 180);
-		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PIE / 180);
+		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PI / 180);
+		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PI / 180);
 	}
 
 	//-- 軌跡データ転送
@@ -123,8 +123,8 @@ void engine3dGL::simulateS3GL()
 void engine3dGL::SimulateH3GL()
 {
 	//=====カメラの範囲
-	double cRangeX = tan((LDBL)CR_RANGE_X / 2 * PIE / 180);
-	double cRangeY = tan((LDBL)CR_RANGE_Y / 2 * PIE / 180);
+	double cRangeX = tan((LDBL)CR_RANGE_X / 2 * PI / 180);
+	double cRangeY = tan((LDBL)CR_RANGE_Y / 2 * PI / 180);
 	double cRangeR;
 	double cRangeD;
 	if (CR_RANGE_R < 0)
@@ -134,8 +134,8 @@ void engine3dGL::SimulateH3GL()
 	}
 	else
 	{
-		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PIE / 180);
-		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PIE / 180);
+		cRangeR = tan((LDBL)CR_RANGE_R / 2 * PI / 180);
+		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PI / 180);
 	}
 
 	// todo★//-- 軌跡データ転送
@@ -507,26 +507,26 @@ int engine3dGL::DrawEachObjsH3(int loop)
 			curObj->rot.x = 0;
 			curObj->rot.y = 0;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE * 0.5;
+			curObj->rot.x = PI * 0.5;
 			curObj->rot.y = 0;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE;
+			curObj->rot.x = PI;
 			curObj->rot.y = 0;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE * 1.5;
+			curObj->rot.x = PI * 1.5;
 			curObj->rot.y = 0;
 			DrawObjectH3(h);
 			curObj->rot.x = 0;
-			curObj->rot.y = PIE;
+			curObj->rot.y = PI;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE * 0.5;
-			curObj->rot.y = PIE;
+			curObj->rot.x = PI * 0.5;
+			curObj->rot.y = PI;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE;
-			curObj->rot.y = PIE;
+			curObj->rot.x = PI;
+			curObj->rot.y = PI;
 			DrawObjectH3(h);
-			curObj->rot.x = PIE * 1.5;
-			curObj->rot.y = PIE;
+			curObj->rot.x = PI * 1.5;
+			curObj->rot.y = PI;
 			DrawObjectH3(h);
 			break;
 		}
@@ -706,7 +706,7 @@ int engine3dGL::DrawMapS3()
 	double cRangeX, cRangeY;
 	short P_WIDTH, P_HEIGHT, W_REST;
 
-	cRangeX = cRangeY = tan((LDBL)10.0 * 0.5 * PIE / 180);
+	cRangeX = cRangeY = tan((LDBL)10.0 * 0.5 * PI / 180);
 	//--
 	P_WIDTH = P_HEIGHT = (short)(HEIGHT * 0.3);
 	W_REST = WIDTH - P_WIDTH;
@@ -787,9 +787,9 @@ int engine3dGL::DrawMapS3()
 			else if (h < BWH_QTY + PLR_QTY && !VIEW_PLR) continue;
 			else if (mapMode == MapMode::DUAL)
 			{
-				if (g == 0 && curObj->locr.z > 0.5 * PIE)
+				if (g == 0 && curObj->locr.z > 0.5 * PI)
 					continue;
-				else if (g == 1 && curObj->locr.z <= 0.5 * PIE)
+				else if (g == 1 && curObj->locr.z <= 0.5 * PI)
 					continue;
 			}
 
@@ -812,10 +812,10 @@ int engine3dGL::DrawMapS3()
 			}
 
 			// farther than 2/π or not 
-			if (curObj->locr.z < 0.5 * PIE)
+			if (curObj->locr.z < 0.5 * PI)
 			{
 				// front or back
-				if (curObj->locr.y > 0.5 * PIE)
+				if (curObj->locr.y > 0.5 * PI)
 					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[17].texNo]);
 				else
 					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[19].texNo]);
@@ -823,7 +823,7 @@ int engine3dGL::DrawMapS3()
 			else
 			{
 				// front or back
-				if (curObj->locr.y > 0.5 * PIE)
+				if (curObj->locr.y > 0.5 * PI)
 					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[18].texNo]);
 				else
 					glBindBuffer(GL_ARRAY_BUFFER, buffers[meshs[20].texNo]);

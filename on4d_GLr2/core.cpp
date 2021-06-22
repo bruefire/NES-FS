@@ -653,8 +653,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		case WM_MBUTTONUP:
 			if(cmJD==1){
-				newEngine->ope.cmRot.x = fmod(newEngine->ope.cmRot.x, PIE*2);
-				newEngine->ope.cmRot.y = fmod(newEngine->ope.cmRot.y, PIE*2);
+				newEngine->ope.cmRot.x = fmod(newEngine->ope.cmRot.x, PI*2);
+				newEngine->ope.cmRot.y = fmod(newEngine->ope.cmRot.y, PI*2);
 			}
 			cmJD = 0;
 			break;
@@ -1065,7 +1065,7 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			SetSliderVal(sRst, MODOBJ_VELOC_SLIDER, velocMax);
 			SetDlgItemText(hDlg, MODOBJ_VELOC_TXT, to_string((long double)sRst).c_str());
 			// rot x velocity
-			sRst = newEngine->objs[newEngine->selectedIdx].rsp.x / PIE * 180;
+			sRst = newEngine->objs[newEngine->selectedIdx].rsp.x / PI * 180;
 			SetSliderVal(sRst, MODOBJ_ROTX_SLIDER, rotvMax);
 			SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
 		}
@@ -1168,9 +1168,9 @@ INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				sRst = (double)sVal / sMax * rotvMax;
 				if (trgObjIdx == -1)
 					for (int h = newEngine->BWH_QTY + newEngine->PLR_QTY; h < newEngine->OBJ_QTY; h++)
-						newEngine->objs[h].rsp.x = sRst / 180 * PIE;
+						newEngine->objs[h].rsp.x = sRst / 180 * PI;
 				else
-					newEngine->objs[trgObjIdx].rsp.x = sRst / 180 * PIE;
+					newEngine->objs[trgObjIdx].rsp.x = sRst / 180 * PI;
 				SetDlgItemText(hDlg, MODOBJ_ROTX_TXT, to_string((long double)sRst).c_str());
 				break;
 			}
@@ -1211,7 +1211,7 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	switch(msg){
 		case WM_INITDIALOG:
 			// 現在のloc・stdを取得してダイアログに反映
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.x)/PIE+1)*0.5 *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.x)/PI+1)*0.5 *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1220,10 +1220,10 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180);
+			sRst = -1*(sRst/PI*180);
 			SetDlgItemText(hDlg, MODLG_LON_TXT, to_string((long double)sRst).c_str());
 
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.y)/PIE) *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.y)/PI) *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1232,10 +1232,10 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180-90);
+			sRst = -1*(sRst/PI*180-90);
 			SetDlgItemText(hDlg, MODLG_LAT_TXT, to_string((long double)sRst).c_str());
 
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.z)/PIE) *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].loc.z)/PI) *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1244,13 +1244,13 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180-90);
+			sRst = -1*(sRst/PI*180-90);
 			SetDlgItemText(hDlg, MODLG_ALT_TXT, to_string((long double)sRst).c_str());
 
 			newEngine->mvObjParam.loc.asg2(newEngine->objs[newEngine->PLR_No].loc);
 			
 			//
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].x)/PIE+1)*0.5 *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].x)/PI+1)*0.5 *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1259,10 +1259,10 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180);
+			sRst = -1*(sRst/PI*180);
 			SetDlgItemText(hDlg, MODLG_LON_TXT2, to_string((long double)sRst).c_str());
 
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].y)/PIE) *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].y)/PI) *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1271,10 +1271,10 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180-90);
+			sRst = -1*(sRst/PI*180-90);
 			SetDlgItemText(hDlg, MODLG_LAT_TXT2, to_string((long double)sRst).c_str());
 
-			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].z)/PIE) *(sMax-sMin)+sMin);
+			sVal = (int)(((sRst = newEngine->objs[newEngine->PLR_No].std[0].z)/PI) *(sMax-sMin)+sMin);
 			if(sVal<sMin) sVal = sMin; else if(sMax<sVal) sVal = sMax;
 			SendDlgItemMessage(
 				hDlg,        // トラックバーのハンドル
@@ -1283,7 +1283,7 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				true,
 				sVal
 			);
-			sRst = -1*(sRst/PIE*180-90);
+			sRst = -1*(sRst/PI*180-90);
 			SetDlgItemText(hDlg, MODLG_ALT_TXT2, to_string((long double)sRst).c_str());
 
 			newEngine->mvObjParam.rot.asg2(newEngine->objs[newEngine->PLR_No].std[0]);
@@ -1329,39 +1329,39 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 				{
 					// 位置
 					case MODLG_LON_SLIDER:
-						newEngine->mvObjParam.loc.x = sRst = (((double)sVal-sMin)/((double)sMax-sMin)*2-1)*PIE;
-						sRst = -1*(sRst/PIE*180);
+						newEngine->mvObjParam.loc.x = sRst = (((double)sVal-sMin)/((double)sMax-sMin)*2-1)*PI;
+						sRst = -1*(sRst/PI*180);
 						SetDlgItemText(hDlg, MODLG_LON_TXT, to_string((long double)sRst).c_str());
 						break;
 
 					case MODLG_LAT_SLIDER:
-						newEngine->mvObjParam.loc.y = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PIE;
-						sRst = -1*(sRst/PIE*180-90);
+						newEngine->mvObjParam.loc.y = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PI;
+						sRst = -1*(sRst/PI*180-90);
 						SetDlgItemText(hDlg, MODLG_LAT_TXT, to_string((long double)sRst).c_str());
 						break;
 
 					case MODLG_ALT_SLIDER:
-						newEngine->mvObjParam.loc.z = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PIE;
-						sRst = -1*(sRst/PIE*180-90);
+						newEngine->mvObjParam.loc.z = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PI;
+						sRst = -1*(sRst/PI*180-90);
 						SetDlgItemText(hDlg, MODLG_ALT_TXT, to_string((long double)sRst).c_str());
 						break;
 
 					// 方向
 					case MODLG_LON_SLIDER2:
-						newEngine->mvObjParam.rot.x = sRst = (((double)sVal-sMin)/((double)sMax-sMin)*2-1)*PIE;
-						sRst = -1*(sRst/PIE*180);
+						newEngine->mvObjParam.rot.x = sRst = (((double)sVal-sMin)/((double)sMax-sMin)*2-1)*PI;
+						sRst = -1*(sRst/PI*180);
 						SetDlgItemText(hDlg, MODLG_LON_TXT2, to_string((long double)sRst).c_str());
 						break;
 
 					case MODLG_LAT_SLIDER2:
-						newEngine->mvObjParam.rot.y = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PIE;
-						sRst = -1*(sRst/PIE*180-90);
+						newEngine->mvObjParam.rot.y = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PI;
+						sRst = -1*(sRst/PI*180-90);
 						SetDlgItemText(hDlg, MODLG_LAT_TXT2, to_string((long double)sRst).c_str());
 						break;
 
 					case MODLG_ALT_SLIDER2:
-						newEngine->mvObjParam.rot.z = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PIE;
-						sRst = -1*(sRst/PIE*180-90);
+						newEngine->mvObjParam.rot.z = sRst = (((double)sVal-sMin)/((double)sMax-sMin))*PI;
+						sRst = -1*(sRst/PI*180-90);
 						SetDlgItemText(hDlg, MODLG_ALT_TXT2, to_string((long double)sRst).c_str());
 						break;
 				}

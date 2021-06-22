@@ -6,8 +6,8 @@
 #define ADJ_VAL 10.0
 
 //========äpìxån====
-#define PIE 3.1415926535
-#define DEG /180.0*PIE
+#define PI 3.1415926535
+#define DEG /180.0*PI
 
 #define MIN_DST 0.0001
 

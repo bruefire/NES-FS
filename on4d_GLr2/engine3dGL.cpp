@@ -649,9 +649,9 @@ void engine3dGL::DrawCoordinateS3()
 				loc_Z.append(kanji[7]).append(kanji[8]).append(": ");
 			}
 
-			loc_X.append( to_string((long double)(-objs[PLR_No].loc.x / PIE * 180)) );
-			loc_Y.append( to_string((long double)(-objs[PLR_No].loc.y / PIE * 180 + 90)) );
-			loc_Z.append( to_string((long double)(-objs[PLR_No].loc.z / PIE * 180 + 90)) );
+			loc_X.append( to_string((long double)(-objs[PLR_No].loc.x / PI * 180)) );
+			loc_Y.append( to_string((long double)(-objs[PLR_No].loc.y / PI * 180 + 90)) );
+			loc_Z.append( to_string((long double)(-objs[PLR_No].loc.z / PI * 180 + 90)) );
 		}
 		else {
 			if (lang == UI_LANG_EN) 
@@ -753,8 +753,8 @@ void engine3dGL::DrawCoordinateH3()
 		if (viewTrackIdx >= 0 && objs[viewTrackIdx].used)
 		{
 			loc_X.append(to_string((long double)(cmCo.x)));
-			loc_Y.append(to_string((long double)(cmCo.y / PIE * 180)));
-			loc_Z.append(to_string((long double)(-cmCo.z / PIE * 180 + 90)));
+			loc_Y.append(to_string((long double)(cmCo.y / PI * 180)));
+			loc_Z.append(to_string((long double)(-cmCo.z / PI * 180 + 90)));
 		}
 
 		// 描画処理
@@ -788,8 +788,8 @@ void engine3dGL::DrawDistancesS3()
 		guiStr.padding.t = 0;
 
 		//=====カメラの範囲
-		double cRangeX = tan((LDBL)CR_RANGE_X * 0.5 * PIE / 180);
-		double cRangeY = tan((LDBL)CR_RANGE_Y * 0.5 * PIE / 180);
+		double cRangeX = tan((LDBL)CR_RANGE_X * 0.5 * PI / 180);
+		double cRangeY = tan((LDBL)CR_RANGE_Y * 0.5 * PI / 180);
 		object3d * pObj = objs + PLR_No;
 
 		for (int h = 0; h < objCnt; h++) 	//-- 距離の表示
@@ -840,8 +840,8 @@ void engine3dGL::DrawDistancesH3()
 		guiStr.padding.t = 0;
 
 		//=====カメラの範囲
-		double cRangeX = tan((LDBL)CR_RANGE_X * 0.5 * PIE / 180);
-		double cRangeY = tan((LDBL)CR_RANGE_Y * 0.5 * PIE / 180);
+		double cRangeX = tan((LDBL)CR_RANGE_X * 0.5 * PI / 180);
+		double cRangeY = tan((LDBL)CR_RANGE_Y * 0.5 * PI / 180);
 		object3d* pObj = objs + PLR_No;
 
 		for (int h = 0; h < objCnt; h++) 	//-- 距離の表示
@@ -1010,7 +1010,7 @@ void engine3dGL::ClickProc()
 
 double engine3dGL::clcRangeY(double rangeX)
 {
-	return atan(tan((LDBL)(rangeX) / 2 * PIE / 180) * HEIGHT / WIDTH) * 2 / PIE * 180;	//カメラ設定
+	return atan(tan((LDBL)(rangeX) / 2 * PI / 180) * HEIGHT / WIDTH) * 2 / PI * 180;	//カメラ設定
 }
 
 void engine3dGL::makeGuiPlateVBO()

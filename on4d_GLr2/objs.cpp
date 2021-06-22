@@ -671,8 +671,8 @@ void object3d::init_stdH3(bool randSW)
 	if (randSW)
 	{
 		double rotOn[2] = {
-			((double)rand() / RAND_MAX) * PIE * 2 - PIE,
-			((double)rand() / RAND_MAX) * PIE
+			((double)rand() / RAND_MAX) * PI * 2 - PI,
+			((double)rand() / RAND_MAX) * PI
 		};
 		tudeRst(&std1.y, &std1.z, rotOn[0], 1);
 		tudeRst(&std2.y, &std2.z, rotOn[0], 1);
@@ -695,8 +695,8 @@ void object3d::init_stdS3(bool randSW){	//-- 標準の初期設定 S3
 
 	if(randSW){//todo★ ランダムなstd
 		double rotOn[2] = {
-			( (double)rand() / RAND_MAX )*PIE*2 - PIE,
-			( (double)rand() / RAND_MAX )*PIE
+			( (double)rand() / RAND_MAX )*PI*2 - PI,
+			( (double)rand() / RAND_MAX )*PI
 		};
 		tudeRst(&std1.y, &std1.z, rotOn[0], 1);
 		tudeRst(&std2.y, &std2.z, rotOn[0], 1);
@@ -1098,8 +1098,8 @@ void object3d::objInitS3(int meshIdx)
   //------
 
 	ctr.asg(0, 0, 0);
-	loc.asg(0, 0, PIE);	//-- (緯度, 経度, 深度)
-	pt4 cPt4 = pt4( 0, 0*PIE, 0*PIE, 0.2*PIE );
+	loc.asg(0, 0, PI);	//-- (緯度, 経度, 深度)
+	pt4 cPt4 = pt4( 0, 0*PI, 0*PI, 0.2*PI );
 	mkLspX_S3(cPt4);
 	rot.asg(0,0,0);
 	rsp.asg(0 DEG, 0 DEG,0 DEG);
@@ -1257,19 +1257,19 @@ void poly::polyInit(int form){
 	pt4 tmpt;
 	pSet(0, 0,0,0,1);		//-- no.0
 	for(int k=0;k<3;k++){	  ///-- xyz_w軸回転
-		dRot[2] += PIE/4;		//-- xyz_w+
+		dRot[2] += PI/4;		//-- xyz_w+
 		tmpt.w = 1 *cos(dRot[2]);
 		tmpt.z = 1 *1 *sin(dRot[2]);
 		pSet(1+k*26, 0,0,tmpt.z,tmpt.w);
 		for(int j=0;j<3;j++){	  ///-- xy_z軸回転
-			dRot[1] += PIE/4;		//-- xy_z+
+			dRot[1] += PI/4;		//-- xy_z+
 			tmpt.z = 1 *cos(dRot[1]) *sin(dRot[2]);
 			int ptNo = 2 + k*26 + j*8;
 			for(int i=ptNo;i<ptNo+8;i++){	  ///-- x_y軸回転
 				tmpt.x = 1 *cos(dRot[0]) *sin(dRot[1]) *sin(dRot[2]);
 				tmpt.y = 1 *sin(dRot[0]) *sin(dRot[1]) *sin(dRot[2]);
 				pSet(i, tmpt.x,tmpt.y,tmpt.z,tmpt.w);
-				dRot[0] += PIE/4;		//-- x_y+
+				dRot[0] += PI/4;		//-- x_y+
 			}
 			dRot[0] = 0;		//-- x_y+
 		}

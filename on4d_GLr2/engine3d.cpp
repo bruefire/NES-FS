@@ -1467,9 +1467,9 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 		tudeRst(&std2.x, &std2.y, cmrStd[2], 0);
 		//-- 後方カメラなら
 		if (ope.cmBack) {
-			tudeRst(&locT.x, &locT.z, PIE, 1);//-- X-Y 回転 (-方向3
-			tudeRst(&std1.x, &std1.z, PIE, 1);
-			tudeRst(&std2.x, &std2.z, PIE, 1);
+			tudeRst(&locT.x, &locT.z, PI, 1);//-- X-Y 回転 (-方向3
+			tudeRst(&std1.x, &std1.z, PI, 1);
+			tudeRst(&std2.x, &std2.z, PI, 1);
 		}
 		// VR
 		if (!ope.vrDev[0].std[0].isZero())
@@ -1555,9 +1555,9 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		//-- 後方カメラなら
 		object3d viewObj(*curObj);
 		if (ope.cmBack) {
-			tudeRst(&viewObj.loc.x, &viewObj.loc.z, PIE, 1);
-			tudeRst(&viewObj.std[0].x, &viewObj.std[0].z, PIE, 1);
-			tudeRst(&viewObj.std[1].x, &viewObj.std[1].z, PIE, 1);
+			tudeRst(&viewObj.loc.x, &viewObj.loc.z, PI, 1);
+			tudeRst(&viewObj.std[0].x, &viewObj.std[0].z, PI, 1);
+			tudeRst(&viewObj.std[1].x, &viewObj.std[1].z, PI, 1);
 		}
 		// VR
 		if (!ope.vrDev[0].std[0].isZero())
@@ -1798,15 +1798,15 @@ int engine3d::InitS3()	// 球面世界用初期化
 	for (h; h < BWH_QTY + PLR_QTY; h++) {
 		objs[h].objInitS3(1);
 		objs[h].loc = pt3(	//-- 位置
-			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-			((double)rand() / RAND_MAX) * PIE,
-			((double)rand() / RAND_MAX) * PIE
+			(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+			((double)rand() / RAND_MAX) * PI,
+			((double)rand() / RAND_MAX) * PI
 		);
 		objs[h].mkLspX_S3( pt4(	//-- 速度
 			0,
-			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-			((double)rand() / RAND_MAX) * PIE,
-			((double)rand() / RAND_MAX) * PIE
+			(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+			((double)rand() / RAND_MAX) * PI,
+			((double)rand() / RAND_MAX) * PI
 		));
 		objs[h].rsp.asg(1 DEG, 0, 0);
 		objs[h].init_stdS3(0);	//-- std
@@ -1817,15 +1817,15 @@ int engine3d::InitS3()	// 球面世界用初期化
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++) {
 		objs[h].objInitS3(4);
 		objs[h].loc = pt3(	//-- 位置
-			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-			((double)rand() / RAND_MAX) * PIE,
-			((double)rand() / RAND_MAX) * PIE
+			(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+			((double)rand() / RAND_MAX) * PI,
+			((double)rand() / RAND_MAX) * PI
 		);
 		objs[h].mkLspX_S3( pt4(	//-- 速度
 			SPEED_MAX,
-			(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-			((double)rand() / RAND_MAX) * PIE,
-			((double)rand() / RAND_MAX) * PIE
+			(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+			((double)rand() / RAND_MAX) * PI,
+			((double)rand() / RAND_MAX) * PI
 		));
 		objs[h].rot.asg(0, 1 DEG, 0);
 		objs[h].rsp.asg(1 DEG, 0, 0);
@@ -1897,15 +1897,15 @@ int engine3d::RandLocS3(engine3d::RandMode mode, int qty) {
 
 		if (mode == RandMode::Cluster) {//-- 乱数 (極座標)
 			objs[h].loc = pt3(	//-- 位置
-				(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-				((double)rand() / RAND_MAX) * PIE,
-				((double)rand() / RAND_MAX) * PIE
+				(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+				((double)rand() / RAND_MAX) * PI,
+				((double)rand() / RAND_MAX) * PI
 			);
 			objs[h].mkLspX_S3( pt4(	//-- 速度
 				SPEED_MAX,
-				(((double)rand() / RAND_MAX) * 2 - 1) * PIE,
-				((double)rand() / RAND_MAX) * PIE,
-				((double)rand() / RAND_MAX) * PIE
+				(((double)rand() / RAND_MAX) * 2 - 1) * PI,
+				((double)rand() / RAND_MAX) * PI,
+				((double)rand() / RAND_MAX) * PI
 			));
 
 		}
@@ -1952,16 +1952,16 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType, int qty)
 			// ランダム位置決定
 			double hypDst = ((double)rand() / RAND_MAX) * maxRad;		// 長さ (双曲)
 			double dst = object3d::ClcEucFromHypb(hypDst);				// 長さ
-			double po1 = ((double)rand() / RAND_MAX) * PIE;				// 極1
-			double po2 = (((double)rand() / RAND_MAX) * 2 - 1) * PIE;	// 極2
+			double po1 = ((double)rand() / RAND_MAX) * PI;				// 極1
+			double po2 = (((double)rand() / RAND_MAX) * 2 - 1) * PI;	// 極2
 
 			eucPt = pt3(0, 0, dst);
 			tudeRst(&eucPt.y, &eucPt.z, po1, 1);
 			tudeRst(&eucPt.x, &eucPt.y, po2, 1);
 
 			// ランダム速度ベクトル決定
-			double pox1 = ((double)rand() / RAND_MAX) * PIE;				// 極1
-			double pox2 = (((double)rand() / RAND_MAX) * 2 - 1) * PIE;		// 極2
+			double pox1 = ((double)rand() / RAND_MAX) * PI;				// 極1
+			double pox2 = (((double)rand() / RAND_MAX) * 2 - 1) * PI;		// 極2
 			pt4 spdDrc = pt4(SPEED_MAX, 0, 0, H3_STD_LEN);
 			tudeRst(&spdDrc.y, &spdDrc.z, pox1, 1);
 			tudeRst(&spdDrc.x, &spdDrc.y, pox2, 1);
@@ -2008,9 +2008,9 @@ pt3 engine3d::randLocUniH3(double maxRad)
 {
 	pt3 rstPt;
 	// 双曲球体積
-	double volume = 4 * PIE * (0.25 * sinh(2 * maxRad) - 0.5 * maxRad);
+	double volume = 4 * PI * (0.25 * sinh(2 * maxRad) - 0.5 * maxRad);
 	// 双曲球面積算出関数
-	auto GetSpArea = [](double r) { return 4 * PIE * powi(sinh(r), 2); };
+	auto GetSpArea = [](double r) { return 4 * PI * powi(sinh(r), 2); };
 	// 最遠球面積
 	double maxSpArea = GetSpArea(maxRad);
 
@@ -2194,13 +2194,13 @@ int engine3d::physics() {
 					double unit = radius / 30;///すべての調整完了(途中直径変更も問題なし)
 					double scale = pyth4(e1Loc.mns(e2Loc));
 					double dstR = asin((scale / 2)) * 2;
-					double force = 0.0001 * 1.0 / (dstR * dstR * unit * unit) * (1.0 / sin((PIE - dstR) * 0.5));
+					double force = 0.0001 * 1.0 / (dstR * dstR * unit * unit) * (1.0 / sin((PI - dstR) * 0.5));
 
 					double minR = 0.1 * 30 / radius;
 					if (GRAVITY == 2)	//-- 斥力の場合
 						force = -2 * force;
 					else if (dstR < minR)	//-- 力の最大値
-						force = 0.0001 * 1.0 / (minR * minR * unit * unit) * (1.0 / sin((PIE - dstR) * 0.5));
+						force = 0.0001 * 1.0 / (minR * minR * unit * unit) * (1.0 / sin((PI - dstR) * 0.5));
 					//force += -4*unit*(minR-dstR)*(1.0/sin((PIE-dstR)*0.5));
 
 					if (scale > pow(0.1, 300)) {//if文はバグ回避
@@ -2222,7 +2222,7 @@ void object3d::cnvForce() {
 
 	double scale = pyth4(lsp4.mns(loc4));
 	double dstR = asin((scale / 2)) * 2;
-	double force = lspX.w * (1.0 / sin((PIE - dstR) * 0.5));
+	double force = lspX.w * (1.0 / sin((PI - dstR) * 0.5));
 	fc = lsp4.mns(loc4).mtp(1 / scale).mtp(force);
 
 }
