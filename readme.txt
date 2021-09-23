@@ -145,6 +145,6 @@ were downloaded and used from here:
 http://www.3dchaya.com/
 ----------------------------------
 NES-FS (Non Euclidean Space Flight Simlator)
-version: 3.3.1
-release: Jun.2021
+version: 3.3.2
+release: Sep.2021
 creator: bruefire

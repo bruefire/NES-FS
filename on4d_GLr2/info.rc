@@ -8,8 +8,8 @@ FONT 9, "MS Shell Dlg", 400, 0, 0x1
 
 BEGIN
 	LTEXT "NES-FS \
-			(Non Euclidean Space Flight Simulator) v.3.3.1\
-			\n\nRelease: 2021.06\
+			(Non Euclidean Space Flight Simulator) v.3.3.2\
+			\n\nRelease: 2021.09\
 			\nMade by: bruefire\
 			\nLicense: Open Source Software",
 			-1, 8, 15, 105, 55

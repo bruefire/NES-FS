@@ -499,35 +499,35 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		{
 		case mesh3d::Symmetric::None:
 		default:
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			break;
 
 		case mesh3d::Symmetric::XYZ_Symm:
 			// hackš
 			curObj->rot.x = 0;
 			curObj->rot.y = 0;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI * 0.5;
 			curObj->rot.y = 0;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI;
 			curObj->rot.y = 0;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI * 1.5;
 			curObj->rot.y = 0;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = 0;
 			curObj->rot.y = PI;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI * 0.5;
 			curObj->rot.y = PI;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI;
 			curObj->rot.y = PI;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			curObj->rot.x = PI * 1.5;
 			curObj->rot.y = PI;
-			DrawObjectH3(h);
+			DrawObjectH3(h, loop);
 			break;
 		}
 
@@ -537,7 +537,7 @@ int engine3dGL::DrawEachObjsH3(int loop)
 	return 1;
 }
 
-int engine3dGL::DrawObjectH3(int objIdx)
+int engine3dGL::DrawObjectH3(int objIdx, int loop)
 {
 	object3d* curObj = GetObject(objIdx);
 

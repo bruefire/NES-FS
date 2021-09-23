@@ -94,7 +94,7 @@ public:
 	int DrawEachObjsS3(int);
 	int DrawEachObjsS3_LQY(int);
 	int DrawEachObjsH3(int);
-	int DrawObjectH3(int);
+	int DrawObjectH3(int, int);
 	double GetAsp();
 	double clcRangeY(double rangeX);
 	
