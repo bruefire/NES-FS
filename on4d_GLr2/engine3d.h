@@ -90,6 +90,8 @@ public:
 
 	object3d sun;		//if(on4D)太陽
 	object3d markObj;	//軌跡s
+	object3d* markObjSub;	//軌跡s (H3)
+	int markObjSubLen;
 	mesh3d markMesh;	//軌跡s
 
 	bool vrFlag;
@@ -130,6 +132,7 @@ public:
 	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
+	void ClcRelaivePosH3_i(object3d*, bool, pt3, double*);	// 相対位置計算H3
 	void ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd);
 	void ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool isHmd);
 	void UpdVRObjectsS3(double* cmrSts);

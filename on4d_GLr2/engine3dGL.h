@@ -94,7 +94,7 @@ public:
 	int DrawEachObjsS3(int);
 	int DrawEachObjsS3_LQY(int);
 	int DrawEachObjsH3(int);
-	int DrawObjectH3(int, int);
+	int DrawObjectH3(object3d*, int, int, uint32_t* = nullptr);
 	double GetAsp();
 	double clcRangeY(double rangeX);
 	
@@ -125,7 +125,8 @@ public:
 	void CreateBuffersForVRMenu();
 	void DisposeBuffersForVRMenu();
 	void DrawGUIForVR();
-	virtual void MakeTracingLines();
+	virtual void MakeTracingLinesS3();
+	virtual void MakeTracingLinesH3();
 	virtual bool LoadLazyObject(int idx);
 
 	uint32_t LoadShaders(const char* vPath, const char* fPath);
@@ -143,6 +144,7 @@ public:
 	uint32_t* texNames;
 	std::vector<uint32_t> shader;
 	int outMax;
+	uint32_t* h3trackBuf;
 
 	// コンストラクタ, デストラクタ
 	engine3dGL();

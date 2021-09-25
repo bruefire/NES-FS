@@ -139,13 +139,17 @@ void engine3dGL::SimulateH3GL()
 	}
 
 	// todoÅö//-- ãOê’ÉfÅ[É^ì]ëó
-	//glBindBuffer(GL_ARRAY_BUFFER, buffers[markMesh.texNo]);
-	//glBufferData(	//---- ptsì]ëó
-	//	GL_ARRAY_BUFFER,
-	//	markMesh.lLen * 16 * sizeof(float),
-	//	markMesh.pts2,
-	//	GL_STATIC_DRAW
-	//	);
+	for (int i = 0; i < markObjSubLen; i++)
+	{
+		int stroke = markMesh.lLen / markObjSubLen * 24;
+		glBindBuffer(GL_ARRAY_BUFFER, h3trackBuf[i]);
+		glBufferData(	//---- ptsì]ëó
+			GL_ARRAY_BUFFER,
+			stroke * sizeof(float),
+			markMesh.pts2 + stroke * i,
+			GL_STATIC_DRAW
+		);
+	}
 
 	// ï`âÊì‡óeÇÃèâä˙âª
 	objs[0].scale = 0.5 * radius;	//-- í≤êÆ
@@ -495,53 +499,61 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
 		if (h == PLR_No) continue;
 
-		switch (curObj->mesh->symmType)
+		if (curObj == &markObj)
 		{
-		case mesh3d::Symmetric::None:
-		default:
-			DrawObjectH3(h, loop);
-			break;
-
-		case mesh3d::Symmetric::XYZ_Symm:
-			// hackÅö
-			curObj->rot.x = 0;
-			curObj->rot.y = 0;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI * 0.5;
-			curObj->rot.y = 0;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI;
-			curObj->rot.y = 0;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI * 1.5;
-			curObj->rot.y = 0;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = 0;
-			curObj->rot.y = PI;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI * 0.5;
-			curObj->rot.y = PI;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI;
-			curObj->rot.y = PI;
-			DrawObjectH3(h, loop);
-			curObj->rot.x = PI * 1.5;
-			curObj->rot.y = PI;
-			DrawObjectH3(h, loop);
-			break;
+			for (int i = 0; i < markObjSubLen; i++)
+			{
+				curObj = markObjSub + i;
+				DrawObjectH3(curObj, h, loop, &h3trackBuf[i]);
+			}
 		}
+		else
+		{
+			switch (curObj->mesh->symmType)
+			{
+			case mesh3d::Symmetric::None:
+			default:
+				DrawObjectH3(curObj, h, loop);
+				break;
 
+			case mesh3d::Symmetric::XYZ_Symm:
+				// hackÅö
+				curObj->rot.x = 0;
+				curObj->rot.y = 0;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI * 0.5;
+				curObj->rot.y = 0;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI;
+				curObj->rot.y = 0;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI * 1.5;
+				curObj->rot.y = 0;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = 0;
+				curObj->rot.y = PI;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI * 0.5;
+				curObj->rot.y = PI;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI;
+				curObj->rot.y = PI;
+				DrawObjectH3(curObj, h, loop);
+				curObj->rot.x = PI * 1.5;
+				curObj->rot.y = PI;
+				DrawObjectH3(curObj, h, loop);
+				break;
+			}
+		}
 
 	}
 
 	return 1;
 }
 
-int engine3dGL::DrawObjectH3(int objIdx, int loop)
+int engine3dGL::DrawObjectH3(object3d* curObj, int objIdx, int loop, uint32_t* bufferNo)
 {
-	object3d* curObj = GetObject(objIdx);
 
-	/////===================///
 	char SDR = (curObj->mesh->faceLen) ? 5 : 3;
 	glUseProgram(shader[SDR]);
 
@@ -564,14 +576,24 @@ int engine3dGL::DrawObjectH3(int objIdx, int loop)
 	glUniform1i(xID, curObj->mesh->texJD);
 
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffers[curObj->mesh->texNo]);
-	glBindTexture(GL_TEXTURE_2D, texNames[curObj->mesh->texNo]);
-
-
-	if (loop == 0)
-		glStencilFunc(GL_ALWAYS, (objIdx + 1) % 256, -1);
+	if (bufferNo == nullptr)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[curObj->mesh->texNo]);
+		glBindTexture(GL_TEXTURE_2D, texNames[curObj->mesh->texNo]);
+	}
 	else
-		glStencilFunc(GL_ALWAYS, (objIdx + 1) % (256 * 256) / 256, -1);
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *bufferNo);
+	}
+
+
+	if (curObj != &markObj)
+	{
+		if (loop == 0)
+			glStencilFunc(GL_ALWAYS, (objIdx + 1) % 256, -1);
+		else
+			glStencilFunc(GL_ALWAYS, (objIdx + 1) % (256 * 256) / 256, -1);
+	}
 
 	glEnable(GL_TEXTURE_2D);
 

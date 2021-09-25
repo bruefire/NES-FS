@@ -367,6 +367,7 @@ int engine3dGL::update()
 	{
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		MakeTracingLinesS3();
 		simulateS3GL();
 		glDisable(GL_STENCIL_TEST);
 
@@ -388,6 +389,7 @@ int engine3dGL::update()
 	{
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		MakeTracingLinesH3();
 		SimulateH3GL();
 		glDisable(GL_STENCIL_TEST);
 
@@ -1217,7 +1219,7 @@ void engine3dGL::DrawGUIForVR()
 
 }
 
-void engine3dGL::MakeTracingLines()
+void engine3dGL::MakeTracingLinesS3()
 {
 	if (qyMode == engine3dGL::QY_MODE::HIGH)
 	{
@@ -1279,6 +1281,43 @@ void engine3dGL::MakeTracingLines()
 					markMesh.pts2[idx + 10] = curObj->past[i + 1].y;
 					markMesh.pts2[idx + 11] = curObj->past[i + 1].z;
 				}
+			}
+		}
+	}
+}
+
+void engine3dGL::MakeTracingLinesH3()
+{
+	for (int h = 0; h < object3d::PAST_QTY - 1; h++)
+	{
+		for (int i = 0; i < OBJ_QTY; i++)
+		{
+			object3d* curObj = objs + i;
+
+			for (int j = 0; j < 2; j++)
+			{
+				int idx = (h * OBJ_QTY * 2 + i * 2 + j) * 12;
+				if (!j)
+				{
+					markMesh.pts2[idx + 0] = curObj->past[h].x;
+					markMesh.pts2[idx + 1] = curObj->past[h].y;
+					markMesh.pts2[idx + 2] = curObj->past[h].z;
+				}
+				else {
+					markMesh.pts2[idx + 0] = curObj->past[h + 1].x;
+					markMesh.pts2[idx + 1] = curObj->past[h + 1].y;
+					markMesh.pts2[idx + 2] = curObj->past[h + 1].z;
+				}
+				markMesh.pts2[idx + 3] = 1.0;
+				markMesh.pts2[idx + 4] = 0;
+				markMesh.pts2[idx + 5] = (double)h / object3d::PAST_QTY;
+
+				markMesh.pts2[idx + 6] = curObj->past[h].x;
+				markMesh.pts2[idx + 7] = curObj->past[h].y;
+				markMesh.pts2[idx + 8] = curObj->past[h].z;
+				markMesh.pts2[idx + 9] = curObj->past[h + 1].x;
+				markMesh.pts2[idx + 10] = curObj->past[h + 1].y;
+				markMesh.pts2[idx + 11] = curObj->past[h + 1].z;
 			}
 		}
 	}

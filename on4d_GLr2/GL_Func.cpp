@@ -36,6 +36,7 @@ void engine3dGL::GL_InitScene()
 	int texs = glTexLen;
 	texNames = new uint32_t[texs];	// 画面1 + mesh数 + 軌跡1 + メニュー1
 	buffers = new uint32_t[texs];
+	h3trackBuf = new uint32_t[markObjSubLen];
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -44,7 +45,8 @@ void engine3dGL::GL_InitScene()
 	///---------------- glew ---------------
 	GLenum err = glewInit();
 
-	glGenBuffers(texs, buffers);	//③頂点バッファを作成する
+	glGenBuffers(texs, buffers);
+	glGenBuffers(markObjSubLen, h3trackBuf);
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);	//バインド
 	//
 
@@ -98,6 +100,7 @@ void engine3dGL::GL_DisposeScene()
 
 	// メインVBO解放
 	glDeleteBuffers(texs, buffers + 0);
+	glDeleteBuffers(markObjSubLen, h3trackBuf + 0);
 	glDeleteTextures(texs, texNames + 0);
 
 	// シェ―ダー後処理
@@ -107,6 +110,7 @@ void engine3dGL::GL_DisposeScene()
 
 	delete[] texNames;
 	delete[] buffers;
+	delete[] h3trackBuf;
 }
 
 
