@@ -100,7 +100,7 @@ BEGIN
 		MENUITEM "Map", UI_MAP
 		//MENUITEM "ˆÚ“®/‰ñ“]•ûŒü", UI_LR_RESULT
 		MENUITEM "Distance", UI_DST
-		//MENUITEM "‹OÕ", UI_PAST
+		MENUITEM "Tracing line", UI_PAST
 	END
 	POPUP "Help"
 	BEGIN

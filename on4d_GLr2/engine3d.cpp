@@ -385,6 +385,9 @@ int engine3d::allocMesh()
 void engine3d::simulateH3()
 {
 
+	// 軌跡サブオブジェクト順更新
+	UpdateTracingDataH3();
+
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
 
@@ -400,18 +403,24 @@ void engine3d::simulateH3()
 	// 12面体移動
 	UpdateBaseObjH3();
 
+}
 
-	// 軌跡サブオブジェクト順更新
+void engine3d::UpdateTracingDataH3()
+{
+	if (!markObj.used || !obMove)
+		return;
+
 	for (int i = markObjSubLen - 1; 0 < i; i--)
 	{
 		markObjSub[i].loc = markObjSub[i - 1].loc;
 		markObjSub[i].std[0] = markObjSub[i - 1].std[0];
 		markObjSub[i].std[1] = markObjSub[i - 1].std[1];
+		markObjSub[i].used = markObjSub[i - 1].used;
 	}
 	markObjSub[0].loc = objs[PLR_No].loc;
 	markObjSub[0].std[0] = objs[PLR_No].std[0];
 	markObjSub[0].std[1] = objs[PLR_No].std[1];
-	markObjSub->used = true;
+	markObjSub[0].used = true;
 
 	///-- 軌跡の更新 --
 	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
@@ -422,11 +431,11 @@ void engine3d::simulateH3()
 			for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
 				curObj->past[i] = curObj->past[i - 1];
 
-			pt3 loc4 = curObj->loc;
+			pt3 loc = curObj->loc;
 			pt3 tmpt;
-			tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
-			tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
-			tmpt.z = object3d::ClcHypbFromEuc(pyth3(curObj->loc)) * radius;	//--距離(長さ)
+			tmpt.x = atan2(loc.x, loc.z);		//--方向1
+			tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--方向2
+			tmpt.z = object3d::ClcHypbFromEuc(pyth3(loc)) * radius;	//--距離(長さ)
 			curObj->past[0] = tmpt;
 		}
 	}
@@ -1124,44 +1133,6 @@ void engine3d::ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, doub
 	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
 	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
 	{
-		//pt4 tmp;
-		//pt4 s1x, s1y, s1z;
-		//pt4 s2x, s2y, s2z;
-		//// 視線固定回転
-		//pt4 tmpN[2];
-		//pt2 tmpRt = pt2(0, 1);
-		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
-		////
-		//s2y = std2N.mtp(tmpRt.y); 
-		//s2x = sideN.mtp(tmpRt.x);
-
-		//// 視線移動回転1
-		//tmpRt = pt2(0, 1);
-		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
-		////
-		//s1z = std1N.mtp(tmpRt.y);
-		//s1y = std2N.mtp(tmpRt.x);
-		//tmp = s2y.mtp(tmpRt.y);
-		//s2z = std1N.mtp(-1 * pt4::dot(std2N, s2y)).mtp(tmpRt.x);
-		//s2y = tmp;
-
-		//// 視線移動回転2
-		//tmpRt = pt2(0, 1);
-		//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
-		////
-		//tmp = s1y.mtp(tmpRt.y);
-		//s1x = sideN.mtp(pt4::dot(std2N, s1y)).mtp(tmpRt.x);
-		//s1y = tmp;
-		//pt4 s2xy = s2x.pls(s2y);
-		//pt4 s2xy1 = s2xy.mtp(tmpRt.y);
-		//double s2xy_yL = pt4::dot(std2N, s2xy);
-		//double s2xy_xL = pt4::dot(sideN, s2xy);
-		//pt4 s2xy_y = std2N.mtp(s2xy_yL);
-		//pt4 s2xy_x = s2xy.mns(s2xy_y);
-		//pt4 s2xyS = pt4()
-		//	.pls(sideN.mtp(s2xy_yL))
-		//	.pls(std2N.mtp(-1 * s2xy_xL));
-		//pt4 s2xy2 = s2xyS.mtp(tmpRt.x);
 
 
 		// set result
@@ -1552,7 +1523,8 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 			for (int i = 0; i < markObjSubLen; i++)
 			{
 				curObj = &markObjSub[i];
-				ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
+				if(curObj->used)
+					ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
 			}
 		}
 		// その他
@@ -1759,7 +1731,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		markObjSub[i].loc = pt3(0, 0, 0);
 		markObjSub[i].init_stdH3(false);
 		markObjSub[i].mesh = &markMesh;
-		markObjSub[i].draw = 1;
+		markObjSub[i].draw = 0;
 		markObjSub[i].used = false;	//-- 有効化
 
 		markObjSub[i].markInitH3(radius);

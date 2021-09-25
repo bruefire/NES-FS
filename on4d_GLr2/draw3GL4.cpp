@@ -138,7 +138,7 @@ void engine3dGL::SimulateH3GL()
 		cRangeD = tan((LDBL)CR_RANGE_D / 2 * PI / 180);
 	}
 
-	// todoÅö//-- ãOê’ÉfÅ[É^ì]ëó
+	//-- transfer tracing line data
 	for (int i = 0; i < markObjSubLen; i++)
 	{
 		int stroke = markMesh.lLen * 24;
@@ -504,7 +504,8 @@ int engine3dGL::DrawEachObjsH3(int loop)
 			for (int i = 0; i < markObjSubLen; i++)
 			{
 				curObj = markObjSub + i;
-				DrawObjectH3(curObj, h, loop, &h3trackBuf[i]);
+				if(curObj->used)
+					DrawObjectH3(curObj, h, loop, &h3trackBuf[i]);
 			}
 		}
 		else
@@ -587,7 +588,7 @@ int engine3dGL::DrawObjectH3(object3d* curObj, int objIdx, int loop, uint32_t* b
 	}
 
 
-	if (curObj != &markObj)
+	if (objIdx != -2)
 	{
 		if (loop == 0)
 			glStencilFunc(GL_ALWAYS, (objIdx + 1) % 256, -1);

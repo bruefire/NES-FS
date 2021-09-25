@@ -142,6 +142,7 @@ public:
 	void HoldObjWithVRHandH3(bool);
 	void ClcCoordinate();
 	void UpdateBaseObjH3();
+	void UpdateTracingDataH3();
 	virtual void MakeTracingLines();
 	object3d* GetObject(int idx);
 	int physics();

@@ -1297,7 +1297,8 @@ void engine3dGL::MakeTracingLinesH3()
 			for (int j = 0; j < 2; j++)
 			{
 				int idx = (h * OBJ_QTY * 2 + i * 2 + j) * 12;
-				if (!j || curObj->past[h].x > 1 || curObj->past[h + 1].x > 1)
+				//if (!j || curObj->past[h].z < -1 || curObj->past[h + 1].z < -1)
+				if(1)
 				{
 					markMesh.pts2[idx + 0] = curObj->past[h].x;
 					markMesh.pts2[idx + 1] = curObj->past[h].y;

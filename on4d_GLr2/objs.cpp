@@ -218,7 +218,7 @@ void object3d::DealH3OohObj(bool loopFlg)
 		ParallelMove(lLoc, true);
 
 		for (int i = 0; i < PAST_QTY; i++)
-			past[i] = pt3(2, 2, 2);
+			past[i] = pt3(-2, -2, -2);
 	}
 	else
 		used = false;
