@@ -141,7 +141,7 @@ void engine3dGL::SimulateH3GL()
 	// todoš//-- ‹OÕƒf[ƒ^“]‘—
 	for (int i = 0; i < markObjSubLen; i++)
 	{
-		int stroke = markMesh.lLen / markObjSubLen * 24;
+		int stroke = markMesh.lLen * 24;
 		glBindBuffer(GL_ARRAY_BUFFER, h3trackBuf[i]);
 		glBufferData(	//---- pts“]‘—
 			GL_ARRAY_BUFFER,

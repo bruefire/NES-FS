@@ -90,7 +90,7 @@ public:
 	symmType;
 
 	int meshInit(std::string, uint32_t, int);
-	int meshInitB(int, uint32_t);
+	int meshInitB(int, uint32_t, int markObjLen = 1);
 	void meshInitC(int);
 	int setNull();
 	void Init();

@@ -216,6 +216,9 @@ void object3d::DealH3OohObj(bool loopFlg)
 		pt3 lLoc = loc.mtp(nmlz).mtp(-1);
 		ParallelMove(loc, false);
 		ParallelMove(lLoc, true);
+
+		for (int i = 0; i < PAST_QTY; i++)
+			past[i] = pt3(2, 2, 2);
 	}
 	else
 		used = false;
@@ -735,12 +738,12 @@ int mesh3d::setNull()
 }
 
 // ‹OÕê—p
-int mesh3d::meshInitB(int qty, uint32_t texNo)
+int mesh3d::meshInitB(int qty, uint32_t texNo, int markObjLen)
 {
 	pts2 = new float[qty*24];
 	
 	faceLen = 0;
-	lLen = qty;
+	lLen = qty / markObjLen;
 	texJD = false;
 	this->texNo = texNo;
 

@@ -384,16 +384,6 @@ int engine3d::allocMesh()
 ///=============== >>>ループ(双曲空間)<<< ==================
 void engine3d::simulateH3()
 {
-	// 軌跡オブジェクト更新
-	for (int i = markObjSubLen; 0 < i; i--)
-	{
-		markObjSub[i].loc = markObjSub[i - 1].loc;
-		markObjSub[i].std[0] = markObjSub[i - 1].std[0];
-		markObjSub[i].std[1] = markObjSub[i - 1].std[1];
-	}
-	markObjSub[0].loc = objs[PLR_No].loc;
-	markObjSub[0].std[0] = objs[PLR_No].std[0];
-	markObjSub[0].std[1] = objs[PLR_No].std[1];
 
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
@@ -409,6 +399,37 @@ void engine3d::simulateH3()
 
 	// 12面体移動
 	UpdateBaseObjH3();
+
+
+	// 軌跡サブオブジェクト順更新
+	for (int i = markObjSubLen - 1; 0 < i; i--)
+	{
+		markObjSub[i].loc = markObjSub[i - 1].loc;
+		markObjSub[i].std[0] = markObjSub[i - 1].std[0];
+		markObjSub[i].std[1] = markObjSub[i - 1].std[1];
+	}
+	markObjSub[0].loc = objs[PLR_No].loc;
+	markObjSub[0].std[0] = objs[PLR_No].std[0];
+	markObjSub[0].std[1] = objs[PLR_No].std[1];
+	markObjSub->used = true;
+
+	///-- 軌跡の更新 --
+	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
+	{
+		object3d* curObj = objs + h;
+
+		if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h) {
+			for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
+				curObj->past[i] = curObj->past[i - 1];
+
+			pt3 loc4 = curObj->loc;
+			pt3 tmpt;
+			tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
+			tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
+			tmpt.z = object3d::ClcHypbFromEuc(pyth3(curObj->loc)) * radius;	//--距離(長さ)
+			curObj->past[0] = tmpt;
+		}
+	}
 }
 
 void engine3d::UpdateBaseObjH3()
@@ -714,18 +735,6 @@ void engine3d::UpdFloatObjsH3()
 		// 元の位置に戻す
 		curObj->ParallelMove(preLoc, true);
 
-		///-- 軌跡の更新 --
-		if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h) {
-			for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
-				curObj->past[i] = curObj->past[i - 1];
-
-			pt3 loc4 = curObj->loc;
-			pt3 tmpt;
-			tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
-			tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
-			tmpt.z = object3d::ClcHypbFromEuc(curObj->loc.z) * radius;	//--距離(長さ)
-			curObj->past[0] = tmpt;
-		}
 	}
 
 	for (int h = 0; h < OBJ_QTY; h++)
@@ -1733,7 +1742,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	// バッファ確保
 	markObjSubLen = object3d::PAST_QTY - 1;
 	markObjSub = new object3d[markObjSubLen];
-	markMesh.meshInitB(OBJ_QTY * markObjSubLen, (meshLen - 1) + 2);
+	markMesh.meshInitB(OBJ_QTY * markObjSubLen, (meshLen - 1) + 2, markObjSubLen);
 
 	markObj.objInitH3(0);
 	markObj.loc = pt3(0, 0, 0);	//-- 位置
@@ -1742,7 +1751,7 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
 
-	for (int i = 0; i < object3d::PAST_QTY - 1; i++)
+	for (int i = 0; i < markObjSubLen; i++)
 	{
 		markObjSub[i].owner = this;
 
@@ -1752,6 +1761,8 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		markObjSub[i].mesh = &markMesh;
 		markObjSub[i].draw = 1;
 		markObjSub[i].used = false;	//-- 有効化
+
+		markObjSub[i].markInitH3(radius);
 	}
 
 
