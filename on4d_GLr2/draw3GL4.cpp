@@ -37,14 +37,17 @@ void engine3dGL::simulateS3GL()
 	}
 
 	//-- ãOê’ÉfÅ[É^ì]ëó
-	int trackLen = (qyMode == engine3dGL::QY_MODE::HIGH) ? 16 : 24;
-	glBindBuffer(GL_ARRAY_BUFFER, buffers[ markMesh.texNo ]);
-	glBufferData(	//---- ptsì]ëó
-		GL_ARRAY_BUFFER,
-		markMesh.lLen * trackLen * sizeof(float),
-		markMesh.pts2,
-		GL_STATIC_DRAW
-	);
+	if (markObj.used)
+	{
+		int trackLen = (qyMode == engine3dGL::QY_MODE::HIGH) ? 16 : 24;
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[markMesh.texNo]);
+		glBufferData(	//---- ptsì]ëó
+			GL_ARRAY_BUFFER,
+			markMesh.lLen * trackLen * sizeof(float),
+			markMesh.pts2,
+			GL_STATIC_DRAW
+		);
+	}
 
 	objs[0].scale = 0.5*radius;	//-- í≤êÆ
 	if(sun.used) glClearColor(0.2, 0.8, 1, 0.0);
@@ -139,16 +142,19 @@ void engine3dGL::SimulateH3GL()
 	}
 
 	//-- transfer tracing line data
-	for (int i = 0; i < markObjSubLen; i++)
+	if (markObj.used)
 	{
-		int stroke = markMesh.lLen * 24;
-		glBindBuffer(GL_ARRAY_BUFFER, h3trackBuf[i]);
-		glBufferData(	//---- ptsì]ëó
-			GL_ARRAY_BUFFER,
-			stroke * sizeof(float),
-			markMesh.pts2 + stroke * i,
-			GL_STATIC_DRAW
-		);
+		for (int i = 0; i < markObjSubLen; i++)
+		{
+			int stroke = markMesh.lLen * 24;
+			glBindBuffer(GL_ARRAY_BUFFER, h3trackBuf[i]);
+			glBufferData(	//---- ptsì]ëó
+				GL_ARRAY_BUFFER,
+				stroke * sizeof(float),
+				markMesh.pts2 + stroke * i,
+				GL_STATIC_DRAW
+			);
+		}
 	}
 
 	// ï`âÊì‡óeÇÃèâä˙âª
