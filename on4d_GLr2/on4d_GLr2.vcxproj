@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE.h" />
     <ClInclude Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE_GL.h" />
+    <ClInclude Include="AreaCellH3.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="engine3d.h" />

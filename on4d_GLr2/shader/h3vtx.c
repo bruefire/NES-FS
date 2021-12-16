@@ -121,7 +121,7 @@ void ParallelMove(vec3 tLoc, bool mode, inout vec3 mvPt[3], int len)
 	vec3 refVec;
 	if (tLocPh < 0.001)
 		refVec = vec3(0.0, 0.0, H3_REF_RADIUS);
-	else if (tLocPh < H3_REF_RADIUS * refBrRatio)
+	else if (tLocPh < refBrRatio)
 		refVec = tLoc * (H3_REF_RADIUS / tLocPh);
 	else
 		refVec = tLoc * (H3_REF_RADIUS / tLocPh) * 0.5;

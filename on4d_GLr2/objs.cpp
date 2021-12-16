@@ -136,18 +136,12 @@ object3d object3d::ReflectionH3(pt4 dstR, pt4 ctrR)
 
 		return result;
 	};
-	pt4 ntd1R = ClcReflected(grdPt, std[0]);
-	pt4 ntd2R = ClcReflected(grdPt, std[1]);
-	//pt4 nspXR = ClcReflected(grdPt, lspX.xyz());
-	pt4 nLocR = ClcReflected(grdPt, loc);
-
 
 	// åãâ Çäiî[
 	object3d moved(*this); // ÉRÉsÅ[
-	moved.loc = nLocR.xyz();
-	moved.std[0] = ntd1R.xyz();
-	moved.std[1] = ntd2R.xyz();
-	//moved.lspX = pt4(lspX.w, nspXR.x, nspXR.y, nspXR.z);
+	moved.loc = ClcReflected(grdPt, loc).xyz();
+	moved.std[0] = ClcReflected(grdPt, std[0]).xyz();
+	moved.std[1] = ClcReflected(grdPt, std[1]).xyz();
 
 	return moved;
 }
@@ -170,12 +164,12 @@ void object3d::ParallelMove(pt3 tLoc, bool mode)
 	float refBrRatio = 0.8;
 
 	pt4 refVecR;
-	if (tLocPh < 0.001)
+	if (tLocPh < 0.0001)
 	{
 		pt3 refVec = pt3(0.0, 0.0, owner->H3_REF_RADIUS);
 		refVecR = pt4(owner->H3_REF_RADIUS_OS, refVec.x, refVec.y, refVec.z);
 	}
-	else if (tLocPh < owner->H3_REF_RADIUS * refBrRatio)
+	else if (tLocPh < refBrRatio)
 	{
 		pt3 refVec = tLoc.mtp(owner->H3_REF_RADIUS / tLocPh);
 		refVecR = pt4(owner->H3_REF_RADIUS_OS, refVec.x, refVec.y, refVec.z);
@@ -222,6 +216,30 @@ void object3d::DealH3OohObj(bool loopFlg)
 	}
 	else
 		used = false;
+}
+
+
+pt3 object3d::Klein2PoinCoord(pt3 tmpPt)
+{
+	double tmpPtW = pyth3OS(tmpPt);
+	pt4 tmpP4 = pt4(1 + tmpPtW, tmpPt.x, tmpPt.y, tmpPt.z);
+	return tmpP4.mtp(1 / (1 + tmpPtW)).xyz();
+}
+
+
+void object3d::Klein2PoinHalfPlane(pt3 tmpt)
+{
+	tmpt = Klein2PoinCoord(tmpt);
+
+	// stereo graphic projection
+	pt4 top = pt4(1, 0, 0, 0);
+	pt4 dir = pt4(0, tmpt.x, tmpt.y, tmpt.z);
+	pt4 hf = dir.mns(top);
+	
+
+
+	// stereo graphic projection again
+
 }
 
 bool object3d::TrackObjDirection(object3d* trgObj)

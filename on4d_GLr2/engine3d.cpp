@@ -54,12 +54,10 @@ engine3d::engine3d()
 	, markObjSubLen(0)
 	, vrMenuObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
-	, H3_STD_LEN(0.1)
+	, H3_STD_LEN(0.9)
 	, selectedIdx(-1)
-	//, H3_MAX_RADIUS(0.995) // ‘o‹È’·‚Å –ñ6.0
-	//, H3_REF_RADIUS(0.999) // ‘o‹È’·‚Å –ñ7.7
 	, H3_MAX_RADIUS(0.999995) // ‘o‹È’·‚Å–ñ12.9	//=0.995 –ñ6.0
-	, H3_REF_RADIUS(0.999999) // ‘o‹È’·‚Å–ñ??.?	//=0.999 –ñ7.7
+	, H3_REF_RADIUS(0.999995) // ‘o‹È’·‚Å–ñ??.?	//=0.999 –ñ7.7
 	, h3objLoop(true)
 	, viewTrackIdx(-1)
 	, vrFlag(false)
