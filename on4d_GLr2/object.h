@@ -79,9 +79,13 @@ public:
 	void ParallelMove(pt3, bool);
 	void DealH3OohObj(bool);
 
-	// ポアンカレモデル座標に変換
+	
 	pt3 Klein2PoinCoord(pt3 tmpPt);
-	void object3d::Klein2PoinHalfPlane(pt3);
+	pt3 Poin2KleinCoord(pt3 tmpPt);
+	pt4 object3d::MapFromFlat2Sphere(pt3);
+	pt3 object3d::MapFromSphere2Flat(pt4);
+	pt3 object3d::Klein2HalfSpace(pt3);
+	pt3 object3d::HalfSpace2Klein(pt3);
 	bool TrackObjDirection(object3d*);
 	bool TrackObjDirectionHead(object3d*);
 	double GetDistance(object3d*);

@@ -218,7 +218,11 @@ void object3d::DealH3OohObj(bool loopFlg)
 		used = false;
 }
 
-
+/// <summary>
+/// convert coords from klein to poincare.
+/// </summary>
+/// <param name="tmpPt"></param>
+/// <returns></returns>
 pt3 object3d::Klein2PoinCoord(pt3 tmpPt)
 {
 	double tmpPtW = pyth3OS(tmpPt);
@@ -226,21 +230,85 @@ pt3 object3d::Klein2PoinCoord(pt3 tmpPt)
 	return tmpP4.mtp(1 / (1 + tmpPtW)).xyz();
 }
 
+/// <summary>
+/// convert coords from poincare to klein.
+/// </summary>
+/// <param name="tmpPt"></param>
+/// <returns></returns>
+pt3 object3d::Poin2KleinCoord(pt3 tmpPt)
+{
+	double lenSq = pt3::dot(tmpPt, tmpPt);
+	
+	if (lenSq < 0.00001 * 0.00001)
+		return pt3(0, 0, 0);
 
-void object3d::Klein2PoinHalfPlane(pt3 tmpt)
+	double top = lenSq * 2.0;
+	pt4 dir = pt4(1, tmpPt.x, tmpPt.y, tmpPt.z).mtp(2.0);
+	pt3 result = dir.mtp(2.0 / (2.0 + top)).xyz();
+
+	return result;
+}
+
+pt4 object3d::MapFromFlat2Sphere(pt3 tmpt)
+{
+	pt4 pov = pt4(1, 0, 0, 0);
+	pt4 subj = pt4(0, tmpt.x, tmpt.y, tmpt.z);
+	pt4 dir = subj.mns(pov);
+	pt4 mapped = dir
+		.mtp(2.0 / pt4::dot(dir, dir))
+		.mns(pt4(1, 0, 0, 0));
+
+	return mapped;
+}
+
+pt3 object3d::MapFromSphere2Flat(pt4 tmpt)
+{
+	pt4 pov2 = pt4(1, 0, 0, 0);
+	pt4 dir2 = tmpt.mns(pov2);
+	pt3 mapped = dir2.mtp(1.0 / dir2.w).xyz();
+
+	return mapped;
+}
+
+/// <summary>
+/// map it from klein to half-space.
+/// </summary>
+/// <param name="tmpt"></param>
+pt3 object3d::Klein2HalfSpace(pt3 tmpt)
 {
 	tmpt = Klein2PoinCoord(tmpt);
 
-	// stereo graphic projection
-	pt4 top = pt4(1, 0, 0, 0);
-	pt4 dir = pt4(0, tmpt.x, tmpt.y, tmpt.z);
-	pt4 hf = dir.mns(top);
+	// stereo graphic projection for mapping it to temp half sphere
+	pt4 mapped = MapFromFlat2Sphere(tmpt);
 	
+	std::swap(mapped.x, mapped.w);
+	mapped.x *= -1;
 
-
-	// stereo graphic projection again
-
+	// stereo graphic projection for mapping it to half-space
+	pt3 mapped2 = MapFromSphere2Flat(mapped);
+	
+	return mapped2;
 }
+
+
+/// <summary>
+/// map it from half-space to klein.
+/// </summary>
+/// <param name="tmpt"></param>
+pt3 object3d::HalfSpace2Klein(pt3 tmpt)
+{
+	// stereo graphic projection for mapping it to temp half sphere
+	pt4 mapped = MapFromFlat2Sphere(tmpt);
+
+	std::swap(mapped.x, mapped.w);
+	mapped.w *= -1;
+
+	// stereo graphic projection for mapping it to poincare space
+	pt3 mapped2 = MapFromSphere2Flat(mapped);
+
+	return Poin2KleinCoord(mapped2);
+}
+
 
 bool object3d::TrackObjDirection(object3d* trgObj)
 {
