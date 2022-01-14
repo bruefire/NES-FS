@@ -2,12 +2,14 @@
 
 #include <stdint.h>
 #include <string>
+#include <map>
 #include "constants.h"
 #include "geometry.h"
 #include "player.h"
 #include "object.h"
 #include "operation.h"
 #include "MenuLgc.h"
+#include "AreaCellH3.h"
 
 
 class engine3d {
@@ -24,6 +26,7 @@ public:
 	double H3_REF_RADIUS;		// クライン鏡映半径 (EUC長)
 	double H3_REF_RADIUS_OS;
 	double H3_REF_RADIUS_HF_OS;
+	const double H3_HALF_SPACE_AREA_IM_RATE;
 	bool h3objLoop;
 
 	enum CLS_TYPE
@@ -73,6 +76,10 @@ public:
 	empObj cmData;		//if(on4D)地図で使用
 	pt3 cmCo;			// 基objとの相対座標 H3で使用
 	int selectedIdx;	// 選択オブジェクト
+
+	//std::unordered_map<pt3i, AreaCellH3, pt3i> area;	// for H3
+	//std::map<pt3i, object3d, pt3i> objsTs;	// test
+	AreaCellH3* currArea;
 
 	// Map
 	int mapMeshLen;

@@ -201,6 +201,9 @@
     <ClCompile Include="..\lib\OVR\LibOVRKernel\Src\GL\CAPI_GLE.cpp">
       <Filter>c++ source\OVR</Filter>
     </ClCompile>
+    <ClCompile Include="AreaCellH3.cpp">
+      <Filter>c++ source\core演算部</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modlgRc.h">

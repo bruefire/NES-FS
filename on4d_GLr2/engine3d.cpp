@@ -59,6 +59,7 @@ engine3d::engine3d()
 	, H3_MAX_RADIUS(0.999995) // ëoã»í∑Ç≈ñÒ12.9	//=0.995 ñÒ6.0
 	, H3_REF_RADIUS(0.999995) // ëoã»í∑Ç≈ñÒ??.?	//=0.999 ñÒ7.7
 	, h3objLoop(true)
+	, H3_HALF_SPACE_AREA_IM_RATE(10.0)
 	, viewTrackIdx(-1)
 	, vrFlag(false)
 	, menuLgc(nullptr)
@@ -1782,6 +1783,10 @@ int engine3d::InitH3()	// ëoã»ê¢äEópèâä˙âª
 	for (h = 0; h < OBJ_QTY; h++) 
 	{
 		objs[h].markInitH3(radius);
+
+		// convert klein coords to half space coords.
+		//objs[h].Klein2HalfSpace();
+
 	}
 
 

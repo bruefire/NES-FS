@@ -21,7 +21,9 @@ double pyth4Sq(pt4 pts)
 	return pts.w * pts.w + pts.x * pts.x + pts.y * pts.y + pts.z * pts.z;
 }
 
-//==
+/// <summary>
+/// this function takes integer only as index.
+/// </summary>
 double powi(double x, int y)
 {
 	if (y == 0) return 1.0;
@@ -39,6 +41,49 @@ double powi(double x, int y)
 
 	return m;
 };
+
+/// <summary>
+/// this function returns result value floored as integer.
+/// </summary>
+int log_floor(double base, double anti_log)
+{
+	// unsupported values..
+	if (base <= 1 || isinf(anti_log) || isnan(anti_log))
+		return std::numeric_limits<int>::max();
+
+	int index = 0;
+
+	if(1.0 <= anti_log && anti_log < base)
+	{ 
+		/* nothing to do */ 
+	}
+	else if (base <= anti_log)
+	{
+		double div = 1.0;
+		while (true)
+		{
+			div *= base;
+			++index;
+
+			if (anti_log / div < base)
+				break;
+		}
+	}
+	else // anti_log < 1.0
+	{
+		double mul = 1.0;
+		while (true)
+		{
+			mul *= base;
+			--index;
+
+			if (anti_log * mul >= 1.0)
+				break;
+		}
+	}
+
+	return index;
+}
 
 //=====Å•ílÇÃí≤êÆ=======
 void degAdj(pt4* pt2, pt4* pt1, char mode)

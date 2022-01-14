@@ -40,6 +40,21 @@ public:
 	pt3();
 	pt3(double, double, double);
 };
+class pt3i
+{
+public:
+	int x;
+	int y;
+	int z;
+	pt3i();
+	pt3i(int, int, int);
+
+	pt3i pls(pt3i) const;
+	pt3i mns(pt3i) const;
+
+	size_t operator()(const pt3i& e) const;	// for hash
+	bool operator()(const pt3i&, const pt3i&) const;	// for comparison
+};
 class pt4 {
 public:
 	double w;

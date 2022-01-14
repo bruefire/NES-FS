@@ -35,6 +35,7 @@ public:
 	pt4 fc2;		//追加の力
 	double ssp;		// スケールの変更速度
 	int stdRefCnt;	// std再計算までのカウンタ
+	pt3i area;
 
 	int drawFace(uint32_t* bmp);
 	void pSet(pt3*, uint32_t);
@@ -80,12 +81,14 @@ public:
 	void DealH3OohObj(bool);
 
 	
-	pt3 Klein2PoinCoord(pt3 tmpPt);
-	pt3 Poin2KleinCoord(pt3 tmpPt);
-	pt4 object3d::MapFromFlat2Sphere(pt3);
-	pt3 object3d::MapFromSphere2Flat(pt4);
-	pt3 object3d::Klein2HalfSpace(pt3);
-	pt3 object3d::HalfSpace2Klein(pt3);
+	static pt3 Klein2PoinCoord(pt3 tmpPt);
+	static pt3 Poin2KleinCoord(pt3 tmpPt);
+	static pt4 object3d::MapFromFlat2Sphere(pt3);
+	static pt3 object3d::MapFromSphere2Flat(pt4);
+	static pt3 object3d::Klein2HalfSpace(pt3);
+	static pt3 object3d::HalfSpace2Klein(pt3);
+	void object3d::Klein2HalfSpace(const object3d*);
+	object3d object3d::HalfSpace2Klein(pt3i* = nullptr, pt3 = pt3(0, 0, 0));
 	bool TrackObjDirection(object3d*);
 	bool TrackObjDirectionHead(object3d*);
 	double GetDistance(object3d*);

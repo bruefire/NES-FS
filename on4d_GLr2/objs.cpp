@@ -57,6 +57,7 @@ int object3d::PAST_QTY = 75;
 object3d::object3d()
 	: stdRefCnt(1)
 	, copyFlg(false)
+	, area(pt3i(0, 0, 0))
 {	//-- OBJ_コンストラクタ
 	used = false;
 	draw = 2;
@@ -237,18 +238,17 @@ pt3 object3d::Klein2PoinCoord(pt3 tmpPt)
 /// <returns></returns>
 pt3 object3d::Poin2KleinCoord(pt3 tmpPt)
 {
-	double lenSq = pt3::dot(tmpPt, tmpPt);
-	
-	if (lenSq < 0.00001 * 0.00001)
-		return pt3(0, 0, 0);
-
-	double top = lenSq * 2.0;
+	double top = pt3::dot(tmpPt, tmpPt) * 2.0;
 	pt4 dir = pt4(1, tmpPt.x, tmpPt.y, tmpPt.z).mtp(2.0);
 	pt3 result = dir.mtp(2.0 / (2.0 + top)).xyz();
 
 	return result;
 }
 
+
+/// <summary>
+/// map a point from half space (R3) to half 3-sphere.
+/// </summary>
 pt4 object3d::MapFromFlat2Sphere(pt3 tmpt)
 {
 	pt4 pov = pt4(1, 0, 0, 0);
@@ -261,6 +261,10 @@ pt4 object3d::MapFromFlat2Sphere(pt3 tmpt)
 	return mapped;
 }
 
+
+/// <summary>
+/// map a point from half 3-sphere to half space (R3).
+/// </summary>
 pt3 object3d::MapFromSphere2Flat(pt4 tmpt)
 {
 	pt4 pov2 = pt4(1, 0, 0, 0);
@@ -269,6 +273,7 @@ pt3 object3d::MapFromSphere2Flat(pt4 tmpt)
 
 	return mapped;
 }
+
 
 /// <summary>
 /// map it from klein to half-space.
@@ -307,6 +312,92 @@ pt3 object3d::HalfSpace2Klein(pt3 tmpt)
 	pt3 mapped2 = MapFromSphere2Flat(mapped);
 
 	return Poin2KleinCoord(mapped2);
+}
+
+
+/// <summary>
+/// map it from klein to half-space.
+/// </summary>
+void object3d::Klein2HalfSpace(const object3d* obj)
+{
+	pt3 tLoc = Klein2HalfSpace(obj->loc);
+	pt3 tStd1 = Klein2HalfSpace(obj->std[0]);
+	pt3 tStd2 = Klein2HalfSpace(obj->std[1]);
+
+	auto ClcLocFromAreaOrigin = [](pt3 oldPts, pt3 tPts)
+	{
+		return pt3(
+			oldPts.x * tPts.x,
+			tPts.y * tPts.x + oldPts.y,
+			tPts.z * tPts.x + oldPts.z);
+	};
+	tLoc = ClcLocFromAreaOrigin(this->loc, tLoc);
+	tStd1 = ClcLocFromAreaOrigin(this->std[0], tStd1);
+	tStd2 = ClcLocFromAreaOrigin(this->std[1], tStd2);
+
+	// オブジェクトをエリア分け
+	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
+
+	int imIdx = log_floor(tLoc.x, imRatio);
+	double imHeight = powi(imRatio, imIdx);
+	double reSpan = imHeight * imRatio;
+	int yIdx = std::floor(tLoc.y / reSpan);
+	int zIdx = std::floor(tLoc.z / reSpan);
+
+	// todo§ エリアidxオーバーフローを考慮
+
+	// relative 
+	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
+
+	auto ClcNextLoc = [imHeight, reSpan, yIdx, zIdx](pt3 tLoc)
+	{
+		return pt3(
+			tLoc.x - imHeight,
+			((tLoc.y / reSpan) - yIdx) * reSpan,
+			((tLoc.z / reSpan) - zIdx) * reSpan);
+	};
+	this->loc = ClcNextLoc(tLoc);
+	this->std[0] = ClcNextLoc(tStd1);
+	this->std[1] = ClcNextLoc(tStd2);
+
+}
+
+
+/// <summary>
+/// map it from half-space to klein.
+/// </summary>
+object3d object3d::HalfSpace2Klein(pt3i* baseArea, pt3 baseLoc)
+{
+	// todo§ stdに関して変更が必用？
+	object3d obj = *this;
+
+	if (!baseArea)
+		baseArea = &this->area;
+
+	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
+
+	int relXIdx = this->area.x - baseArea->x;
+	double imHeight = powi(imRatio, relXIdx);
+	double reSpan = imHeight * imRatio;
+
+	double relXp = (imHeight + imHeight * this->loc.x);
+	double relY = (this->area.y * reSpan + this->loc.y * imHeight) 
+					- (baseArea->y * imRatio + baseLoc.y * 1.0);
+	double relZ = (this->area.z * reSpan + this->loc.z * imHeight)
+					- (baseArea->z * imRatio + baseLoc.z * 1.0);
+	
+	pt3 relLoc = pt3(relXp, relY, relZ)
+		.mtp(1.0 / (1 + baseLoc.x));
+
+	double oldRatio = relLoc.x / this->loc.x;
+	pt3 relStd1 = this->std[0].mns(this->loc).mtp(oldRatio);
+	pt3 relStd2 = this->std[1].mns(this->loc).mtp(oldRatio);
+
+	obj.loc = HalfSpace2Klein(relLoc);
+	obj.std[0] = HalfSpace2Klein(relStd1);
+	obj.std[1] = HalfSpace2Klein(relStd2);
+
+	return obj;
 }
 
 
@@ -1565,6 +1656,71 @@ pt3::pt3() :x(0), y(0), z(0) {}
 pt3::pt3(double x, double y, double z)
 {
 	this->x = x; this->y = y; this->z = z;
+}
+pt3i::pt3i()
+	: x(0), y(0), z(0)
+{}
+pt3i::pt3i(int x, int y, int z)
+	: x(x), y(y), z(z)
+{}
+
+pt3i pt3i::pls(pt3i pts) const
+{
+	return pt3i(this->x + pts.x, this->y + pts.y, this->z + pts.z);
+}
+pt3i pt3i::mns(pt3i pts) const
+{
+	return pt3i(this->x - pts.x, this->y - pts.y, this->z - pts.z);
+}
+
+// for creating hash value
+size_t pt3i::operator()(const pt3i& e) const
+{
+	union {
+		int val_i[3];
+		uint8_t val_c[1];
+	} value;
+
+	value.val_i[0] = e.x;
+	value.val_i[1] = e.y;
+	value.val_i[2] = e.z;
+
+	size_t gLen = sizeof(int) * 3;
+	size_t sLen = sizeof(size_t);
+	size_t result = 0;
+
+	for (int i = 0; i < gLen; i++)
+	{
+		result ^= ((size_t)value.val_c[i]) << (i % sLen) * 8;
+	}
+
+	return result;
+}
+// for comparison
+bool pt3i::operator()(const pt3i& a, const pt3i& b) const
+{
+	if (a.x < b.x)
+		return true;
+	else if (a.x > b.x)
+		return false;
+
+	// a.x == b.x
+
+	if (a.y < b.y)
+		return true;
+	else if (a.y > b.y)
+		return false;
+
+	// a.x == b.x && a.y == b.y
+
+	if (a.z < b.z)
+		return true;
+	else if (a.z > b.z)
+		return false;
+
+	// a == b
+
+	return true;
 }
 
 void face3::cSet(uint8_t r, uint8_t g, uint8_t b){ col3 tCol = { r, g, b }; col = tCol; }//色設定
