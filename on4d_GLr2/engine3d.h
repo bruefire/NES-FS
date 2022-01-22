@@ -23,10 +23,11 @@ public:
 	
 	const double H3_STD_LEN;	// クラインstd長 (EUC長)
 	double H3_MAX_RADIUS;		// クライン有効半径 (EUC長)
+	double H3_VIEW_MAX_RADIUS;	// クライン有効半径 (EUC長)
 	double H3_REF_RADIUS;		// クライン鏡映半径 (EUC長)
 	double H3_REF_RADIUS_OS;
 	double H3_REF_RADIUS_HF_OS;
-	const double H3_HALF_SPACE_AREA_IM_RATE;
+	const unsigned int H3_HALF_SPACE_AREA_IM_RATE;	// N > 1
 	bool h3objLoop;
 
 	enum CLS_TYPE
@@ -139,7 +140,7 @@ public:
 	void UpdPlayerObjsH3(double*);	// プレイヤー更新H3
 	void ClcRelaivePosS3(double*);	// 相対位置計算S3
 	void ClcRelaivePosH3(double*);	// 相対位置計算H3
-	void ClcRelaivePosH3_i(object3d*, bool, pt3, double*);	// 相対位置計算H3
+	void ClcRelaivePosH3_i(object3d*, bool, double*);	// 相対位置計算H3
 	void ClcVRObjectPosS3(VRDeviceOperation devOpe, object3d* curObj, double* cmrStd);
 	void ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool isHmd);
 	void UpdVRObjectsS3(double* cmrSts);

@@ -43,6 +43,19 @@ double powi(double x, int y)
 };
 
 /// <summary>
+/// this function takes integer only as index.
+/// </summary>
+int powi(int x, unsigned int y)
+{
+	if (y == 0) return 1;
+
+	int m = 1;
+	for (int i = 0; i < y; i++) m *= x;
+
+	return m;
+};
+
+/// <summary>
 /// this function returns result value floored as integer.
 /// </summary>
 int log_floor(double base, double anti_log)

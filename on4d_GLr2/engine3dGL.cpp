@@ -747,16 +747,30 @@ void engine3dGL::DrawCoordinateH3()
 	{
 		// ì‡óeê›íË
 		string locMode = "", loc_X = "", loc_Y = "", loc_Z = "", loc_W = "";
-		locMode = "Relative Coords";
-		loc_X = "Radius   : ";
-		loc_Y = "Longitude: ";
-		loc_Z = "Latitude : ";
 
 		if (viewTrackIdx >= 0 && objs[viewTrackIdx].used)
 		{
+			locMode = "Relative Coords";
+			loc_X = "Radius   : ";
+			loc_Y = "Longitude: ";
+			loc_Z = "Latitude : ";
 			loc_X.append(to_string((long double)(cmCo.x)));
 			loc_Y.append(to_string((long double)(cmCo.y / PI * 180)));
 			loc_Z.append(to_string((long double)(-cmCo.z / PI * 180 + 90)));
+		}
+		else
+		{
+			locMode = "Half Space Coords";
+			loc_X = "X : ";
+			loc_Y = "Y : ";
+			loc_Z = "Z : ";
+			loc_W = "AREA :("; 
+			loc_X.append(to_string((long double)(cmCo.x)));
+			loc_Y.append(to_string((long double)(cmCo.y / H3_HALF_SPACE_AREA_IM_RATE)));
+			loc_Z.append(to_string((long double)(cmCo.z / H3_HALF_SPACE_AREA_IM_RATE)));
+			loc_W.append(to_string((int)objs[PLR_No].area.x) + ", ");
+			loc_W.append(to_string((int)objs[PLR_No].area.y) + ", ");
+			loc_W.append(to_string((int)objs[PLR_No].area.z) + ")");
 		}
 
 		// ï`âÊèàóù
@@ -773,6 +787,10 @@ void engine3dGL::DrawCoordinateH3()
 
 		guiStr.drawArea.t += guiStr.fontSz * asp;
 		guiStr.content = loc_Z;
+		DrawChars(guiStr);
+
+		guiStr.drawArea.t += guiStr.fontSz * asp;
+		guiStr.content = loc_W;
 		DrawChars(guiStr);
 	}
 }

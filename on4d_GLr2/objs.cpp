@@ -88,17 +88,24 @@ object3d::object3d(const object3d& obj)
 void object3d::OptimStd()
 {
 	// std調整
-	double rotOn[3];
-	clcStd(std[0], std[1], rotOn);
-	pt3 ntd1 = pt3(0, 0, owner->H3_STD_LEN);
-	pt3 ntd2 = pt3(0, owner->H3_STD_LEN, 0);
-	tudeRst(&ntd2.x, &ntd2.y, rotOn[2], 1);
-	tudeRst(&ntd1.y, &ntd1.z, rotOn[1], 1);
-	tudeRst(&ntd2.y, &ntd2.z, rotOn[1], 1);
-	tudeRst(&ntd1.x, &ntd1.y, rotOn[0], 1);
-	tudeRst(&ntd2.x, &ntd2.y, rotOn[0], 1);
-	std[0] = ntd1;
-	std[1] = ntd2;
+	pt3 std1N = this->std[0].norm();
+	this->std[0] = std1N.mtp(owner->H3_STD_LEN);
+	
+	pt3 std2_s1p = this->std[1].mtp(pt3::dot(std1N, this->std[1].norm()));
+	this->std[1] = this->std[1].mns(std2_s1p).norm().mtp(owner->H3_STD_LEN);
+
+	//// std調整
+	//double rotOn[3];
+	//clcStd(std[0], std[1], rotOn);
+	//pt3 ntd1 = pt3(0, 0, owner->H3_STD_LEN);
+	//pt3 ntd2 = pt3(0, owner->H3_STD_LEN, 0);
+	//tudeRst(&ntd2.x, &ntd2.y, rotOn[2], 1);
+	//tudeRst(&ntd1.y, &ntd1.z, rotOn[1], 1);
+	//tudeRst(&ntd2.y, &ntd2.z, rotOn[1], 1);
+	//tudeRst(&ntd1.x, &ntd1.y, rotOn[0], 1);
+	//tudeRst(&ntd2.x, &ntd2.y, rotOn[0], 1);
+	//std[0] = ntd1;
+	//std[1] = ntd2;
 }
 
 // 鏡映 (H3)
@@ -256,7 +263,7 @@ pt4 object3d::MapFromFlat2Sphere(pt3 tmpt)
 	pt4 dir = subj.mns(pov);
 	pt4 mapped = dir
 		.mtp(2.0 / pt4::dot(dir, dir))
-		.mns(pt4(1, 0, 0, 0));
+		.mns(pt4(-1, 0, 0, 0));
 
 	return mapped;
 }
@@ -267,9 +274,9 @@ pt4 object3d::MapFromFlat2Sphere(pt3 tmpt)
 /// </summary>
 pt3 object3d::MapFromSphere2Flat(pt4 tmpt)
 {
-	pt4 pov2 = pt4(1, 0, 0, 0);
-	pt4 dir2 = tmpt.mns(pov2);
-	pt3 mapped = dir2.mtp(1.0 / dir2.w).xyz();
+	pt4 pov = pt4(1, 0, 0, 0);
+	pt4 dir = tmpt.mns(pov);
+	pt3 mapped = dir.mtp(1.0 / -dir.w).xyz();
 
 	return mapped;
 }
@@ -318,27 +325,35 @@ pt3 object3d::HalfSpace2Klein(pt3 tmpt)
 /// <summary>
 /// map it from klein to half-space.
 /// </summary>
-void object3d::Klein2HalfSpace(const object3d* obj)
+void object3d::Klein2HalfSpace(
+	const object3d* obj, pt3* baseLoc)
 {
+	if (!obj)
+		return;
+
+	if (!baseLoc)
+		baseLoc = &this->loc;
+
 	pt3 tLoc = Klein2HalfSpace(obj->loc);
 	pt3 tStd1 = Klein2HalfSpace(obj->std[0]);
 	pt3 tStd2 = Klein2HalfSpace(obj->std[1]);
 
-	auto ClcLocFromAreaOrigin = [](pt3 oldPts, pt3 tPts)
+	auto ClcLocFromAreaOrigin = [](pt3 basePts, pt3 destPts)
 	{
-		return pt3(
-			oldPts.x * tPts.x,
-			tPts.y * tPts.x + oldPts.y,
-			tPts.z * tPts.x + oldPts.z);
+		return 
+			destPts
+			.mtp(1.0 + basePts.x)
+			.pls(pt3(0, basePts.y, basePts.z));
 	};
-	tLoc = ClcLocFromAreaOrigin(this->loc, tLoc);
-	tStd1 = ClcLocFromAreaOrigin(this->std[0], tStd1);
-	tStd2 = ClcLocFromAreaOrigin(this->std[1], tStd2);
+	tLoc = ClcLocFromAreaOrigin(*baseLoc, tLoc);
+	tStd1 = ClcLocFromAreaOrigin(*baseLoc, tStd1);
+	tStd2 = ClcLocFromAreaOrigin(*baseLoc, tStd2);
 
 	// オブジェクトをエリア分け
-	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
+	const unsigned int imRatio_i = owner->H3_HALF_SPACE_AREA_IM_RATE;
+	const double imRatio = (double)imRatio_i;
 
-	int imIdx = log_floor(tLoc.x, imRatio);
+	int imIdx = log_floor(imRatio, tLoc.x);
 	double imHeight = powi(imRatio, imIdx);
 	double reSpan = imHeight * imRatio;
 	int yIdx = std::floor(tLoc.y / reSpan);
@@ -346,33 +361,54 @@ void object3d::Klein2HalfSpace(const object3d* obj)
 
 	// todo§ エリアidxオーバーフローを考慮
 
-	// relative 
-	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
-
-	auto ClcNextLoc = [imHeight, reSpan, yIdx, zIdx](pt3 tLoc)
+	// update coords in the area
+	auto ClcNextLoc = [imRatio, imHeight, reSpan, yIdx, zIdx](pt3 tLoc)
 	{
 		return pt3(
-			tLoc.x - imHeight,
-			((tLoc.y / reSpan) - yIdx) * reSpan,
-			((tLoc.z / reSpan) - zIdx) * reSpan);
+			(tLoc.x / imHeight) - 1.0,
+			((tLoc.y / reSpan) - yIdx) * imRatio,
+			((tLoc.z / reSpan) - zIdx) * imRatio);
 	};
 	this->loc = ClcNextLoc(tLoc);
 	this->std[0] = ClcNextLoc(tStd1);
 	this->std[1] = ClcNextLoc(tStd2);
 
+	// update area number.
+	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
+	if (imIdx > 0)
+	{
+		const int div = powi(imRatio_i, imIdx);
+		this->area.y /= div;
+		this->area.z /= div;
+	}
+	else if(imIdx < 0)
+	{
+		const int mul = powi(imRatio_i, -imIdx);
+		this->area.y *= mul;
+		this->area.z *= mul;
+	}
 }
 
 
 /// <summary>
 /// map it from half-space to klein.
 /// </summary>
-object3d object3d::HalfSpace2Klein(pt3i* baseArea, pt3 baseLoc)
+object3d object3d::HalfSpace2Klein(object3d* baseObj)
 {
 	// todo§ stdに関して変更が必用？
-	object3d obj = *this;
 
-	if (!baseArea)
+	pt3i* baseArea;
+	pt3 baseLoc;
+	if (baseObj)
+	{
+		baseArea = &baseObj->area;
+		baseLoc = baseObj->loc;
+	}
+	else
+	{
 		baseArea = &this->area;
+		baseLoc = this->loc;
+	}
 
 	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
 
@@ -380,6 +416,7 @@ object3d object3d::HalfSpace2Klein(pt3i* baseArea, pt3 baseLoc)
 	double imHeight = powi(imRatio, relXIdx);
 	double reSpan = imHeight * imRatio;
 
+	// todo§ 計算誤差の少ない方法に変更 §
 	double relXp = (imHeight + imHeight * this->loc.x);
 	double relY = (this->area.y * reSpan + this->loc.y * imHeight) 
 					- (baseArea->y * imRatio + baseLoc.y * 1.0);
@@ -387,12 +424,13 @@ object3d object3d::HalfSpace2Klein(pt3i* baseArea, pt3 baseLoc)
 					- (baseArea->z * imRatio + baseLoc.z * 1.0);
 	
 	pt3 relLoc = pt3(relXp, relY, relZ)
-		.mtp(1.0 / (1 + baseLoc.x));
+		.mtp(1.0 / (1.0 + baseLoc.x));
 
-	double oldRatio = relLoc.x / this->loc.x;
-	pt3 relStd1 = this->std[0].mns(this->loc).mtp(oldRatio);
-	pt3 relStd2 = this->std[1].mns(this->loc).mtp(oldRatio);
+	double oldRatio = relLoc.x / (1.0 + this->loc.x);
+	pt3 relStd1 = this->std[0].mns(this->loc).mtp(oldRatio).pls(relLoc);
+	pt3 relStd2 = this->std[1].mns(this->loc).mtp(oldRatio).pls(relLoc);
 
+	object3d obj(*this);
 	obj.loc = HalfSpace2Klein(relLoc);
 	obj.std[0] = HalfSpace2Klein(relStd1);
 	obj.std[1] = HalfSpace2Klein(relStd2);
@@ -721,12 +759,12 @@ bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
 bool object3d::SetRotRelative(pt3 nRot)
 {
 	pt3 preLoc = loc;
-	ParallelMove(preLoc, false);
+	object3d kleinObj = this->HalfSpace2Klein();
 
 	//---> 新規回転の反映
 	// 軸ベクトル定義
-	pt3 std1N = std[0].norm();
-	pt3 std2N = std[1].norm();
+	pt3 std1N = kleinObj.std[0].norm();
+	pt3 std2N = kleinObj.std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
 	// 軸方向の回転
@@ -735,10 +773,10 @@ bool object3d::SetRotRelative(pt3 nRot)
 	object3d::RotVecs(&std1N, &sideN, nRot.x);	// 左右方向回転
 
 	// 結果の反映
-	std[0] = std1N.mtp(owner->H3_STD_LEN);
-	std[1] = std2N.mtp(owner->H3_STD_LEN);
+	kleinObj.std[0] = std1N.mtp(owner->H3_STD_LEN);
+	kleinObj.std[1] = std2N.mtp(owner->H3_STD_LEN);
 
-	ParallelMove(preLoc, true);
+	this->Klein2HalfSpace(&kleinObj);
 
 	return true;
 }

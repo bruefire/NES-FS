@@ -21,8 +21,8 @@ using namespace std::chrono;
 
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
-	, PLR_QTY(10)	// プレイヤー
-	, ENR_QTY(1000)	// 隕石()
+	, PLR_QTY(1)	// プレイヤー
+	, ENR_QTY(500)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
 	, ATK_QTY(1)	// ﾌﾟﾚｲﾔと敵の攻撃
@@ -58,8 +58,9 @@ engine3d::engine3d()
 	, selectedIdx(-1)
 	, H3_MAX_RADIUS(0.999995) // 双曲長で約12.9	//=0.995 約6.0
 	, H3_REF_RADIUS(0.999995) // 双曲長で約??.?	//=0.999 約7.7
+	, H3_VIEW_MAX_RADIUS(0.9999995)
 	, h3objLoop(true)
-	, H3_HALF_SPACE_AREA_IM_RATE(10.0)
+	, H3_HALF_SPACE_AREA_IM_RATE(2)
 	, viewTrackIdx(-1)
 	, vrFlag(false)
 	, menuLgc(nullptr)
@@ -385,7 +386,7 @@ void engine3d::simulateH3()
 {
 
 	// 軌跡サブオブジェクト順更新
-	UpdateTracingDataH3();
+	//UpdateTracingDataH3();
 
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
@@ -400,8 +401,28 @@ void engine3d::simulateH3()
 	ClcCoordinate();
 
 	// 12面体移動
-	UpdateBaseObjH3();
+	//UpdateBaseObjH3();
 
+	// std調整 暫定
+	//for (int h = -5; h < OBJ_QTY; h++)
+	for (int h = 0; h < OBJ_QTY; h++)
+	{
+		object3d* curObj = objs + h;
+		if (!curObj->used)
+			continue;
+
+		// std修正
+		if (curObj->stdRefCnt == stdRefSpan)
+		{
+			object3d kleinObj = curObj->HalfSpace2Klein();
+			kleinObj.OptimStd();
+			curObj->Klein2HalfSpace(&kleinObj);
+
+			curObj->stdRefCnt = 0;
+		}
+		else
+			++curObj->stdRefCnt;
+	}
 }
 
 void engine3d::UpdateTracingDataH3()
@@ -693,56 +714,106 @@ void engine3d::UpdFloatObjsS3()
 	}
 }
 
+//// 射撃オブジェクト更新 H3
+//void engine3d::UpdFloatObjsH3()
+//{
+//	if (!obMove) return;
+//	
+//	//-----------オブジェクトごとの速度更新----------//
+//	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
+//	{
+//		object3d* curObj = objs + h;
+//		if (!curObj->used) continue;
+//
+//		//-- 位置,速度,傾きのデータ更新
+//		//-----------> 位置,速度,基準位置の更新 <-------------
+//		pt3 preLoc = curObj->loc;
+//		// 原点に移動
+//		curObj->ParallelMove(curObj->loc, false);
+//
+//		// 速度方向に移動
+//		double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w * adjSpd / radius);
+//		if (lspEuc > abs(0.000000001))
+//		{
+//			pt3 std1N = curObj->std[0].mtp(1 / H3_STD_LEN);
+//			pt3 std2N = curObj->std[1].mtp(1 / H3_STD_LEN);
+//			pt3 sideN = pt3::cross(std2N, std1N);
+//			pt3 drc = pt3()
+//				.pls(std1N.mtp(curObj->lspX.z))
+//				.pls(std2N.mtp(curObj->lspX.y))
+//				.pls(sideN.mtp(curObj->lspX.x))
+//				.mtp(1 / H3_STD_LEN)
+//				.mtp(lspEuc);
+//
+//			// 有効範囲チェック
+//			if (pyth3(drc) < H3_MAX_RADIUS)
+//				curObj->ParallelMove(drc, true);
+//			else
+//			{
+//				// プレイヤーの場合範囲内に留める
+//				if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
+//				{
+//					if(h3objLoop)
+//						curObj->DealH3OohObj(h3objLoop);
+//				}
+//				else
+//					curObj->DealH3OohObj(h3objLoop);
+//			}
+//		}
+//
+//		// 元の位置に戻す
+//		curObj->ParallelMove(preLoc, true);
+//
+//	}
+//
+//	for (int h = 0; h < OBJ_QTY; h++)
+//	{
+//		///----------- 傾きの更新 -------------
+//		object3d* curObj = objs + h;
+//		curObj->rot = curObj->rot.pls(curObj->rsp.mtp(adjSpd));
+//	}
+//}
+
 // 射撃オブジェクト更新 H3
 void engine3d::UpdFloatObjsH3()
 {
+
 	if (!obMove) return;
-	
+
 	//-----------オブジェクトごとの速度更新----------//
-	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
+	for (int h = 0; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = objs + h;
 		if (!curObj->used) continue;
 
-		//-- 位置,速度,傾きのデータ更新
 		//-----------> 位置,速度,基準位置の更新 <-------------
-		pt3 preLoc = curObj->loc;
-		// 原点に移動
-		curObj->ParallelMove(curObj->loc, false);
+		// move the object to the klein model origin.
+		object3d kleinObj = curObj->HalfSpace2Klein();
 
 		// 速度方向に移動
-		double lspEuc = object3d::ClcEucFromHypb(curObj->lspX.w * adjSpd / radius);
+		double lspEuc = object3d::ClcEucFromHypb(kleinObj.lspX.w * adjSpd / radius);
 		if (lspEuc > abs(0.000000001))
 		{
-			pt3 std1N = curObj->std[0].mtp(1 / H3_STD_LEN);
-			pt3 std2N = curObj->std[1].mtp(1 / H3_STD_LEN);
+			pt3 std1N = kleinObj.std[0].mtp(1 / H3_STD_LEN);
+			pt3 std2N = kleinObj.std[1].mtp(1 / H3_STD_LEN);
 			pt3 sideN = pt3::cross(std2N, std1N);
 			pt3 drc = pt3()
-				.pls(std1N.mtp(curObj->lspX.z))
-				.pls(std2N.mtp(curObj->lspX.y))
-				.pls(sideN.mtp(curObj->lspX.x))
+				.pls(std1N.mtp(kleinObj.lspX.z))
+				.pls(std2N.mtp(kleinObj.lspX.y))
+				.pls(sideN.mtp(kleinObj.lspX.x))
 				.mtp(1 / H3_STD_LEN)
 				.mtp(lspEuc);
 
-			// 有効範囲チェック
-			if (pyth3(drc) < H3_MAX_RADIUS)
-				curObj->ParallelMove(drc, true);
-			else
-			{
-				// プレイヤーの場合範囲内に留める
-				if (BWH_QTY <= h && h < BWH_QTY + PLR_QTY)
-				{
-					if(h3objLoop)
-						curObj->DealH3OohObj(h3objLoop);
-				}
-				else
-					curObj->DealH3OohObj(h3objLoop);
-			}
+			// check that the object destination is within the moving limit.
+			double drcDst = pyth3(drc);
+			if (drcDst < H3_MAX_RADIUS)
+				drc = drc.mtp(H3_MAX_RADIUS / drcDst);
+
+			kleinObj.ParallelMove(drc, true);
 		}
 
-		// 元の位置に戻す
-		curObj->ParallelMove(preLoc, true);
-
+		// return the object to half space.
+		curObj->Klein2HalfSpace(&kleinObj);
 	}
 
 	for (int h = 0; h < OBJ_QTY; h++)
@@ -905,6 +976,7 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 	curObj->clcStd(std1, std2, cmrStd);
 
 	// std修正
+	// todo§ 再設計後に全オブジェクト統一的な機構に
 	if (curObj->stdRefCnt == stdRefSpan)
 	{
 		pt4 ntd1 = pt4(COS_1, 0, 0, SIN_1);
@@ -936,35 +1008,112 @@ void engine3d::UpdPlayerObjsS3(double* cmrStd)
 
 }
 
+//// プレイヤー更新 H3
+//void engine3d::UpdPlayerObjsH3(double* cmrStd)
+//{
+//	//----
+//	object3d* curObj = &objs[PLR_No];
+//	curObj->rot.asg(-ope.cmRot.x, ope.cmRot.y, ope.cmRot.z);
+//	pt3 preLoc = curObj->loc;
+//
+//	// 原点に移動
+//	curObj->ParallelMove(curObj->loc, false);
+//
+//	//---> 新規回転の反映
+//	// 軸ベクトル定義
+//	pt3 std1N = curObj->std[0].norm();
+//	pt3 std2N = curObj->std[1].norm();
+//	pt3 sideN = pt3::cross(std2N, std1N);
+//
+//	if (!CheckTrackedEnable())
+//	{
+//		// 軸方向の回転
+//		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
+//		object3d::RotVecs(&std1N, &std2N, curObj->rot.y);	// 上下方向回転
+//		object3d::RotVecs(&std1N, &sideN, curObj->rot.x);	// 左右方向回転
+//	}
+//	else
+//	{
+//		// 対象オブジェクト方向を向く
+//		object3d* _trgObj = &objs[viewTrackIdx];
+//		object3d trgObj(*_trgObj);
+//		trgObj.ParallelMove(preLoc, false);
+//		pt3 rotvN = pt3(trgObj.loc.x, trgObj.loc.y, 0).norm(sideN);
+//
+//		double rpLen = pt3::dot(std2N, rotvN);
+//		pt3 std2N_rp = rotvN.mtp(rpLen);
+//		pt3 std2N_rs = std2N.mns(std2N_rp);
+//
+//		double rot = atan2(pyth2(trgObj.loc.x, trgObj.loc.y), trgObj.loc.z);
+//		object3d::RotVecs(&std1N, &rotvN, rot);			// 対象方向へ回転
+//		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+//
+//		// 軸方向の回転
+//		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
+//	}
+//
+//	curObj->std[0] = std1N.mtp(H3_STD_LEN);
+//	curObj->std[1] = std2N.mtp(H3_STD_LEN);
+//
+//	///-------- 位置,基準位置の更新 ----------
+//	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius).mtp(2);
+//	cmLc.w = pyth3(cmLc.x, cmLc.y, cmLc.z);
+//	double eucW = object3d::ClcEucFromHypb(cmLc.w);
+//
+//	// 有効範囲チェック
+//	if (cmLc.w > 0.0000000001 && eucW < H3_MAX_RADIUS)
+//	{
+//		// 移動方向ベクトル
+//		pt3 lspX = std1N.mtp(cmLc.z)
+//			.pls(std2N.mtp(cmLc.y))
+//			.pls(sideN.mtp(cmLc.x))
+//			.norm()
+//			.mtp(eucW);
+//
+//		curObj->ParallelMove(lspX, true);	// 平行移動
+//	}
+//
+//	// 元の位置に戻す
+//	curObj->ParallelMove(preLoc, true);
+//
+//
+//	// todo★ 表示情報更新
+//	//double mvCoe = (1000.0 / fps) / radius;
+//	//double rtCoe = (1000.0 / fps);
+//	//cmData.loc.asg(cmLc.z * mvCoe, cmLc.x * mvCoe, cmLc.y * mvCoe);
+//	//cmData.rot.asg(curObj->rot.x * rtCoe, curObj->rot.y * rtCoe, curObj->rot.z * rtCoe);
+//}
+
 // プレイヤー更新 H3
 void engine3d::UpdPlayerObjsH3(double* cmrStd)
 {
 	//----
 	object3d* curObj = &objs[PLR_No];
 	curObj->rot.asg(-ope.cmRot.x, ope.cmRot.y, ope.cmRot.z);
-	pt3 preLoc = curObj->loc;
 
-	// 原点に移動
-	curObj->ParallelMove(curObj->loc, false);
+	// move the object to the klein model origin.
+	object3d kleinObj = curObj->HalfSpace2Klein();
+	pt3 preLoc = kleinObj.loc;
+
 
 	//---> 新規回転の反映
 	// 軸ベクトル定義
-	pt3 std1N = curObj->std[0].norm();
-	pt3 std2N = curObj->std[1].norm();
+	pt3 std1N = kleinObj.std[0].norm();
+	pt3 std2N = kleinObj.std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
 	if (!CheckTrackedEnable())
 	{
 		// 軸方向の回転
-		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
-		object3d::RotVecs(&std1N, &std2N, curObj->rot.y);	// 上下方向回転
-		object3d::RotVecs(&std1N, &sideN, curObj->rot.x);	// 左右方向回転
+		object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// 正面固定回転
+		object3d::RotVecs(&std1N, &std2N, kleinObj.rot.y);	// 上下方向回転
+		object3d::RotVecs(&std1N, &sideN, kleinObj.rot.x);	// 左右方向回転
 	}
 	else
 	{
 		// 対象オブジェクト方向を向く
-		object3d* _trgObj = &objs[viewTrackIdx];
-		object3d trgObj(*_trgObj);
+		object3d trgObj(objs[viewTrackIdx].HalfSpace2Klein(curObj));
+
 		trgObj.ParallelMove(preLoc, false);
 		pt3 rotvN = pt3(trgObj.loc.x, trgObj.loc.y, 0).norm(sideN);
 
@@ -977,11 +1126,11 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
 
 		// 軸方向の回転
-		object3d::RotVecs(&std2N, &sideN, curObj->rot.z);	// 正面固定回転
+		object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// 正面固定回転
 	}
 
-	curObj->std[0] = std1N.mtp(H3_STD_LEN);
-	curObj->std[1] = std2N.mtp(H3_STD_LEN);
+	kleinObj.std[0] = std1N.mtp(H3_STD_LEN);
+	kleinObj.std[1] = std2N.mtp(H3_STD_LEN);
 
 	///-------- 位置,基準位置の更新 ----------
 	pt4 cmLc = pt4(0, ope.cmLoc.y, ope.cmLoc.z, ope.cmLoc.x).mtp(1 / radius).mtp(2);
@@ -998,12 +1147,11 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 			.norm()
 			.mtp(eucW);
 
-		curObj->ParallelMove(lspX, true);	// 平行移動
+		kleinObj.ParallelMove(lspX, true);	// 平行移動
 	}
 
-	// 元の位置に戻す
-	curObj->ParallelMove(preLoc, true);
-
+	// return the object to half space.
+	curObj->Klein2HalfSpace(&kleinObj);
 
 	// todo★ 表示情報更新
 	//double mvCoe = (1000.0 / fps) / radius;
@@ -1043,36 +1191,6 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool
 		.pls(sideN.mtp(devOpe.std[1].x));
 	pt3 newSideN = pt3::cross(newStd2N, newStd1N);
 
-	//// 正面固定回転
-	//pt2 tmpRt = pt2(0, 1);
-	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.z, 1);
-	//pt3 s2y = std2N.mtp(tmpRt.y);
-	//pt3 s2x = sideN.mtp(tmpRt.x);
-
-	//// 上下方向回転
-	//tmpRt = pt2(0, 1);
-	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.y, 1);
-	//pt3 s1z = std1N.mtp(tmpRt.y);
-	//pt3 s1y = std2N.mtp(tmpRt.x);
-	//pt3 s2z = s2y.mtp(tmpRt.x * -1);
-	//s2y = std2N.mtp(pt3::dot(std2N, s2y)).mtp(tmpRt.y);
-
-	//// 左右方向回転
-	//tmpRt = pt2(0, 1);
-	//tudeRst(&tmpRt.x, &tmpRt.y, curObj->rot.x, 1);
-	//pt3 s1x = sideN.mtp(pt3::dot(std2N, s1y)).mtp(tmpRt.x);
-	//s1y = s1y.mtp(tmpRt.y);
-	//pt3 s2xy = s2x.pls(s2y);
-	//pt3 s2xySd = pt3()
-	//	.pls(sideN.mtp(pt3::dot(std2N, s2y)))
-	//	.pls(std2N.mtp(pt3::dot(sideN, s2x) * -1));
-	//pt3 s2xy1 = s2xy.mtp(tmpRt.y);
-	//pt3 s2xy2 = s2xySd.mtp(tmpRt.x);
-
-	//// set result
-	//pt3 newStd1N = s1x.pls(s1y).pls(s1z);
-	//pt3 newStd2N = s2xy1.pls(s2xy2).pls(s2z);
-	//pt3 newSideN = pt3::cross(std2N, std1N);
 	if (isHmd)
 	{
 		std1N = newStd1N;
@@ -1497,21 +1615,59 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 }
 
 
+//// 相対位置計算 H3
+//void engine3d::ClcRelaivePosH3(double* cmrStd)
+//{
+//	object3d* plrObj = &objs[PLR_No];
+//	pt3 plrLoc = plrObj->loc;
+//
+//	// プレイヤーstd算出
+//	object3d plrCpy(*plrObj);	// コピー
+//	plrCpy.ParallelMove(plrCpy.loc, false);	// 原点に移動
+//	double rotOn[3];
+//	plrCpy.clcStd(plrCpy.std[0], plrCpy.std[1], rotOn);
+//
+//
+//	// 各obj位置ををプレイヤーからの相対位置に
+//	for (int h = -5; h < OBJ_QTY; h++)
+//	{
+//		object3d* curObj = GetObject(h);
+//		if (!curObj->used) continue;
+//
+//		// 軌跡
+//		if (curObj == &markObj)
+//		{
+//			for (int i = 0; i < markObjSubLen; i++)
+//			{
+//				curObj = &markObjSub[i];
+//				if(curObj->used)
+//					ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
+//			}
+//		}
+//		// その他
+//		else
+//		{
+//			bool isPlayer = (BWH_QTY <= h && h < BWH_QTY + PLR_QTY);
+//			ClcRelaivePosH3_i(curObj, isPlayer, plrLoc, rotOn);
+//		}
+//
+//	}
+//}
+
+
 // 相対位置計算 H3
 void engine3d::ClcRelaivePosH3(double* cmrStd)
 {
-	object3d* plrObj = &objs[PLR_No];
-	pt3 plrLoc = plrObj->loc;
+	object3d kPlrObj = objs[PLR_No].HalfSpace2Klein();
 
 	// プレイヤーstd算出
-	object3d plrCpy(*plrObj);	// コピー
-	plrCpy.ParallelMove(plrCpy.loc, false);	// 原点に移動
 	double rotOn[3];
-	plrCpy.clcStd(plrCpy.std[0], plrCpy.std[1], rotOn);
+	kPlrObj.clcStd(kPlrObj.std[0], kPlrObj.std[1], rotOn);
 
 
 	// 各obj位置ををプレイヤーからの相対位置に
-	for (int h = -5; h < OBJ_QTY; h++)
+	//for (int h = -5; h < OBJ_QTY; h++)
+	for (int h = 0; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;
@@ -1519,68 +1675,131 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		// 軌跡
 		if (curObj == &markObj)
 		{
-			for (int i = 0; i < markObjSubLen; i++)
-			{
-				curObj = &markObjSub[i];
-				if(curObj->used)
-					ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
-			}
+			//for (int i = 0; i < markObjSubLen; i++)
+			//{
+			//	curObj = &markObjSub[i];
+			//	if(curObj->used)
+			//		ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
+			//}
 		}
 		// その他
 		else
 		{
 			bool isPlayer = (BWH_QTY <= h && h < BWH_QTY + PLR_QTY);
-			ClcRelaivePosH3_i(curObj, isPlayer, plrLoc, rotOn);
+			ClcRelaivePosH3_i(curObj, isPlayer, rotOn);
 		}
 
 	}
 }
 
+//void engine3d::ClcRelaivePosH3_i(object3d* curObj, bool isPlayer, pt3 plrLoc, double* rotOn)
+//{
+//	//プレイヤー中心の平行移動 原点へ
+//	curObj->ParallelMove(plrLoc, false);
+//
+//	// 有効範囲チェック
+//	double cLocLen = pyth3(curObj->loc);
+//	if (cLocLen > H3_MAX_RADIUS)
+//	{
+//		// プレイヤーの場合範囲内に留める
+//		if (isPlayer)
+//		{
+//			if (h3objLoop)
+//				curObj->DealH3OohObj(h3objLoop);
+//			else
+//			{
+//				pt3 adjLoc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
+//				curObj->ParallelMove(curObj->loc, false);
+//				curObj->ParallelMove(adjLoc, true);
+//			}
+//		}
+//		else
+//			curObj->DealH3OohObj(h3objLoop);
+//	}
+//
+//	// プレイヤーの回転リセット
+//	tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[0], 0);
+//	tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[0], 0);
+//	tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[0], 0);
+//
+//	tudeRst(&curObj->loc.y, &curObj->loc.z, rotOn[1], 0);
+//	tudeRst(&curObj->std[0].y, &curObj->std[0].z, rotOn[1], 0);
+//	tudeRst(&curObj->std[1].y, &curObj->std[1].z, rotOn[1], 0);
+//
+//	tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[2], 0);
+//	tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[2], 0);
+//	tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
+//
+//	//-- 後方カメラなら
+//	object3d viewObj(*curObj);
+//	if (ope.cmBack) {
+//		tudeRst(&viewObj.loc.x, &viewObj.loc.z, PI, 1);
+//		tudeRst(&viewObj.std[0].x, &viewObj.std[0].z, PI, 1);
+//		tudeRst(&viewObj.std[1].x, &viewObj.std[1].z, PI, 1);
+//	}
+//	// VR
+//	if (!ope.vrDev[0].std[0].isZero())
+//	{
+//		double cmLcX = ope.VREysDst * (2 / radius);	// why *2?
+//		double eucW = object3d::ClcEucFromHypb(cmLcX);
+//
+//		// 有効範囲チェック
+//		if (cmLcX > 0.0000000001 && eucW < H3_MAX_RADIUS)
+//			viewObj.ParallelMove(pt3(eucW, 0, 0), false);
+//	}
+//	curObj->locr = viewObj.loc;
+//	viewObj.ParallelMove(viewObj.loc, false);
+//
+//	// std算出、調整、保存
+//	pt3 locOld = curObj->loc;
+//	curObj->ParallelMove(curObj->loc, false);
+//	double objStd[3];
+//	curObj->clcStd(viewObj.std[0], viewObj.std[1], objStd);
+//	curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
+//
+//	// std調整
+//	curObj->OptimStd();
+//
+//	// 元の位置に戻す
+//	curObj->ParallelMove(locOld, true);
+//}
 
-void engine3d::ClcRelaivePosH3_i(object3d* curObj, bool isPlayer, pt3 plrLoc, double*rotOn)
+
+void engine3d::ClcRelaivePosH3_i(object3d* curObj, bool isPlayer, double*rotOn)
 {
 	//プレイヤー中心の平行移動 原点へ
-	curObj->ParallelMove(plrLoc, false);
+	object3d kleinObj = curObj->HalfSpace2Klein(&objs[PLR_No]);
+
 
 	// 有効範囲チェック
-	double cLocLen = pyth3(curObj->loc);
-	if (cLocLen > H3_MAX_RADIUS)
+	double cLocLen = pyth3(kleinObj.loc);
+	if (isnan(cLocLen) || isinf(cLocLen) || cLocLen > H3_VIEW_MAX_RADIUS)
 	{
-		// プレイヤーの場合範囲内に留める
-		if (isPlayer)
-		{
-			if (h3objLoop)
-				curObj->DealH3OohObj(h3objLoop);
-			else
-			{
-				pt3 adjLoc = curObj->loc.mtp(H3_MAX_RADIUS / cLocLen);
-				curObj->ParallelMove(curObj->loc, false);
-				curObj->ParallelMove(adjLoc, true);
-			}
-		}
-		else
-			curObj->DealH3OohObj(h3objLoop);
+		curObj->locr.x =
+		curObj->locr.y =
+		curObj->locr.z = std::numeric_limits<double>::quiet_NaN();
+
+		return;
 	}
 
 	// プレイヤーの回転リセット
-	tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[0], 0);
-	tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[0], 0);
-	tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[0], 0);
+	tudeRst(&kleinObj.loc.x, &kleinObj.loc.y, rotOn[0], 0);
+	tudeRst(&kleinObj.std[0].x, &kleinObj.std[0].y, rotOn[0], 0);
+	tudeRst(&kleinObj.std[1].x, &kleinObj.std[1].y, rotOn[0], 0);
 
-	tudeRst(&curObj->loc.y, &curObj->loc.z, rotOn[1], 0);
-	tudeRst(&curObj->std[0].y, &curObj->std[0].z, rotOn[1], 0);
-	tudeRst(&curObj->std[1].y, &curObj->std[1].z, rotOn[1], 0);
+	tudeRst(&kleinObj.loc.y, &kleinObj.loc.z, rotOn[1], 0);
+	tudeRst(&kleinObj.std[0].y, &kleinObj.std[0].z, rotOn[1], 0);
+	tudeRst(&kleinObj.std[1].y, &kleinObj.std[1].z, rotOn[1], 0);
 
-	tudeRst(&curObj->loc.x, &curObj->loc.y, rotOn[2], 0);
-	tudeRst(&curObj->std[0].x, &curObj->std[0].y, rotOn[2], 0);
-	tudeRst(&curObj->std[1].x, &curObj->std[1].y, rotOn[2], 0);
+	tudeRst(&kleinObj.loc.x, &kleinObj.loc.y, rotOn[2], 0);
+	tudeRst(&kleinObj.std[0].x, &kleinObj.std[0].y, rotOn[2], 0);
+	tudeRst(&kleinObj.std[1].x, &kleinObj.std[1].y, rotOn[2], 0);
 
 	//-- 後方カメラなら
-	object3d viewObj(*curObj);
 	if (ope.cmBack) {
-		tudeRst(&viewObj.loc.x, &viewObj.loc.z, PI, 1);
-		tudeRst(&viewObj.std[0].x, &viewObj.std[0].z, PI, 1);
-		tudeRst(&viewObj.std[1].x, &viewObj.std[1].z, PI, 1);
+		tudeRst(&kleinObj.loc.x, &kleinObj.loc.z, PI, 1);
+		tudeRst(&kleinObj.std[0].x, &kleinObj.std[0].z, PI, 1);
+		tudeRst(&kleinObj.std[1].x, &kleinObj.std[1].z, PI, 1);
 	}
 	// VR
 	if (!ope.vrDev[0].std[0].isZero())
@@ -1590,23 +1809,15 @@ void engine3d::ClcRelaivePosH3_i(object3d* curObj, bool isPlayer, pt3 plrLoc, do
 
 		// 有効範囲チェック
 		if (cmLcX > 0.0000000001 && eucW < H3_MAX_RADIUS)
-			viewObj.ParallelMove(pt3(eucW, 0, 0), false);
+			kleinObj.ParallelMove(pt3(eucW, 0, 0), false);
 	}
-	curObj->locr = viewObj.loc;
-	viewObj.ParallelMove(viewObj.loc, false);
+	curObj->locr = kleinObj.loc;
 
 	// std算出、調整、保存
-	pt3 locOld = curObj->loc;
-	curObj->ParallelMove(curObj->loc, false);
+	kleinObj.ParallelMove(kleinObj.loc, false);
 	double objStd[3];
-	curObj->clcStd(viewObj.std[0], viewObj.std[1], objStd);
+	kleinObj.clcStd(kleinObj.std[0], kleinObj.std[1], objStd);
 	curObj->objStd.asg(objStd[0], objStd[1], objStd[2]);
-
-	// std調整
-	curObj->OptimStd();
-
-	// 元の位置に戻す
-	curObj->ParallelMove(locOld, true);
 }
 
 
@@ -1634,33 +1845,37 @@ object3d* engine3d::GetObject(int idx)
 void engine3d::ClcCoordinate()
 {
 	if (viewTrackIdx < 0)
-		return;
-
-	object3d* baseObj = objs + viewTrackIdx;
-	if (!baseObj->used)
 	{
-		cmCo = pt3(0, 0, 0);
-		return;
+		cmCo = objs[PLR_No].loc;
 	}
+	else
+	{
+		object3d* baseObj = objs + viewTrackIdx;
+		if (!baseObj->used)
+		{
+			cmCo = pt3(0, 0, 0);
+			return;
+		}
 
-	pt3 baseLoc = baseObj->loc;
-	object3d* plrObj = &objs[PLR_No];
+		pt3 baseLoc = baseObj->loc;
+		object3d* plrObj = &objs[PLR_No];
 
-	object3d plrCpy(*plrObj);	// コピー
-	object3d baseCpy(*baseObj);	// コピー
-	plrCpy.ParallelMove(baseLoc, false);	// 原点に移動
-	baseCpy.ParallelMove(baseLoc, false);	// 原点に移動
-	double rotOn[3];
-	baseCpy.clcStd(baseCpy.std[0], baseCpy.std[1], rotOn);
-	// 回転をリセット
-	tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[0], 0);
-	tudeRst(&plrCpy.loc.y, &plrCpy.loc.z, rotOn[1], 0);
-	tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[2], 0);
+		object3d plrCpy(*plrObj);	// コピー
+		object3d baseCpy(*baseObj);	// コピー
+		plrCpy.ParallelMove(baseLoc, false);	// 原点に移動
+		baseCpy.ParallelMove(baseLoc, false);	// 原点に移動
+		double rotOn[3];
+		baseCpy.clcStd(baseCpy.std[0], baseCpy.std[1], rotOn);
+		// 回転をリセット
+		tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[0], 0);
+		tudeRst(&plrCpy.loc.y, &plrCpy.loc.z, rotOn[1], 0);
 
-	// 結果を格納
-	cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc)) * radius;
-	cmCo.y = atan2(plrCpy.loc.x, plrCpy.loc.y);
-	cmCo.z = atan2(pyth2(plrCpy.loc.x, plrCpy.loc.y), plrCpy.loc.z);
+		// 結果を格納
+		cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc)) * radius;
+		cmCo.y = atan2(plrCpy.loc.x, plrCpy.loc.y);
+		cmCo.z = atan2(pyth2(plrCpy.loc.x, plrCpy.loc.y), plrCpy.loc.z);
+		tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[2], 0);
+	}
 }
 
 
@@ -1782,11 +1997,11 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	///-- 共通
 	for (h = 0; h < OBJ_QTY; h++) 
 	{
-		objs[h].markInitH3(radius);
+		object3d* currObj = &objs[h];
+		currObj->markInitH3(radius);
 
 		// convert klein coords to half space coords.
-		//objs[h].Klein2HalfSpace();
-
+		currObj->Klein2HalfSpace(currObj, &pt3(0, 0, 0));
 	}
 
 
@@ -2287,6 +2502,9 @@ void engine3d::shoot()
 				objs[i].loc = objs[PLR_No].loc;
 				objs[i].std[0] = objs[PLR_No].std[0];
 				objs[i].std[1] = objs[PLR_No].std[1];
+				objs[i].area = objs[PLR_No].area;
+				objs[i].stdRefCnt = objs[PLR_No].stdRefCnt;
+
 				if (worldGeo == WorldGeo::SPHERICAL)
 					objs[i].lspX = pt4(SPEED_MAX, objs[PLR_No].std[0]);
 				else

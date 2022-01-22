@@ -295,7 +295,7 @@ bool VR_Manager::MainLoop(bool retryCreate)
             }
 
             // Render Scene to Eye Buffers
-            for (int eye = 0; eye < 2; ++eye)
+            for (unsigned int eye = 0; eye < 2; ++eye)
             {
                 // Switch to eye render target
                 eyeRenderTexture[eye]->SetAndClearRenderSurface();

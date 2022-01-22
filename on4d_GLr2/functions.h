@@ -10,6 +10,7 @@ double pyth4(pt4 pts);
 double pyth4Sq(pt4 pts);
 double pyth3OS(pt3 pts, double hLen = 1);	// ‘Î•Ó(Î•Ó‚Å‚È‚¢•û)‚Ì’·‚³
 double powi(double, int);
+int powi(int, unsigned int);
 int log_floor(double, double);
 //=====¥’l‚Ì’²®
 void degAdj(pt4* pt2, pt4* pt1, char mode);

@@ -87,8 +87,8 @@ public:
 	static pt3 object3d::MapFromSphere2Flat(pt4);
 	static pt3 object3d::Klein2HalfSpace(pt3);
 	static pt3 object3d::HalfSpace2Klein(pt3);
-	void object3d::Klein2HalfSpace(const object3d*);
-	object3d object3d::HalfSpace2Klein(pt3i* = nullptr, pt3 = pt3(0, 0, 0));
+	void object3d::Klein2HalfSpace(const object3d*, pt3* = nullptr);
+	object3d object3d::HalfSpace2Klein(object3d* = nullptr);
 	bool TrackObjDirection(object3d*);
 	bool TrackObjDirectionHead(object3d*);
 	double GetDistance(object3d*);
