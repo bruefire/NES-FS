@@ -349,17 +349,45 @@ void object3d::Klein2HalfSpace(
 	tStd1 = ClcLocFromAreaOrigin(*baseLoc, tStd1);
 	tStd2 = ClcLocFromAreaOrigin(*baseLoc, tStd2);
 
+	// todo§ エリアidxオーバーフローを考慮
 	// オブジェクトをエリア分け
 	const unsigned int imRatio_i = owner->H3_HALF_SPACE_AREA_IM_RATE;
 	const double imRatio = (double)imRatio_i;
-
 	int imIdx = log_floor(imRatio, tLoc.x);
+
+	// update area number.
+	if (imIdx > 0)
+	{
+		const int div = powi(imRatio_i, (unsigned int)imIdx);
+		auto AdjustCoord = [imRatio](int areaIdx, int div)
+		{
+			int rest = areaIdx % div;
+			return rest
+				? -(double)rest * imRatio
+				: 0.0;
+		};
+		pt3 adjCoord = pt3(0, 
+			AdjustCoord(this->area.y, div),
+			AdjustCoord(this->area.z, div));
+		tLoc = tLoc.mns(adjCoord);
+		tStd1 = tStd1.mns(adjCoord);
+		tStd2 = tStd2.mns(adjCoord);
+		this->area.y /= div;
+		this->area.z /= div;
+	}
+	else if(imIdx < 0)
+	{
+		const int mul = powi(imRatio_i, (unsigned int)-imIdx);
+		this->area.y *= mul;
+		this->area.z *= mul;
+	}
+
 	double imHeight = powi(imRatio, imIdx);
 	double reSpan = imHeight * imRatio;
 	int yIdx = std::floor(tLoc.y / reSpan);
 	int zIdx = std::floor(tLoc.z / reSpan);
 
-	// todo§ エリアidxオーバーフローを考慮
+	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
 
 	// update coords in the area
 	auto ClcNextLoc = [imRatio, imHeight, reSpan, yIdx, zIdx](pt3 tLoc)
@@ -372,21 +400,6 @@ void object3d::Klein2HalfSpace(
 	this->loc = ClcNextLoc(tLoc);
 	this->std[0] = ClcNextLoc(tStd1);
 	this->std[1] = ClcNextLoc(tStd2);
-
-	// update area number.
-	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
-	if (imIdx > 0)
-	{
-		const int div = powi(imRatio_i, imIdx);
-		this->area.y /= div;
-		this->area.z /= div;
-	}
-	else if(imIdx < 0)
-	{
-		const int mul = powi(imRatio_i, -imIdx);
-		this->area.y *= mul;
-		this->area.z *= mul;
-	}
 }
 
 
