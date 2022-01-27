@@ -325,11 +325,11 @@ pt3 object3d::HalfSpace2Klein(pt3 tmpt)
 /// <summary>
 /// map it from klein to half-space.
 /// </summary>
-void object3d::Klein2HalfSpace(
+bool object3d::Klein2HalfSpace(
 	const object3d* obj, pt3* baseLoc)
 {
 	if (!obj)
-		return;
+		return false;
 
 	if (!baseLoc)
 		baseLoc = &this->loc;
@@ -349,13 +349,14 @@ void object3d::Klein2HalfSpace(
 	tStd1 = ClcLocFromAreaOrigin(*baseLoc, tStd1);
 	tStd2 = ClcLocFromAreaOrigin(*baseLoc, tStd2);
 
-	// todo§ エリアidxオーバーフローを考慮
 	// オブジェクトをエリア分け
 	const unsigned int imRatio_i = owner->H3_HALF_SPACE_AREA_IM_RATE;
 	const double imRatio = (double)imRatio_i;
 	int imIdx = log_floor(imRatio, tLoc.x);
 
 	// update area number.
+	long long tAreaY = this->area.y;
+	long long tAreaZ = this->area.z;
 	if (imIdx > 0)
 	{
 		const int div = powi(imRatio_i, (unsigned int)imIdx);
@@ -372,14 +373,14 @@ void object3d::Klein2HalfSpace(
 		tLoc = tLoc.mns(adjCoord);
 		tStd1 = tStd1.mns(adjCoord);
 		tStd2 = tStd2.mns(adjCoord);
-		this->area.y /= div;
-		this->area.z /= div;
+		tAreaY /= div;
+		tAreaZ /= div;
 	}
 	else if(imIdx < 0)
 	{
 		const int mul = powi(imRatio_i, (unsigned int)-imIdx);
-		this->area.y *= mul;
-		this->area.z *= mul;
+		tAreaY *= mul;
+		tAreaZ *= mul;
 	}
 
 	double imHeight = powi(imRatio, imIdx);
@@ -387,7 +388,16 @@ void object3d::Klein2HalfSpace(
 	int yIdx = std::floor(tLoc.y / reSpan);
 	int zIdx = std::floor(tLoc.z / reSpan);
 
-	this->area = this->area.pls(pt3i(imIdx, yIdx, zIdx));
+	if ((long long)this->area.x + imIdx < numeric_limits<int>::min()
+		|| (long long)tAreaY + yIdx < numeric_limits<int>::min()
+		|| (long long)tAreaZ + zIdx < numeric_limits<int>::min()
+		|| numeric_limits<int>::max() < (long long)this->area.x + imIdx
+		|| numeric_limits<int>::max() < (long long)tAreaY + yIdx
+		|| numeric_limits<int>::max() < (long long)tAreaZ + zIdx)
+		return false;
+
+	this->area = pt3i(this->area.x, tAreaY, tAreaZ)
+		.pls(pt3i(imIdx, yIdx, zIdx));
 
 	// update coords in the area
 	auto ClcNextLoc = [imRatio, imHeight, reSpan, yIdx, zIdx](pt3 tLoc)
@@ -400,6 +410,8 @@ void object3d::Klein2HalfSpace(
 	this->loc = ClcNextLoc(tLoc);
 	this->std[0] = ClcNextLoc(tStd1);
 	this->std[1] = ClcNextLoc(tStd2);
+
+	return true;
 }
 
 
@@ -426,16 +438,27 @@ object3d object3d::HalfSpace2Klein(object3d* baseObj)
 	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
 
 	int relXIdx = this->area.x - baseArea->x;
+	int mul = powi(imRatio, abs(relXIdx));
 	double imHeight = powi(imRatio, relXIdx);
 	double reSpan = imHeight * imRatio;
 
-	// todo§ 計算誤差の少ない方法に変更 §
+	// calculate relative location from base
 	double relXp = (imHeight + imHeight * this->loc.x);
-	double relY = (this->area.y * reSpan + this->loc.y * imHeight) 
-					- (baseArea->y * imRatio + baseLoc.y * 1.0);
-	double relZ = (this->area.z * reSpan + this->loc.z * imHeight)
-					- (baseArea->z * imRatio + baseLoc.z * 1.0);
-	
+	double relY, relZ;
+	if (relXIdx > 0)
+	{
+		relY = ((long long)this->area.y * mul - baseArea->y) * imRatio
+			+ this->loc.y * imHeight - baseLoc.y;
+		relZ = ((long long)this->area.z * mul - baseArea->z) * imRatio
+			+ this->loc.z * imHeight - baseLoc.z;
+	}
+	else
+	{
+		relY = ((long long)this->area.y - baseArea->y * mul) * reSpan
+			+ this->loc.y * imHeight - baseLoc.y;
+		relZ = ((long long)this->area.z - baseArea->z * mul) * reSpan
+			+ this->loc.z * imHeight - baseLoc.z;
+	}
 	pt3 relLoc = pt3(relXp, relY, relZ)
 		.mtp(1.0 / (1.0 + baseLoc.x));
 
@@ -1313,6 +1336,9 @@ void object3d::objInitH3(int meshIdx)
 
 	init_stdH3(false);	//-- 角度標準の設定
 	mkLspX_H3(pt4(0, std[0].x, std[0].y, std[0].z));
+
+	area = pt3i(0, 0, 0);
+	Klein2HalfSpace(this, &pt3(0, 0, 0));
 
 	polObj = false;
 	//used = true;

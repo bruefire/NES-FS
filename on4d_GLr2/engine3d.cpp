@@ -21,7 +21,7 @@ using namespace std::chrono;
 
 engine3d::engine3d()
 	: BWH_QTY(1)	// 軸
-	, PLR_QTY(1)	// プレイヤー
+	, PLR_QTY(10)	// プレイヤー
 	, ENR_QTY(500)	// 隕石()
 	, OBJ_QTY(BWH_QTY + PLR_QTY + ENR_QTY)
 	, EFE_QTY(1)	// エフェクト(飾り/相互関係なし)
@@ -58,7 +58,7 @@ engine3d::engine3d()
 	, selectedIdx(-1)
 	, H3_MAX_RADIUS(0.999995) // 双曲長で約12.9	//=0.995 約6.0
 	, H3_REF_RADIUS(0.999995) // 双曲長で約??.?	//=0.999 約7.7
-	, H3_VIEW_MAX_RADIUS(0.9999995)
+	, H3_VIEW_MAX_RADIUS(0.9999999)
 	, h3objLoop(true)
 	, H3_HALF_SPACE_AREA_IM_RATE(2)
 	, viewTrackIdx(-1)
@@ -781,7 +781,7 @@ void engine3d::UpdFloatObjsH3()
 	if (!obMove) return;
 
 	//-----------オブジェクトごとの速度更新----------//
-	for (int h = 0; h < OBJ_QTY; h++)
+	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = objs + h;
 		if (!curObj->used) continue;
@@ -806,7 +806,7 @@ void engine3d::UpdFloatObjsH3()
 
 			// check that the object destination is within the moving limit.
 			double drcDst = pyth3(drc);
-			if (drcDst < H3_MAX_RADIUS)
+			if (drcDst > H3_MAX_RADIUS)
 				drc = drc.mtp(H3_MAX_RADIUS / drcDst);
 
 			kleinObj.ParallelMove(drc, true);
@@ -1932,7 +1932,6 @@ int engine3d::InitH3()	// 双曲世界用初期化
 
 	markObj.objInitH3(0);
 	markObj.loc = pt3(0, 0, 0);	//-- 位置
-	markObj.init_stdH3(false);	//-- 角度標準の設定
 	markObj.mesh = &markMesh;
 	markObj.draw = 1;
 	markObj.used = false;	//-- 有効化
@@ -1943,7 +1942,6 @@ int engine3d::InitH3()	// 双曲世界用初期化
 
 		markObjSub[i].objInitH3(0);
 		markObjSub[i].loc = pt3(0, 0, 0);
-		markObjSub[i].init_stdH3(false);
 		markObjSub[i].mesh = &markMesh;
 		markObjSub[i].draw = 0;
 		markObjSub[i].used = false;	//-- 有効化
@@ -1960,7 +1958,6 @@ int engine3d::InitH3()	// 双曲世界用初期化
 		objs[h].objInitH3(0);
 		objs[h].draw = 0;
 		objs[h].scale = 0.5 * radius;
-		objs[h].init_stdH3(0);	//-- std
 		objs[h].used = true;	//-- 有効化
 	}
 
@@ -1976,9 +1973,11 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	// ランダムな位置
 	RandLocH3(RandMode::Uniform, ObjType::Player);
 	// 一期は中心に
+	objs[BWH_QTY].area = pt3i(0, 0, 0);
 	objs[BWH_QTY].loc = pt3(0, 0, 0);
 	objs[BWH_QTY].init_stdH3(0);
 	objs[BWH_QTY].lspX.asgPt3(pt3(0, 0, H3_STD_LEN));
+	objs[BWH_QTY].Klein2HalfSpace(&objs[BWH_QTY], &pt3(0, 0, 0));
 
 	///-- 放出オブジェクト ------
 	for (h; h < BWH_QTY + PLR_QTY + ENR_QTY; h++)
@@ -1999,9 +1998,6 @@ int engine3d::InitH3()	// 双曲世界用初期化
 	{
 		object3d* currObj = &objs[h];
 		currObj->markInitH3(radius);
-
-		// convert klein coords to half space coords.
-		currObj->Klein2HalfSpace(currObj, &pt3(0, 0, 0));
 	}
 
 
@@ -2127,13 +2123,13 @@ void engine3d::RandLoc(engine3d::RandMode mode, int qty)
 			? bgn + qty
 			: OBJ_QTY;
 
-		for (int h = bgn; h < end; h++)
-		{
-			objs[h].loc = plrObj->loc;
-			objs[h].std[0] = plrObj->std[0];
-			objs[h].std[1] = plrObj->std[1];
-			objs[h].lspX.asgPt3(pt3(0, 0, H3_STD_LEN));
-		}
+		//for (int h = bgn; h < end; h++)
+		//{
+		//	objs[h].loc = plrObj->loc;
+		//	objs[h].std[0] = plrObj->std[0];
+		//	objs[h].std[1] = plrObj->std[1];
+		//	objs[h].lspX.asgPt3(pt3(0, 0, H3_STD_LEN));
+		//}
 		RandLocH3(mode, ObjType::Energy, qty);
 	}
 	else
@@ -2203,6 +2199,12 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType, int qty)
 	double maxRad = object3d::ClcHypbFromEuc(H3_MAX_RADIUS);
 	for (int h = bgn; h < end; h++)
 	{
+		objs[h].area = pt3i(0, 0, 0);
+		objs[h].loc = pt3(0, 0, 0);
+		objs[h].init_stdH3(0);
+		object3d kleinObj(objs[h]);
+		objs[h].Klein2HalfSpace(&kleinObj, &pt3(0, 0, 0));
+
 		pt3 eucPt;
 		if (mode == RandMode::Cluster) // 乱数 (極座標)
 		{
@@ -2233,8 +2235,8 @@ void engine3d::RandLocH3(engine3d::RandMode mode, ObjType oType, int qty)
 		}
 
 		// 結果を反映
-		objs[h].ParallelMove(eucPt, true);
-		objs[h].used = true;
+		kleinObj.ParallelMove(eucPt, true);
+		objs[h].used = objs[h].Klein2HalfSpace(&kleinObj, &pt3(0, 0, 0));
 	}
 }
 
