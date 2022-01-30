@@ -1093,7 +1093,6 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 
 	// move the object to the klein model origin.
 	object3d kleinObj = curObj->HalfSpace2Klein();
-	pt3 preLoc = kleinObj.loc;
 
 
 	//---> V‹K‰ñ“]‚Ì”½‰f
@@ -1102,31 +1101,38 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 	pt3 std2N = kleinObj.std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
-	if (!CheckTrackedEnable())
+	if (CheckTrackedEnable())
+	{
+		// ‘ÎÛƒIƒuƒWƒFƒNƒg•ûŒü‚ðŒü‚­
+		object3d trgObj = objs[viewTrackIdx].HalfSpace2Klein(curObj);
+		if (pyth3Sq(trgObj.loc) > 0)
+		{
+			double ip = pt3::dot(trgObj.loc, std1N);
+			pt3 rotvN = trgObj.loc.mns(std1N.mtp(ip)).norm(sideN);
+
+			double rpLen = pt3::dot(std2N, rotvN);
+			pt3 std2N_rp = rotvN.mtp(rpLen);
+			pt3 std2N_rs = std2N.mns(std2N_rp);
+
+			double temp = ip / pyth3(trgObj.loc);
+			if (temp < -1)
+				temp = -1;
+			else if (1 < temp)
+				temp = 1;
+			double rot = acos(temp);
+			object3d::RotVecs(&std1N, &rotvN, rot);			// ‘ÎÛ•ûŒü‚Ö‰ñ“]
+			std2N = std2N_rs.pls(rotvN.mtp(rpLen));
+
+			// Ž²•ûŒü‚Ì‰ñ“]
+			object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// ³–ÊŒÅ’è‰ñ“]
+		}
+	}
+	else
 	{
 		// Ž²•ûŒü‚Ì‰ñ“]
 		object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// ³–ÊŒÅ’è‰ñ“]
 		object3d::RotVecs(&std1N, &std2N, kleinObj.rot.y);	// ã‰º•ûŒü‰ñ“]
 		object3d::RotVecs(&std1N, &sideN, kleinObj.rot.x);	// ¶‰E•ûŒü‰ñ“]
-	}
-	else
-	{
-		// ‘ÎÛƒIƒuƒWƒFƒNƒg•ûŒü‚ðŒü‚­
-		object3d trgObj(objs[viewTrackIdx].HalfSpace2Klein(curObj));
-
-		trgObj.ParallelMove(preLoc, false);
-		pt3 rotvN = pt3(trgObj.loc.x, trgObj.loc.y, 0).norm(sideN);
-
-		double rpLen = pt3::dot(std2N, rotvN);
-		pt3 std2N_rp = rotvN.mtp(rpLen);
-		pt3 std2N_rs = std2N.mns(std2N_rp);
-
-		double rot = atan2(pyth2(trgObj.loc.x, trgObj.loc.y), trgObj.loc.z);
-		object3d::RotVecs(&std1N, &rotvN, rot);			// ‘ÎÛ•ûŒü‚Ö‰ñ“]
-		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
-
-		// Ž²•ûŒü‚Ì‰ñ“]
-		object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// ³–ÊŒÅ’è‰ñ“]
 	}
 
 	kleinObj.std[0] = std1N.mtp(H3_STD_LEN);

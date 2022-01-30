@@ -6,6 +6,7 @@ double pyth2(double x, double y);
 double pyth3(double x, double y, double z);
 double pyth4(double w, double x, double y, double z);
 double pyth3(pt3 pts);
+double pyth3Sq(pt3 pts);
 double pyth4(pt4 pts);
 double pyth4Sq(pt4 pts);
 double pyth3OS(pt3 pts, double hLen = 1);	// ‘Î•Ó(ŽÎ•Ó‚Å‚È‚¢•û)‚Ì’·‚³
