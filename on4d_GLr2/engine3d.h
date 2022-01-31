@@ -98,8 +98,6 @@ public:
 
 	object3d sun;		//if(on4D)‘¾—z
 	object3d markObj;	//‹OÕs
-	object3d* markObjSub;	//‹OÕs (H3)
-	int markObjSubLen;
 	mesh3d markMesh;	//‹OÕs
 
 	bool vrFlag;

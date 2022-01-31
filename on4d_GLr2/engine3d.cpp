@@ -50,8 +50,6 @@ engine3d::engine3d()
 	, SIN_1R(1.0 / SIN_1)
 	, sun(this)
 	, markObj(this)
-	, markObjSub(nullptr)
-	, markObjSubLen(0)
 	, vrMenuObj(this)
 	, worldGeo(WorldGeo::HYPERBOLIC)
 	, H3_STD_LEN(0.9)
@@ -289,7 +287,7 @@ int engine3d::dispose()
 	delete[] objs;
 	delete[] meshs;
 	delete[] meshNames;
-	delete[] markObjSub;
+	//delete[] markObjSub;
 
 	disposeFlg = true;
 
@@ -384,9 +382,26 @@ int engine3d::allocMesh()
 ///=============== >>>ループ(双曲空間)<<< ==================
 void engine3d::simulateH3()
 {
+	///-- 軌跡の更新 --
+	//for (int h = 0; h < OBJ_QTY; h++)
+	//{
+	//	object3d* curObj = &objs[h];
 
-	// 軌跡サブオブジェクト順更新
-	//UpdateTracingDataH3();
+	//	if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h)
+	//	{
+	//		for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
+	//			curObj->past[i] = curObj->past[i - 1];
+
+	//		curObj->past;
+
+	//		pt4 loc4 = curObj->tudeToEuc(curObj->loc);
+	//		pt3 tmpt;
+	//		tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
+	//		tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
+	//		tmpt.z = curObj->loc.z * radius;	//--距離(長さ)
+	//		curObj->past[0] = tmpt;
+	//	}
+	//}
 
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
@@ -427,38 +442,6 @@ void engine3d::simulateH3()
 
 void engine3d::UpdateTracingDataH3()
 {
-	if (!markObj.used || !obMove)
-		return;
-
-	for (int i = markObjSubLen - 1; 0 < i; i--)
-	{
-		markObjSub[i].loc = markObjSub[i - 1].loc;
-		markObjSub[i].std[0] = markObjSub[i - 1].std[0];
-		markObjSub[i].std[1] = markObjSub[i - 1].std[1];
-		markObjSub[i].used = markObjSub[i - 1].used;
-	}
-	markObjSub[0].loc = objs[PLR_No].loc;
-	markObjSub[0].std[0] = objs[PLR_No].std[0];
-	markObjSub[0].std[1] = objs[PLR_No].std[1];
-	markObjSub[0].used = true;
-
-	///-- 軌跡の更新 --
-	for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
-	{
-		object3d* curObj = objs + h;
-
-		if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h) {
-			for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
-				curObj->past[i] = curObj->past[i - 1];
-
-			pt3 loc = curObj->loc;
-			pt3 tmpt;
-			tmpt.x = atan2(loc.x, loc.z);		//--方向1
-			tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--方向2
-			tmpt.z = object3d::ClcHypbFromEuc(pyth3(loc)) * radius;	//--距離(長さ)
-			curObj->past[0] = tmpt;
-		}
-	}
 }
 
 void engine3d::UpdateBaseObjH3()
@@ -699,7 +682,8 @@ void engine3d::UpdFloatObjsS3()
 			curObj->rot = curObj->rot.pls(curObj->rsp.mtp(adjSpd));
 
 			///-- 軌跡の更新 --
-			if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h) {
+			if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h) 
+			{
 				for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
 					curObj->past[i] = curObj->past[i - 1];
 
@@ -1621,46 +1605,6 @@ void engine3d::ClcRelaivePosS3(double* cmrStd)
 }
 
 
-//// 相対位置計算 H3
-//void engine3d::ClcRelaivePosH3(double* cmrStd)
-//{
-//	object3d* plrObj = &objs[PLR_No];
-//	pt3 plrLoc = plrObj->loc;
-//
-//	// プレイヤーstd算出
-//	object3d plrCpy(*plrObj);	// コピー
-//	plrCpy.ParallelMove(plrCpy.loc, false);	// 原点に移動
-//	double rotOn[3];
-//	plrCpy.clcStd(plrCpy.std[0], plrCpy.std[1], rotOn);
-//
-//
-//	// 各obj位置ををプレイヤーからの相対位置に
-//	for (int h = -5; h < OBJ_QTY; h++)
-//	{
-//		object3d* curObj = GetObject(h);
-//		if (!curObj->used) continue;
-//
-//		// 軌跡
-//		if (curObj == &markObj)
-//		{
-//			for (int i = 0; i < markObjSubLen; i++)
-//			{
-//				curObj = &markObjSub[i];
-//				if(curObj->used)
-//					ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
-//			}
-//		}
-//		// その他
-//		else
-//		{
-//			bool isPlayer = (BWH_QTY <= h && h < BWH_QTY + PLR_QTY);
-//			ClcRelaivePosH3_i(curObj, isPlayer, plrLoc, rotOn);
-//		}
-//
-//	}
-//}
-
-
 // 相対位置計算 H3
 void engine3d::ClcRelaivePosH3(double* cmrStd)
 {
@@ -1678,18 +1622,6 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;
 
-		// 軌跡
-		if (curObj == &markObj)
-		{
-			//for (int i = 0; i < markObjSubLen; i++)
-			//{
-			//	curObj = &markObjSub[i];
-			//	if(curObj->used)
-			//		ClcRelaivePosH3_i(curObj, false, plrLoc, rotOn);
-			//}
-		}
-		// その他
-		else
 		{
 			bool isPlayer = (BWH_QTY <= h && h < BWH_QTY + PLR_QTY);
 			ClcRelaivePosH3_i(curObj, isPlayer, rotOn);
@@ -1932,28 +1864,12 @@ int engine3d::InitH3()	// 双曲世界用初期化
 
 	//-- 軌跡オブジェクト
 	// バッファ確保
-	markObjSubLen = object3d::PAST_QTY - 1;
-	markObjSub = new object3d[markObjSubLen];
-	markMesh.meshInitB(OBJ_QTY * markObjSubLen, (meshLen - 1) + 2, markObjSubLen);
-
+	markMesh.meshInitB(OBJ_QTY * (object3d::PAST_QTY - 1), (meshLen - 1) + 2);
 	markObj.objInitH3(0);
 	markObj.loc = pt3(0, 0, 0);	//-- 位置
 	markObj.mesh = &markMesh;
 	markObj.draw = 1;
-	markObj.used = false;	//-- 有効化
-
-	for (int i = 0; i < markObjSubLen; i++)
-	{
-		markObjSub[i].owner = this;
-
-		markObjSub[i].objInitH3(0);
-		markObjSub[i].loc = pt3(0, 0, 0);
-		markObjSub[i].mesh = &markMesh;
-		markObjSub[i].draw = 0;
-		markObjSub[i].used = false;	//-- 有効化
-
-		markObjSub[i].markInitH3(radius);
-	}
+	markObj.used = false;
 
 
 	// 最初に全部オブジェクトを用意

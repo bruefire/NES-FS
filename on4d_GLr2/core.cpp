@@ -456,11 +456,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				case UI_PAST:
 					newEngine->markObj.used = !newEngine->markObj.used;
-					if (!newEngine->markObj.used)
-					{
-						for (int i = 0; i < newEngine->markObjSubLen; i++)
-							newEngine->markObjSub[i].used = false;
-					}
+					//if (!newEngine->markObj.used)
+					//{
+					//	for (int i = 0; i < newEngine->markObjSubLen; i++)
+					//		newEngine->markObjSub[i].used = false;
+					//}
 					menuCheck2(hMenu, &menuItemInfo, UI_PAST);
 					break;
 

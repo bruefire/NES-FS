@@ -144,7 +144,7 @@ public:
 	uint32_t* texNames;
 	std::vector<uint32_t> shader;
 	int outMax;
-	uint32_t* h3trackBuf;
+	//uint32_t* h3trackBuf;
 
 	// コンストラクタ, デストラクタ
 	engine3dGL();
