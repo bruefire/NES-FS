@@ -144,6 +144,14 @@ void engine3dGL::SimulateH3GL()
 	//-- transfer tracing line data
 	if (markObj.used)
 	{
+		int trackLen = 24;
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[markMesh.texNo]);
+		glBufferData(	//---- pts“]‘—
+			GL_ARRAY_BUFFER,
+			markMesh.lLen * trackLen * sizeof(float),
+			markMesh.pts2,
+			GL_STATIC_DRAW
+		);
 	}
 
 	// •`‰æ“à—e‚Ì‰Šú‰»
@@ -494,17 +502,6 @@ int engine3dGL::DrawEachObjsH3(int loop)
 		if (!VIEW_PLR && BWH_QTY <= h && h < BWH_QTY + PLR_QTY) continue;
 		if (h == PLR_No) continue;
 
-		if (curObj == &markObj)
-		{
-			continue;
-			//for (int i = 0; i < markObjSubLen; i++)
-			//{
-			//	curObj = markObjSub + i;
-			//	if(curObj->used)
-			//		DrawObjectH3(curObj, h, loop, &h3trackBuf[i]);
-			//}
-		}
-		else
 		{
 			switch (curObj->mesh->symmType)
 			{

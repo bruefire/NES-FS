@@ -1306,37 +1306,71 @@ void engine3dGL::MakeTracingLinesS3()
 
 void engine3dGL::MakeTracingLinesH3()
 {
-	for (int h = 0; h < object3d::PAST_QTY - 1; h++)
+	if (!markObj.used)
+		return;
+
+	object3d* plrObj = &objs[PLR_No];
+	object3d kleinPlr = plrObj->HalfSpace2Klein();
+	pt3 std1N = kleinPlr.std[0].mtp(1 / H3_STD_LEN);
+	pt3 std2N = kleinPlr.std[1].mtp(1 / H3_STD_LEN);
+	pt3 sideN = pt3::cross(std2N, std1N);
+
+	double radius = this->radius;
+	auto test = [radius, plrObj, std1N, std2N, sideN](int i, object3d* curObj)
 	{
-		for (int i = 0; i < OBJ_QTY; i++)
+		// HACK
+		object3d curCpy = *curObj;
+		curCpy.loc = curObj->past[i];
+		curCpy.std[0] = curObj->past[i];
+		curCpy.std[1] = curObj->past[i];
+		curCpy.area = curObj->pastArea[i];
+		object3d kleinObj = curCpy.HalfSpace2Klein(plrObj);
+
+		pt3 loc = pt3(
+			pt3::dot(sideN, kleinObj.loc),
+			pt3::dot(std2N, kleinObj.loc),
+			pt3::dot(std1N, kleinObj.loc));
+
+		pt3 tmpt;
+		tmpt.x = atan2(loc.x, loc.z);		//--ï˚å¸1
+		tmpt.y = atan2(pyth2(loc.x, loc.z), loc.y);	//--ï˚å¸2
+		tmpt.z = object3d::ClcHypbFromEuc(pyth3(loc)) * radius;	//--ãóó£(í∑Ç≥)
+
+		return tmpt;
+	};
+
+	//-- ãOê’å`ê¨ --//
+	for (int h = 0; h < OBJ_QTY; h++) 
+	{
+		object3d* curObj = &objs[h];
+
+		pt3 tmpt[2];
+		tmpt[1] = test(0, curObj);
+
+		for (int i = 0; i < object3d::PAST_QTY - 1; i++) 
 		{
-			object3d* curObj = objs + i;
+			tmpt[0] = tmpt[1];
+			tmpt[1] = test(i + 1, curObj);
 
 			for (int j = 0; j < 2; j++)
 			{
-				int idx = (h * OBJ_QTY * 2 + i * 2 + j) * 12;
-				//if (!j || curObj->past[h].z < -1 || curObj->past[h + 1].z < -1)
-				if(1)
-				{
-					markMesh.pts2[idx + 0] = curObj->past[h].x;
-					markMesh.pts2[idx + 1] = curObj->past[h].y;
-					markMesh.pts2[idx + 2] = curObj->past[h].z;
-				}
-				else {
-					markMesh.pts2[idx + 0] = curObj->past[h + 1].x;
-					markMesh.pts2[idx + 1] = curObj->past[h + 1].y;
-					markMesh.pts2[idx + 2] = curObj->past[h + 1].z;
-				}
+
+				int idx = (h * (object3d::PAST_QTY - 1) * 2 + i * 2 + j) * 12;
+
+				markMesh.pts2[idx + 0] = tmpt[j].x;
+				markMesh.pts2[idx + 1] = tmpt[j].y;
+				markMesh.pts2[idx + 2] = tmpt[j].z;
+
 				markMesh.pts2[idx + 3] = 1.0;
 				markMesh.pts2[idx + 4] = 0;
-				markMesh.pts2[idx + 5] = (double)h / object3d::PAST_QTY;
+				markMesh.pts2[idx + 5] = (double)i / object3d::PAST_QTY;
 
-				markMesh.pts2[idx + 6] = curObj->past[h].x;
-				markMesh.pts2[idx + 7] = curObj->past[h].y;
-				markMesh.pts2[idx + 8] = curObj->past[h].z;
-				markMesh.pts2[idx + 9] = curObj->past[h + 1].x;
-				markMesh.pts2[idx + 10] = curObj->past[h + 1].y;
-				markMesh.pts2[idx + 11] = curObj->past[h + 1].z;
+				markMesh.pts2[idx + 6] = tmpt[0].x;
+				markMesh.pts2[idx + 7] = tmpt[0].y;
+				markMesh.pts2[idx + 8] = tmpt[0].z;
+				markMesh.pts2[idx + 9] =  tmpt[1].x;
+				markMesh.pts2[idx + 10] = tmpt[1].y;
+				markMesh.pts2[idx + 11] = tmpt[1].z;
 			}
 		}
 	}

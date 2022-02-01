@@ -21,6 +21,7 @@ public:
 	double scale;	//スケール
 	static int PAST_QTY;
 	pt3* past;	//軌跡
+	pt3i* pastArea;
 
 	pt3 ctr;		//中心(重心)
 	pt3 loc;		//位置

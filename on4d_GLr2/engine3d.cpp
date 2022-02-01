@@ -383,25 +383,18 @@ int engine3d::allocMesh()
 void engine3d::simulateH3()
 {
 	///-- 軌跡の更新 --
-	//for (int h = 0; h < OBJ_QTY; h++)
-	//{
-	//	object3d* curObj = &objs[h];
+	for (int h = 0; h < OBJ_QTY; h++)
+	{
+		object3d* curObj = &objs[h];
 
-	//	if (h < BWH_QTY || BWH_QTY + PLR_QTY <= h)
-	//	{
-	//		for (int i = object3d::PAST_QTY - 1; 0 < i; i--)
-	//			curObj->past[i] = curObj->past[i - 1];
-
-	//		curObj->past;
-
-	//		pt4 loc4 = curObj->tudeToEuc(curObj->loc);
-	//		pt3 tmpt;
-	//		tmpt.x = atan2(loc4.x, loc4.z);		//--方向1
-	//		tmpt.y = atan2(pyth2(loc4.x, loc4.z), loc4.y);	//--方向2
-	//		tmpt.z = curObj->loc.z * radius;	//--距離(長さ)
-	//		curObj->past[0] = tmpt;
-	//	}
-	//}
+		for (int i = object3d::PAST_QTY - 1; i > 0; i--)
+		{
+			curObj->past[i] = curObj->past[i - 1];
+			curObj->pastArea[i] = curObj->pastArea[i - 1];
+		}
+		curObj->past[0] = curObj->loc;
+		curObj->pastArea[0] = curObj->area;
+	}
 
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();

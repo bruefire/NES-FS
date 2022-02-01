@@ -61,8 +61,14 @@ object3d::object3d()
 {	//-- OBJ_コンストラクタ
 	used = false;
 	draw = 2;
-	past = new pt3[PAST_QTY];
 
+	past = new pt3[PAST_QTY];
+	pastArea = new pt3i[PAST_QTY];
+	for (int i = 0; i < PAST_QTY; i++)
+	{
+		past[i] = pt3(0,0,0);
+		pastArea[i] = pt3i(0,0,0);
+	}
 }
 object3d::object3d(engine3d* owner)
 	: object3d()
@@ -75,6 +81,7 @@ object3d::~object3d()
 		return;
 
 	delete[] past;
+	delete[] pastArea;
 }
 object3d::object3d(const object3d& obj)
 {
@@ -82,6 +89,7 @@ object3d::object3d(const object3d& obj)
 
 	copyFlg = true;
 	past = nullptr;
+	pastArea = nullptr;
 }
 
 // std調整 (事前にlocの原点移動が必要)
