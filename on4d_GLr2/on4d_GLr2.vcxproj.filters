@@ -343,6 +343,9 @@
     <ResourceCompile Include="randomUI.rc">
       <Filter>resource files\OS依存部%28Windows%29</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="chgPlayerLocH3.rc">
+      <Filter>resource files\OS依存部%28Windows%29</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="s3sim.ico">

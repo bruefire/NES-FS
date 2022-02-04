@@ -26,6 +26,7 @@
       <FileType>Text</FileType>
     </ResourceCompile>
     <None Include="shader/geo.c" />
+    <ResourceCompile Include="chgPlayerLocH3.rc" />
     <ResourceCompile Include="editor.rc" />
     <ResourceCompile Include="howTo.rc" />
     <ResourceCompile Include="info.rc">

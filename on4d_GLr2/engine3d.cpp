@@ -399,6 +399,9 @@ void engine3d::simulateH3()
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
 
+	// 
+	setObjPosH3();
+
 	// プレイヤーオブジェクト更新
 	UpdPlayerObjsH3(nullptr);
 
@@ -2235,6 +2238,32 @@ pt3 engine3d::randVec3(double r)
 	}
 
 	return rstPt;
+}
+
+/// <summary>
+/// move the player object location.
+/// </summary>
+/// <returns></returns>
+int engine3d::setObjPosH3()
+{
+	if (!mvObjFlg)
+		return 0;
+
+	object3d* curObj = objs + PLR_No;
+
+	curObj->loc = pt3(0, 0, 0);
+	curObj->std[0] = pt3(0, 0, H3_STD_LEN);
+	curObj->std[1] = pt3(0, H3_STD_LEN, 0);
+
+	pt3 tLoc = pt3(mvObjParam.loc.x * (H3_HALF_SPACE_AREA_IM_RATE - 1),
+		mvObjParam.loc.y * H3_HALF_SPACE_AREA_IM_RATE,
+		mvObjParam.loc.z * H3_HALF_SPACE_AREA_IM_RATE);
+
+	curObj->Klein2HalfSpace(curObj, &tLoc);
+	curObj->area = mvObjParam.area;
+
+	mvObjFlg = false;
+	return 1;
 }
 
 // オブジェクトの姿勢を動的に変更

@@ -121,6 +121,9 @@ public:
 	{
 		pt3 loc;
 		pt3 rot;
+		pt3i area;
+		MvObjParam()
+			: loc(), rot(), area() {};
 	}
 	mvObjParam;
 
@@ -175,6 +178,7 @@ public:
 	pt3 randVec3(double);
 	void all_cnvForce();	// 速度ベクトルから変換(存在する全て)
 	int setObjPos();		// オブジェクトの位置・回転を変更
+	int setObjPosH3();		// オブジェクトの位置・回転を変更
 	int InitMesh();
 	virtual mesh3d* GetMesh(int idx);
 	virtual int allocMesh();

@@ -27,6 +27,7 @@ INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK RandomRelocProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK howToDlgProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
+INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK EditorProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 INT_PTR CALLBACK ModObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp);
 
@@ -49,6 +50,7 @@ char* titleName = "超球面遊泳シミュレータ";	// ウィンドウタイトル
 HWND preWnd;
 HWND editDlg = nullptr;
 HWND modObjDlg = nullptr;
+HWND moveDlg = nullptr;
 char cmJD = 0;
 POINTS cm_rot[2] = {{}, {}};
 HMENU hpMenu;
@@ -600,8 +602,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					DialogBox(curInst, "HOWTO_DLG", preWnd, howToDlgProc); break;
 				case UI_INFO_DLG:
 					DialogBox(curInst, "INFO_DLG", preWnd, DialogProc); break;
+
 				case UI_CALL_MODLG:
-					DialogBox(curInst, "MOVE_OBJ_DLG", preWnd, moveObjProc); break;
+					if (!moveDlg)
+					{
+						if (newEngine->worldGeo == engine3d::WorldGeo::SPHERICAL)
+							moveDlg = CreateDialog(curInst, "MOVE_OBJ_DLG", preWnd, moveObjProc);
+						else if (newEngine->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
+							moveDlg = CreateDialog(curInst, "MOVE_OBJ_H3_DLG", preWnd, moveObjProcH3);
+						else
+							break;
+						ShowWindow(moveDlg, SW_NORMAL);
+					}
+					break;
+
 				case UI_CALL_SCRIPT:
 					if (editDlg == nullptr)
 					{
@@ -1300,12 +1314,11 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_COMMAND:
 			switch(LOWORD(wp)){
 			case IDOK:
-				EndDialog(hDlg, IDOK);
 				return true;
 
 			case IDCANCEL:
 				newEngine->mvObjFlg = false;
-				EndDialog(hDlg, IDOK);
+				DestroyWindow(moveDlg);
 				return true;
 
 
@@ -1314,7 +1327,7 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 			}
 		case WM_DESTROY:
-			EndDialog(hDlg, IDOK);
+			moveDlg = nullptr;
 			return true;
 
 		case WM_HSCROLL:
@@ -1375,6 +1388,185 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			} 
 			return true;
 		
+	}
+	return false;
+}
+
+// オブジェクト操作プロシージャ
+INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
+{
+	// スライダー変数
+	LONG_PTR sVal;
+	LONG_PTR sMin;
+	LONG_PTR sMax;
+	double sRst;
+	char txt[128];
+	pt3i area = newEngine->objs[newEngine->PLR_No].area;
+	double almost1 = 0.99999;
+
+	sMin = SendDlgItemMessage
+	(
+		hDlg,
+		MODLG_LON_SLIDER,
+		TBM_GETRANGEMIN,
+		NULL,
+		NULL
+	);
+	sMax = SendDlgItemMessage
+	(
+		hDlg,
+		MODLG_LON_SLIDER,
+		TBM_GETRANGEMAX,
+		NULL,
+		NULL
+	);
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		// 現在のloc・stdを取得してダイアログに反映
+		sVal = (int)((sRst = newEngine->objs[newEngine->PLR_No].loc.x / (newEngine->H3_HALF_SPACE_AREA_IM_RATE - 1)) * (sMax - sMin) + sMin);
+		if (sVal < sMin) sVal = sMin; else if (sMax < sVal) sVal = sMax;
+		SendDlgItemMessage(
+			hDlg,        // トラックバーのハンドル
+			MODLG_LON_SLIDER,
+			TBM_SETPOS,
+			true,
+			sVal
+		);
+		SetDlgItemText(hDlg, MODLG_LON_TXT, to_string((long double)sRst).c_str());
+
+		sVal = (int)((sRst = newEngine->objs[newEngine->PLR_No].loc.y / newEngine->H3_HALF_SPACE_AREA_IM_RATE) * (sMax - sMin) + sMin);
+		if (sVal < sMin) sVal = sMin; else if (sMax < sVal) sVal = sMax;
+		SendDlgItemMessage(
+			hDlg,        // トラックバーのハンドル
+			MODLG_LAT_SLIDER,
+			TBM_SETPOS,
+			true,
+			sVal
+		);
+		SetDlgItemText(hDlg, MODLG_LAT_TXT, to_string((long double)sRst).c_str());
+
+		sVal = (int)((sRst = newEngine->objs[newEngine->PLR_No].loc.z / newEngine->H3_HALF_SPACE_AREA_IM_RATE) * (sMax - sMin) + sMin);
+		if (sVal < sMin) sVal = sMin; else if (sMax < sVal) sVal = sMax;
+		SendDlgItemMessage(
+			hDlg,        // トラックバーのハンドル
+			MODLG_ALT_SLIDER,
+			TBM_SETPOS,
+			true,
+			sVal
+		);
+		SetDlgItemText(hDlg, MODLG_ALT_TXT, to_string((long double)sRst).c_str());
+
+		// set max values of area textboxes.
+		SendDlgItemMessage(hDlg, MODLG_AREA_X_SPIN, UDM_SETRANGE32, INT_MIN, INT_MAX);
+		SendDlgItemMessage(hDlg, MODLG_AREA_Y_SPIN, UDM_SETRANGE32, INT_MIN, INT_MAX);
+		SendDlgItemMessage(hDlg, MODLG_AREA_Z_SPIN, UDM_SETRANGE32, INT_MIN, INT_MAX);
+
+		newEngine->mvObjParam.loc.asg2(newEngine->objs[newEngine->PLR_No].loc);
+		//
+
+		newEngine->mvObjParam.rot.asg2(newEngine->objs[newEngine->PLR_No].std[0]);
+		//
+		{
+			pt3i area = newEngine->objs[newEngine->PLR_No].area;
+			SetDlgItemText(hDlg, MODLG_AREA_X_TXT, to_string(area.x).c_str());
+			sRst = newEngine->objs[newEngine->PLR_No].area.y;
+			SetDlgItemText(hDlg, MODLG_AREA_Y_TXT, to_string(area.y).c_str());
+			sRst = newEngine->objs[newEngine->PLR_No].area.z;
+			SetDlgItemText(hDlg, MODLG_AREA_Z_TXT, to_string(area.z).c_str());
+		}
+
+		return true;
+
+	case WM_COMMAND:
+		switch (LOWORD(wp)) {
+
+		case IDOK:
+			newEngine->mvObjFlg = true;
+			return true;
+
+		case IDCANCEL:
+			newEngine->mvObjFlg = false;
+			DestroyWindow(moveDlg);
+			return true;
+
+		case MODLG_AREA_X_SPIN:
+		case MODLG_AREA_Y_SPIN:
+		case MODLG_AREA_Z_SPIN:
+			return true;
+
+		case MODLG_AREA_X_TXT:
+			if (HIWORD(wp) == EN_CHANGE)
+			{
+				GetDlgItemText(hDlg, MODLG_AREA_X_TXT, txt, 128);
+				newEngine->mvObjParam.area.x = strtoll(txt, nullptr, 10);
+				newEngine->mvObjFlg = true;
+			}
+			return true;
+
+		case MODLG_AREA_Y_TXT:
+			if (HIWORD(wp) == EN_CHANGE)
+			{
+				GetDlgItemText(hDlg, MODLG_AREA_Y_TXT, txt, 128);
+				newEngine->mvObjParam.area.y = strtoll(txt, nullptr, 10);
+				newEngine->mvObjFlg = true;
+			}
+			return true;
+
+		case MODLG_AREA_Z_TXT:
+			if (HIWORD(wp) == EN_CHANGE)
+			{
+				GetDlgItemText(hDlg, MODLG_AREA_Z_TXT, txt, 128);
+				newEngine->mvObjParam.area.z = strtoll(txt, nullptr, 10);
+				newEngine->mvObjFlg = true;
+			}
+			return true;
+
+		default:
+			return true;
+
+		}
+	case WM_DESTROY:
+		moveDlg = nullptr;
+		return true;
+
+	case WM_HSCROLL:
+		if (lp != 0)
+		{
+			sVal = SendMessage(
+				(HWND)lp,        // トラックバーのハンドル
+				(UINT)TBM_GETPOS,
+				NULL,
+				NULL
+			);
+			// スライダー特定
+			int sliderID = GetDlgCtrlID((HWND)lp);
+
+			// スライダーに応じた処理
+			switch (sliderID)
+			{
+				// 位置
+			case MODLG_LON_SLIDER:
+				newEngine->mvObjParam.loc.x = sRst = std::min(((double)sVal - sMin) / ((double)sMax - sMin), almost1);
+				SetDlgItemText(hDlg, MODLG_LON_TXT, to_string((long double)sRst).c_str());
+				break;
+
+			case MODLG_LAT_SLIDER:
+				newEngine->mvObjParam.loc.y = sRst = std::min(((double)sVal - sMin) / ((double)sMax - sMin), almost1);
+				SetDlgItemText(hDlg, MODLG_LAT_TXT, to_string((long double)sRst).c_str());
+				break;
+
+			case MODLG_ALT_SLIDER:
+				newEngine->mvObjParam.loc.z = sRst = std::min(((double)sVal - sMin) / ((double)sMax - sMin), almost1);
+				SetDlgItemText(hDlg, MODLG_ALT_TXT, to_string((long double)sRst).c_str());
+				break;
+
+			}
+			newEngine->mvObjFlg = true;
+
+		}
+		return true;
+
 	}
 	return false;
 }
