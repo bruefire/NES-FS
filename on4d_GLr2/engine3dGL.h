@@ -97,6 +97,7 @@ public:
 	int DrawObjectH3(object3d*, int, int, uint32_t* = nullptr);
 	double GetAsp();
 	double clcRangeY(double rangeX);
+	void ClcCoordinate();
 	
 	void MakeCharVBO();
 	void DisposeCharVBO();

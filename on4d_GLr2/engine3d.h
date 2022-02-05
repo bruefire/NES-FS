@@ -149,7 +149,6 @@ public:
 	void HoldObjWithVRHand(bool);
 	void HoldObjWithVRHandS3(bool);
 	void HoldObjWithVRHandH3(bool);
-	void ClcCoordinate();
 	void UpdateBaseObjH3();
 	void UpdateTracingDataH3();
 	virtual void MakeTracingLines();

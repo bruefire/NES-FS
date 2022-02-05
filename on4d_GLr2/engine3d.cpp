@@ -408,9 +408,6 @@ void engine3d::simulateH3()
 	// 相対位置計算
 	ClcRelaivePosH3(nullptr);
 
-	// 基objとの相対位置計算 (表示座標)
-	ClcCoordinate();
-
 	// 12面体移動
 	UpdateBaseObjH3();
 
@@ -1549,44 +1546,6 @@ object3d* engine3d::GetObject(int idx)
 		return &sun;
 	default:
 		return objs + idx;
-	}
-}
-
-
-// 現プレイヤー座標計算
-void engine3d::ClcCoordinate()
-{
-	if (viewTrackIdx < 0)
-	{
-		cmCo = objs[PLR_No].loc;
-	}
-	else
-	{
-		object3d* baseObj = objs + viewTrackIdx;
-		if (!baseObj->used)
-		{
-			cmCo = pt3(0, 0, 0);
-			return;
-		}
-
-		pt3 baseLoc = baseObj->loc;
-		object3d* plrObj = &objs[PLR_No];
-
-		object3d plrCpy(*plrObj);	// コピー
-		object3d baseCpy(*baseObj);	// コピー
-		plrCpy.ParallelMove(baseLoc, false);	// 原点に移動
-		baseCpy.ParallelMove(baseLoc, false);	// 原点に移動
-		double rotOn[3];
-		baseCpy.clcStd(baseCpy.std[0], baseCpy.std[1], rotOn);
-		// 回転をリセット
-		tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[0], 0);
-		tudeRst(&plrCpy.loc.y, &plrCpy.loc.z, rotOn[1], 0);
-
-		// 結果を格納
-		cmCo.x = object3d::ClcHypbFromEuc(pyth3(plrCpy.loc)) * radius;
-		cmCo.y = atan2(plrCpy.loc.x, plrCpy.loc.y);
-		cmCo.z = atan2(pyth2(plrCpy.loc.x, plrCpy.loc.y), plrCpy.loc.z);
-		tudeRst(&plrCpy.loc.x, &plrCpy.loc.y, rotOn[2], 0);
 	}
 }
 

@@ -34,6 +34,12 @@ BEGIN
 			MENUITEM "Black", UI_BG_BK
 		END
 
+		POPUP "Coordinate"
+		BEGIN
+		MENUITEM "Polar", UI_LOC_TUDE
+		MENUITEM "Rectangular", UI_LOC_EUC
+		END
+
 		POPUP "World Scale"
 		BEGIN
 			MENUITEM "20", UI_RDS_SS

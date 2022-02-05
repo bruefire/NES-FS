@@ -745,10 +745,13 @@ void engine3dGL::DrawCoordinateH3()
 
 	if (VIEW_XYZ)
 	{
+		// 計算
+		ClcCoordinate();
+
 		// 内容設定
 		string locMode = "", loc_X = "", loc_Y = "", loc_Z = "", loc_W = "";
 
-		if (viewTrackIdx >= 0 && objs[viewTrackIdx].used)
+		if (LOC_MODE)
 		{
 			locMode = "Relative Coords";
 			loc_X = "Radius   : ";
@@ -792,6 +795,37 @@ void engine3dGL::DrawCoordinateH3()
 		guiStr.drawArea.t += guiStr.fontSz * asp;
 		guiStr.content = loc_W;
 		DrawChars(guiStr);
+	}
+}
+
+
+// 現プレイヤー座標計算
+void engine3dGL::ClcCoordinate()
+{
+	if (!LOC_MODE)
+	{
+		cmCo = objs[PLR_No].loc;
+	}
+	else
+	{
+		object3d BaseObj = *objs;
+		BaseObj.objInitH3(-1);
+		object3d kleinPlr = objs[PLR_No].HalfSpace2Klein(&BaseObj);
+		object3d kleinBase = BaseObj.HalfSpace2Klein();
+
+		pt3 std1N = kleinBase.std[0].mtp(1 / H3_STD_LEN);
+		pt3 std2N = kleinBase.std[1].mtp(1 / H3_STD_LEN);
+		pt3 sideN = pt3::cross(std2N, std1N);
+
+		pt3 relLoc = pt3(
+			pt3::dot(sideN, kleinPlr.loc),
+			pt3::dot(std2N, kleinPlr.loc),
+			pt3::dot(std1N, kleinPlr.loc));
+
+		// set result
+		cmCo.x = object3d::ClcHypbFromEuc(pyth3(kleinPlr.loc)) * radius;
+		cmCo.y = atan2(relLoc.x, relLoc.z);
+		cmCo.z = atan2(pyth2(relLoc.x, relLoc.z), relLoc.y);
 	}
 }
 
