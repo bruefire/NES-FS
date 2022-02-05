@@ -538,19 +538,17 @@ bool object3d::TrackObjDirection(object3d* trgObj)
 	}
 	else if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
 	{
-		pt3 preLoc = this->loc;
 		// 原点に移動
-		this->ParallelMove(preLoc, false);
+		object3d kleinPlr = this->HalfSpace2Klein();
 
 		// 軸ベクトル定義
-		pt3 std1N = this->std[0].norm();
-		pt3 std2N = this->std[1].norm();
+		pt3 std1N = kleinPlr.std[0].mtp(1 / owner->H3_STD_LEN);
+		pt3 std2N = kleinPlr.std[1].mtp(1 / owner->H3_STD_LEN);
 		pt3 sideN = pt3::cross(std2N, std1N);
 
 		// 対象オブジェクト方向を向く
-		object3d trgCpy(*trgObj);
-		trgCpy.ParallelMove(preLoc, false);
-		pt3 tNorm = trgCpy.loc.norm();
+		object3d kleinTrg = trgObj->HalfSpace2Klein(this);
+		pt3 tNorm = kleinTrg.loc.norm();
 		double ip = pt3::dot(std1N, tNorm);
 		pt3 tStd1 = std1N.mtp(ip);
 		pt3 tSide = tNorm.mns(tStd1);
@@ -564,11 +562,11 @@ bool object3d::TrackObjDirection(object3d* trgObj)
 		object3d::RotVecs(&std1N, &rotvN, rot);			// 対象方向へ回転
 		std2N = std2N_rs.pls(rotvN.mtp(rpLen));
 
-		this->std[0] = std1N.mtp(owner->H3_STD_LEN);
-		this->std[1] = std2N.mtp(owner->H3_STD_LEN);
+		kleinPlr.std[0] = std1N.mtp(owner->H3_STD_LEN);
+		kleinPlr.std[1] = std2N.mtp(owner->H3_STD_LEN);
 
 		// 元の位置に戻す
-		this->ParallelMove(preLoc, true);
+		this->Klein2HalfSpace(&kleinPlr);
 	}
 
 	return true;
@@ -589,26 +587,23 @@ bool object3d::TrackObjDirectionHead(object3d* trgObj)
 	}
 	else
 	{
-		object3d trgCpy = *trgObj;
+		object3d kleinPlr = this->HalfSpace2Klein();
+		object3d kleinTrg = trgObj->HalfSpace2Klein(this);
 
-		pt3 preLoc = this->loc;
-		this->ParallelMove(preLoc, false);
-		trgCpy.ParallelMove(preLoc, false);
-
-		pt3 std1N = this->std[0].norm();
-		pt3 std2N = this->std[1].norm();
+		pt3 std1N = kleinPlr.std[0].mtp(1 / owner->H3_STD_LEN);
+		pt3 std2N = kleinPlr.std[1].mtp(1 / owner->H3_STD_LEN);
 		pt3 sideN = pt3::cross(std2N, std1N);
 
 		pt3 nStd1Comp = pt3()
-			.pls(std2N.mtp(pt3::dot(trgCpy.loc, std2N)))
-			.pls(sideN.mtp(pt3::dot(trgCpy.loc, sideN)));
+			.pls(std2N.mtp(pt3::dot(kleinTrg.loc, std2N)))
+			.pls(sideN.mtp(pt3::dot(kleinTrg.loc, sideN)));
 
 		if (nStd1Comp.isZero())
 			return false;
 
-		this->std[1] = nStd1Comp.norm().mtp(owner->H3_STD_LEN);
+		kleinPlr.std[1] = nStd1Comp.norm().mtp(owner->H3_STD_LEN);
 
-		this->ParallelMove(preLoc, true);
+		this->Klein2HalfSpace(&kleinPlr);
 	}
 
 	return true;
@@ -626,16 +621,8 @@ double object3d::GetDistance(object3d* trgObj)
 	}
 	else if (owner->worldGeo == engine3d::WorldGeo::HYPERBOLIC)
 	{
-		pt3 preLoc = this->loc;
-		// 原点に移動
-		this->ParallelMove(preLoc, false);
-		object3d trgCpy(*trgObj);
-		trgCpy.ParallelMove(preLoc, false);
-
-		double dst = object3d::ClcHypbFromEuc(pyth3(trgCpy.loc)) * owner->radius;
-
-		// 元の位置に戻す
-		this->ParallelMove(preLoc, true);
+		object3d kleinTrg = trgObj->HalfSpace2Klein(this);
+		double dst = object3d::ClcHypbFromEuc(pyth3(kleinTrg.loc)) * owner->radius;
 
 		return dst;
 	}
@@ -662,20 +649,14 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	if (!trgObj->used)
 		return false;
 
-	// 位置再設定
-	object3d trgCpy(*trgObj);
-	pt3 preLoc = trgCpy.loc;
-	trgCpy.ParallelMove(preLoc, false);
+	this->loc = trgObj->loc;
+	this->std[0] = trgObj->std[0];
+	this->std[1] = trgObj->std[1];
+	this->area = trgObj->area;
+	object3d reObj = this->HalfSpace2Klein();
 
-	object3d reObj(owner);
-	reObj.objInitH3(-1);
-	reObj.std[0] = trgCpy.std[0];
-	reObj.std[1] = trgCpy.std[1];
-	reObj.lspX.asgPt3(pt3(0, 0, owner->H3_STD_LEN));
-	reObj.lspX.w = owner->SPEED_MAX;
-
-	pt3 std1N = trgCpy.std[0].norm();
-	pt3 std2N = trgCpy.std[1].norm();
+	pt3 std1N = reObj.std[0].mtp(1 / owner->H3_STD_LEN);
+	pt3 std2N = reObj.std[1].mtp(1 / owner->H3_STD_LEN);
 	pt3 sideN = pt3::cross(std2N, std1N);
 	pt3 nLocK = pt3(0, 0, 0)
 		.pls(std1N.mtp(nLoc.z))
@@ -685,19 +666,16 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 		.mtp(object3d::ClcEucFromHypb(dst / owner->radius));
 
 	reObj.ParallelMove(nLocK, true);
-	reObj.ParallelMove(preLoc, true);
 
-	// 有効範囲チェック
+	// check if it is on valid range.
 	double rstDst = pyth3(reObj.loc);
-	if (rstDst > owner->H3_MAX_RADIUS || isnan(rstDst))
-		return true;
+	if (rstDst > owner->H3_MAX_RADIUS || isnan(rstDst) || isinf(rstDst))
+		return false;
 
-	// 結果を反映
+	// set result
+	this->Klein2HalfSpace(&reObj);
+	this->lspX.asgPt3(pt3(0, 0, 1));
 	this->used = true;
-	this->loc = reObj.loc;
-	this->std[0] = reObj.std[0];
-	this->std[1] = reObj.std[1];
-	this->lspX = reObj.lspX;
 
 	return true;
 }
@@ -713,18 +691,20 @@ bool object3d::SetLocS3(pt3 nLoc)
 	return true;
 }
 
-// 位置再設定
+// set location with klein model coordinate.
 bool object3d::SetLocH3(pt3 nLoc)
 {
 	if (pyth3(nLoc) >= owner->H3_MAX_RADIUS)
 		return false;
 
-	this->used = true;
 	this->loc = pt3(0, 0, 0);
 	this->std[0] = pt3(0, 0, owner->H3_STD_LEN);
 	this->std[1] = pt3(0, owner->H3_STD_LEN, 0);
-	this->lspX.asgPt3(this->std[0]);
+	this->area = pt3i(0, 0, 0);
+
 	this->ParallelMove(nLoc, true);
+	this->Klein2HalfSpace(this, &pt3(0, 0, 0));
+	this->used = true;
 
 	return true;
 }
@@ -807,8 +787,8 @@ bool object3d::SetRotRelative(pt3 nRot)
 
 	//---> 新規回転の反映
 	// 軸ベクトル定義
-	pt3 std1N = kleinObj.std[0].norm();
-	pt3 std2N = kleinObj.std[1].norm();
+	pt3 std1N = kleinObj.std[0].mtp(1 / owner->H3_STD_LEN);
+	pt3 std2N = kleinObj.std[1].mtp(1 / owner->H3_STD_LEN);
 	pt3 sideN = pt3::cross(std2N, std1N);
 
 	// 軸方向の回転

@@ -70,6 +70,9 @@
     <Filter Include="c++ header\OS/Hard依存部%28Windows%29\WinUI系">
       <UniqueIdentifier>{1d777d3a-076e-4f26-bb8c-ddf3724e49f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource files\python sample scripts">
+      <UniqueIdentifier>{e6217361-4ec6-4108-abca-1ca528365256}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="メモ.txt">
@@ -135,6 +138,15 @@
     </None>
     <None Include="pyInit.py">
       <Filter>resource files</Filter>
+    </None>
+    <None Include="sample_script\h3_constant_circum_ratio_Pie.py">
+      <Filter>resource files\python sample scripts</Filter>
+    </None>
+    <None Include="sample_script\h3_right_angle_pentagon.py">
+      <Filter>resource files\python sample scripts</Filter>
+    </None>
+    <None Include="sample_script\sh_aim_player.py">
+      <Filter>resource files\python sample scripts</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

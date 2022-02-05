@@ -631,6 +631,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case SUBUI_CLEAR_OBJ:
 					if (newEngine->CheckSelectedEnable())
 						newEngine->objs[newEngine->selectedIdx].used = false;
+					else
+						newEngine->ClearFloatObjs();
 					break;
 				case SUBUI_SETTING_OBJ:
 					if (modObjDlg != nullptr)
@@ -1393,6 +1395,7 @@ INT_PTR CALLBACK moveObjProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 // オブジェクト操作プロシージャ
+static bool inited_moveObjProcH3 = false;
 INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
 	// スライダー変数
@@ -1463,8 +1466,6 @@ INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		SendDlgItemMessage(hDlg, MODLG_AREA_Z_SPIN, UDM_SETRANGE32, INT_MIN, INT_MAX);
 
 		newEngine->mvObjParam.loc.asg2(newEngine->objs[newEngine->PLR_No].loc);
-		//
-
 		newEngine->mvObjParam.rot.asg2(newEngine->objs[newEngine->PLR_No].std[0]);
 		//
 		{
@@ -1476,9 +1477,13 @@ INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 			SetDlgItemText(hDlg, MODLG_AREA_Z_TXT, to_string(area.z).c_str());
 		}
 
+		inited_moveObjProcH3 = true;
 		return true;
 
 	case WM_COMMAND:
+		if (!inited_moveObjProcH3)
+			return false;
+
 		switch (LOWORD(wp)) {
 
 		case IDOK:
@@ -1528,6 +1533,7 @@ INT_PTR CALLBACK moveObjProcH3(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		}
 	case WM_DESTROY:
 		moveDlg = nullptr;
+		inited_moveObjProcH3 = false;
 		return true;
 
 	case WM_HSCROLL:

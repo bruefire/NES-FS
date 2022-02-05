@@ -56,7 +56,7 @@ BEGIN
 	END
 	POPUP "Object"
 	BEGIN
-		MENUITEM "Object loop"	UI_OBJ_LOOP
+		MENUITEM "Move object"	UI_CALL_MODLG
 		POPUP "Change object"
 		BEGIN
 			POPUP "Base object"

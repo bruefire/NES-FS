@@ -21,6 +21,9 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
     <None Include="pyInit.py" />
+    <None Include="sample_script\h3_constant_circum_ratio_Pie.py" />
+    <None Include="sample_script\h3_right_angle_pentagon.py" />
+    <None Include="sample_script\sh_aim_player.py" />
     <None Include="メモ.txt" />
     <ResourceCompile Include="chgPlayerLoc.rc">
       <FileType>Text</FileType>
