@@ -68,7 +68,7 @@ bool NesEsVR::updateSceneLgc()
 		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
 		owner->UpdVRObjectsH3(nullptr);
 		
-		//owner->UpdateBaseObjH3();
+		owner->UpdateBaseObjH3();
 	}
 
 	owner->PrepareInParamForNext();
