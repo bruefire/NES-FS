@@ -44,10 +44,12 @@ bool NesEsVR::updateSceneLgc()
 	if (holdObj)
 	{
 		owner->player.holdedPreLoc = holdObj->loc;
+		owner->player.holdedPreArea = holdObj->area;
 		holdObj->loc = owner->vrHand[1].loc;
 		holdObj->std[0] = owner->vrHand[1].std[0];
 		holdObj->std[1] = owner->vrHand[1].std[1];
 		holdObj->lspX = owner->vrHand[1].lspX;
+		holdObj->area = owner->vrHand[1].area;
 	}
 
 	if (owner->worldGeo == engine3d::WorldGeo::SPHERICAL)
@@ -66,7 +68,7 @@ bool NesEsVR::updateSceneLgc()
 		owner->UpdPlayerObjsH3(cmrStd);	// cmrStd is unused.
 		owner->UpdVRObjectsH3(nullptr);
 		
-		owner->UpdateBaseObjH3();
+		//owner->UpdateBaseObjH3();
 	}
 
 	owner->PrepareInParamForNext();

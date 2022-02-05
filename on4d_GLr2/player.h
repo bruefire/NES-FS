@@ -12,6 +12,7 @@ public:
 	//int score;
 	object3d* holdedObj;
 	pt3 holdedPreLoc;
+	pt3i holdedPreArea;
 
 	Player();
 };

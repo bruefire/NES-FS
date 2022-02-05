@@ -428,10 +428,9 @@ bool object3d::Klein2HalfSpace(
 /// </summary>
 object3d object3d::HalfSpace2Klein(object3d* baseObj)
 {
-	// todo§ stdに関して変更が必用？
-
 	pt3i* baseArea;
 	pt3 baseLoc;
+
 	if (baseObj)
 	{
 		baseArea = &baseObj->area;
@@ -442,10 +441,18 @@ object3d object3d::HalfSpace2Klein(object3d* baseObj)
 		baseArea = &this->area;
 		baseLoc = this->loc;
 	}
+	return this->HalfSpace2Klein(baseLoc, *baseArea);
+}
 
+
+/// <summary>
+/// map it from half-space to klein.
+/// </summary>
+object3d object3d::HalfSpace2Klein(pt3 baseLoc, pt3i baseArea)
+{
 	const double imRatio = owner->H3_HALF_SPACE_AREA_IM_RATE;
 
-	int relXIdx = this->area.x - baseArea->x;
+	int relXIdx = this->area.x - baseArea.x;
 	int mul = powi(imRatio, abs(relXIdx));
 	double imHeight = powi(imRatio, relXIdx);
 	double reSpan = imHeight * imRatio;
@@ -455,16 +462,16 @@ object3d object3d::HalfSpace2Klein(object3d* baseObj)
 	double relY, relZ;
 	if (relXIdx > 0)
 	{
-		relY = ((long long)this->area.y * mul - baseArea->y) * imRatio
+		relY = ((long long)this->area.y * mul - baseArea.y) * imRatio
 			+ this->loc.y * imHeight - baseLoc.y;
-		relZ = ((long long)this->area.z * mul - baseArea->z) * imRatio
+		relZ = ((long long)this->area.z * mul - baseArea.z) * imRatio
 			+ this->loc.z * imHeight - baseLoc.z;
 	}
 	else
 	{
-		relY = ((long long)this->area.y - baseArea->y * mul) * reSpan
+		relY = ((long long)this->area.y - baseArea.y * mul) * reSpan
 			+ this->loc.y * imHeight - baseLoc.y;
-		relZ = ((long long)this->area.z - baseArea->z * mul) * reSpan
+		relZ = ((long long)this->area.z - baseArea.z * mul) * reSpan
 			+ this->loc.z * imHeight - baseLoc.z;
 	}
 	pt3 relLoc = pt3(relXp, relY, relZ)
@@ -653,6 +660,10 @@ bool object3d::SetLocRelativeH3(object3d* trgObj, pt3 nLoc, double dst)
 	this->std[0] = trgObj->std[0];
 	this->std[1] = trgObj->std[1];
 	this->area = trgObj->area;
+
+	if (dst == 0)
+		return true;
+
 	object3d reObj = this->HalfSpace2Klein();
 
 	pt3 std1N = reObj.std[0].mtp(1 / owner->H3_STD_LEN);
@@ -719,6 +730,9 @@ bool object3d::SetLocRelativeS3(object3d* trgObj, pt3 nLoc, double dst)
 	loc = trgObj->loc;
 	std[0] = trgObj->std[0];
 	std[1] = trgObj->std[1];
+
+	if (dst == 0)
+		return true;
 
 	// prepare local axes etc
 	pt4 locE = trgObj->tudeToEuc(trgObj->loc);

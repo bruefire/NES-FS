@@ -1152,19 +1152,15 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool
 	if (devOpe.std[0].isZero())
 		return;
 
-	pt3 preLoc = curObj->loc;
-
-	// 原点に移動
-	curObj->ParallelMove(curObj->loc, false);
 
 	double rotOn[3];
-	curObj->clcStd(devOpe.std[0], devOpe.std[1], rotOn);
-	curObj->rot.asg(rotOn[0], rotOn[1], rotOn[2]);
+	object3d kleinObj = curObj->HalfSpace2Klein();
+	kleinObj.clcStd(devOpe.std[0], devOpe.std[1], rotOn);
 
 	//---> 新規回転の反映
 	// 軸ベクトル定義
-	pt3 std1N = curObj->std[0].norm();
-	pt3 std2N = curObj->std[1].norm();
+	pt3 std1N = kleinObj.std[0].norm();
+	pt3 std2N = kleinObj.std[1].norm();
 	pt3 sideN = pt3::cross(std2N, std1N);
 
 	pt3 newStd1N = pt3()
@@ -1183,8 +1179,8 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool
 		std2N = newStd2N;
 		sideN = newSideN;
 	}
-	curObj->std[0] = newStd1N.mtp(H3_STD_LEN);
-	curObj->std[1] = newStd2N.mtp(H3_STD_LEN);
+	kleinObj.std[0] = newStd1N.mtp(H3_STD_LEN);
+	kleinObj.std[1] = newStd2N.mtp(H3_STD_LEN);
 
 
 	///-------- 位置,基準位置の更新 ----------
@@ -1202,11 +1198,10 @@ void engine3d::ClcVRObjectPosH3(VRDeviceOperation devOpe, object3d* curObj, bool
 			.norm()
 			.mtp(eucW);
 
-		curObj->ParallelMove(lspX, true);	// 平行移動
+		kleinObj.ParallelMove(lspX, true);	// 平行移動
 	}
 
-	// 元の位置に戻す
-	curObj->ParallelMove(preLoc, true);
+	curObj->Klein2HalfSpace(&kleinObj);
 	
 	curObj->rot = pt3(0, 0, 0);
 }
@@ -1412,6 +1407,7 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 		vrHand[i].loc = plrObj->loc;
 		vrHand[i].std[0] = plrObj->std[0];
 		vrHand[i].std[1] = plrObj->std[1];
+		vrHand[i].area = plrObj->area;
 	}
 	ClcVRObjectPosH3(ope.vrDev[1], &vrHand[0], false);
 	ClcVRObjectPosH3(ope.vrDev[2], &vrHand[1], false);
@@ -1422,6 +1418,7 @@ void engine3d::UpdVRObjectsH3(double* cmrStd)
 	vrMenuObj.loc = vrHand[0].loc;
 	vrMenuObj.std[0] = vrHand[0].std[0];
 	vrMenuObj.std[1] = vrHand[0].std[1];
+	vrMenuObj.area = vrHand[0].area;
 
 }
 
@@ -1439,17 +1436,14 @@ void engine3d::HoldObjWithVRHandH3(bool holdFlag)
 {
 	if (holdFlag)
 	{
-		pt3 pLoc = vrHand[1].loc;
-
 		// find the nearest object.
 		double nearestLen = DBL_MAX;	// farthestLen => ((unit=1)*2)^2
 		int nearObjIdx = -1;
 		for (int h = BWH_QTY + PLR_QTY; h < OBJ_QTY; h++)
 		{
 			object3d* curObj = objs + h;
-			object3d curCpy(*curObj);
+			object3d curCpy = curObj->HalfSpace2Klein(&vrHand[1]);
 
-			curCpy.ParallelMove(pLoc, false);
 			double len = object3d::ClcHypbFromEuc(pyth3(curCpy.loc));
 			if (nearestLen > len)
 			{
@@ -1468,8 +1462,11 @@ void engine3d::HoldObjWithVRHandH3(bool holdFlag)
 	{
 		if (!player.holdedObj)
 			return;
-		object3d holdedCpy(*player.holdedObj);
-		holdedCpy.ParallelMove(player.holdedPreLoc, false);
+
+		// throw holded object.
+		object3d holdedCpy = player.holdedObj->HalfSpace2Klein(
+			player.holdedPreLoc, player.holdedPreArea);
+
 		double veloc = object3d::ClcHypbFromEuc(pyth3(holdedCpy.loc)) * radius;
 		pt3 velVec = holdedCpy.loc.norm().mtp(H3_STD_LEN);
 		pt3 tpLoc = holdedCpy.loc;
@@ -1482,15 +1479,9 @@ void engine3d::HoldObjWithVRHandH3(bool holdFlag)
 			pt3::dot(sideN, velVec),
 			pt3::dot(std2N, velVec),
 			pt3::dot(std1N, velVec));
-		holdedCpy.lspX.asgPt3(velVec);
-		holdedCpy.lspX.w = veloc;
-		//holdedCpy.ParallelMove(tpLoc, true);
-		//holdedCpy.ParallelMove(player.holdedPreLoc, true);
 
-		player.holdedObj->lspX = holdedCpy.lspX;
+		player.holdedObj->lspX.asgPt3(velVec);
 		player.holdedObj->lspX.w = veloc;
-		player.holdedObj = nullptr;
-		
 		player.holdedObj = nullptr;
 	}
 }
@@ -1612,8 +1603,7 @@ void engine3d::ClcRelaivePosH3(double* cmrStd)
 
 
 	// 各obj位置ををプレイヤーからの相対位置に
-	//for (int h = -5; h < OBJ_QTY; h++)
-	for (int h = 0; h < OBJ_QTY; h++)
+	for (int h = -5; h < OBJ_QTY; h++)
 	{
 		object3d* curObj = GetObject(h);
 		if (!curObj->used) continue;

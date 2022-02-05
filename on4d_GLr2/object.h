@@ -89,6 +89,7 @@ public:
 	static pt3 object3d::Klein2HalfSpace(pt3);
 	static pt3 object3d::HalfSpace2Klein(pt3);
 	bool object3d::Klein2HalfSpace(const object3d*, pt3* = nullptr);
+	object3d object3d::HalfSpace2Klein(pt3 loc, pt3i area);
 	object3d object3d::HalfSpace2Klein(object3d* = nullptr);
 	bool TrackObjDirection(object3d*);
 	bool TrackObjDirectionHead(object3d*);
