@@ -300,6 +300,7 @@ bool MenuLgcH3::MenuMsgProc(MENU_ACT act)
         break;
     case CHANGE_BASIC_OBJECT_TO_EARTH:
         ChangeBasicObject(BASIC_OBJ::EARTH2, DRAW_TYPE::SURFACE);
+        break;
     case CHANGE_BASIC_OBJECT_TO_GREEN_FIELD:
         ChangeBasicObject(BASIC_OBJ::GREEN_FIELD, DRAW_TYPE::SURFACE);
         break;
