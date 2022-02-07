@@ -30,7 +30,8 @@ public:
         GetWorldScale,
         TrackObjDirection,
         GetDistance,
-        TrackObjDirectionHead
+        TrackObjDirectionHead,
+        SetLocWithArea
     };
     static FuncObject funcID;
 

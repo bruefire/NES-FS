@@ -433,6 +433,20 @@ PyObject* CppPythonIF::ExecCommonFunc(PyObject* self, PyObject* args)
 
         break;
     }
+    case FuncObject::SetLocWithArea:
+    {
+        PyObject* src, * selfIdx;
+        pt3 loc;
+        pt3i area;
+        if (!PyArg_ParseTuple(args, "Odddiii", &src, &loc.x, &loc.y, &loc.z, &area.x, &area.y, &area.z)
+            || !GetObjObj(&src, &selfIdx))
+            return NULL;
+
+        engine->SetLocWithArea(PyLong_AsLong(selfIdx), loc, area);
+        result = PyLong_FromLong(1);
+        ReleaseObjObj(selfIdx);
+        break;
+    }
     }
     CppPythonIF::funcID = FuncObject::None;
 

@@ -29,6 +29,7 @@ class FuncObject(IntEnum) :
 	TrackObjDirection = 11
 	GetDistance = 12
 	TrackObjDirectionHead = 13
+	SetLocWithArea = 14
 
 
 class World :
@@ -146,6 +147,10 @@ class ObjData :
 	def GetDistance(self, trg) :
 		h3sim.SetCommonFunc(int(FuncObject.GetDistance))
 		return h3sim.ExecCommonFunc(self, trg)
+
+	def SetLocWithArea(self, x, y, z, ix, iy, iz) :
+		h3sim.SetCommonFunc(int(FuncObject.SetLocWithArea))
+		return h3sim.ExecCommonFunc(self, x, y, z, ix, iy, iz)
 
 
 		

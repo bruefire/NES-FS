@@ -399,8 +399,11 @@ void engine3d::simulateH3()
 	//射撃オブジェクト更新
 	UpdFloatObjsH3();
 
-	// 
-	setObjPosH3();
+	if (mvObjFlg)
+	{
+		SetLocWithArea(PLR_No, mvObjParam.loc, mvObjParam.area);
+		mvObjFlg = false;
+	}
 
 	// プレイヤーオブジェクト更新
 	UpdPlayerObjsH3(nullptr);
@@ -1978,28 +1981,41 @@ pt3 engine3d::randVec3(double r)
 }
 
 /// <summary>
-/// move the player object location.
+/// move an object location (for H3).
 /// </summary>
 /// <returns></returns>
-int engine3d::setObjPosH3()
+int engine3d::SetLocWithArea(unsigned int idx, pt3 loc, pt3i area)
 {
-	if (!mvObjFlg)
+	if (worldGeo != WorldGeo::HYPERBOLIC)
 		return 0;
 
-	object3d* curObj = objs + PLR_No;
+	object3d* curObj = objs + idx;
 
 	curObj->loc = pt3(0, 0, 0);
 	curObj->std[0] = pt3(0, 0, H3_STD_LEN);
 	curObj->std[1] = pt3(0, H3_STD_LEN, 0);
 
-	pt3 tLoc = pt3(mvObjParam.loc.x * (H3_HALF_SPACE_AREA_IM_RATE - 1),
-		mvObjParam.loc.y * H3_HALF_SPACE_AREA_IM_RATE,
-		mvObjParam.loc.z * H3_HALF_SPACE_AREA_IM_RATE);
+	// check range
+	loc.x = std::min(loc.x, 1.0);
+	loc.y = std::min(loc.y, 1.0);
+	loc.z = std::min(loc.z, 1.0);
+	loc.x = std::max(loc.x, 0.0);
+	loc.y = std::max(loc.y, 0.0);
+	loc.z = std::max(loc.z, 0.0);
+	area.x = std::min(area.x, INT_MAX);
+	area.y = std::min(area.y, INT_MAX);
+	area.z = std::min(area.z, INT_MAX);
+	area.x = std::max(area.x, INT_MIN);
+	area.y = std::max(area.y, INT_MIN);
+	area.z = std::max(area.z, INT_MIN);
 
+	pt3 tLoc = pt3(loc.x * (H3_HALF_SPACE_AREA_IM_RATE - 1),
+		loc.y * H3_HALF_SPACE_AREA_IM_RATE,
+		loc.z * H3_HALF_SPACE_AREA_IM_RATE);
+
+	curObj->area = area;
 	curObj->Klein2HalfSpace(curObj, &tLoc);
-	curObj->area = mvObjParam.area;
 
-	mvObjFlg = false;
 	return 1;
 }
 
