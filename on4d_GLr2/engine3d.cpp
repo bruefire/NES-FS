@@ -964,6 +964,7 @@ void engine3d::UpdPlayerObjsH3(double* cmrStd)
 			std2N = std2N_rs.pls(rotvN.mtp(rpLen));
 
 			// ²•ûŒü‚Ì‰ñ“]
+			sideN = pt3::cross(std2N, std1N);
 			object3d::RotVecs(&std2N, &sideN, kleinObj.rot.z);	// ³–ÊŒÅ’è‰ñ“]
 		}
 	}
